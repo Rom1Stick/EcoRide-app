@@ -1,0 +1,25 @@
+@import 'utils/variables';
+@import 'utils/mixins';
+@import 'base/reset';
+@import 'base/typography';
+@import 'layout/header';
+@import 'layout/footer';
+@import 'components/button';
+@import 'components/card';
+
+body {
+  font-family: $font-base;
+  background-color: $color-background;
+  color: $color-text;
+}
+
+.header {
+  background-color: $color-primary;
+  &__logo {
+    max-height: 60px;
+  }
+  &__nav {}
+  &--dark {
+    background-color: $color-primary-dark;
+  }
+}

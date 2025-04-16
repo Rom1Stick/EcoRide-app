@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Exécuter lint-staged pour ne traiter que les fichiers modifiés
+npx lint-staged 

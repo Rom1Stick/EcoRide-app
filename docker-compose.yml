@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+    volumes:
+      - .:/app:delegated
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - ecoride-net
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5173"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - ecoride-net
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: ecoride
+      MYSQL_USER: ecorider
+      MYSQL_PASSWORD: securepass
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - ecoride-net
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./frontend/dist:/usr/share/nginx/html
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - ecoride-net
+
+volumes:
+  db_data:
+
+networks:
+  ecoride-net:
+    driver: bridge

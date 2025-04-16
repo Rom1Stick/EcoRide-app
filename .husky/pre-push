@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Exécuter le build avant de pousser les modifications
+npm run build 
