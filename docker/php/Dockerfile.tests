@@ -1,0 +1,33 @@
+# Image de base pour les tests
+FROM php:8.2-cli
+
+# Installation des dépendances système pour les tests
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    libxml2-dev \
+    && docker-php-ext-install zip pdo pdo_mysql
+
+# Installation de Xdebug pour la couverture de code
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+# Configuration de Xdebug
+RUN echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+# Installation de Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configuration du répertoire de travail
+WORKDIR /var/www/html
+
+# Copie des fichiers de test
+COPY ./backend /var/www/html
+
+# Installer les dépendances PHP pour les tests
+RUN composer install --no-interaction --no-progress
+
+# La commande par défaut exécute tous les tests
+CMD ["./vendor/bin/phpunit", "-c", "config/phpunit.xml"] 

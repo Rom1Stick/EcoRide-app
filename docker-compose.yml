@@ -64,6 +64,26 @@ services:
     networks:
       - ecoride-net
 
+  # Service de tests unitaires indépendant
+  tests:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.tests
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - ecoride-net
+    environment:
+      APP_ENV: "testing"
+      DB_CONNECTION: "sqlite"
+      DB_DATABASE: ":memory:"
+    # Ce service ne démarre pas automatiquement, il faut l'exécuter manuellement avec:
+    # docker-compose run tests
+    profiles:
+      - tests
+
 volumes:
   db_data:
 

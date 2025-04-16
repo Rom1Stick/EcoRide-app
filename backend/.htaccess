@@ -1,0 +1,54 @@
+# Protection contre l'accès direct aux fichiers sensibles
+<FilesMatch "^(\.env|composer\.json|composer\.lock)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Protection des dossiers sensibles
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Bloquer l'accès direct aux dossiers sensibles
+    RewriteRule ^(app|config|routes|storage|vendor)/ - [F,L]
+    
+    # Bloquer l'accès aux fichiers dotfiles
+    RewriteRule ^\.(.*)$ - [F,L]
+    
+    # Rediriger toutes les requêtes vers le contrôleur frontal
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ public/index.php [L]
+</IfModule>
+
+# Configuration de sécurité
+<IfModule mod_headers.c>
+    # Désactiver la signature du serveur
+    Header unset Server
+    
+    # Protection XSS
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # Protection contre le clickjacking
+    Header set X-Frame-Options "SAMEORIGIN"
+    
+    # Protection contre le MIME-sniffing
+    Header set X-Content-Type-Options "nosniff"
+    
+    # Sécurité des cookies
+    Header always edit Set-Cookie (.*) "$1; HttpOnly; Secure; SameSite=Strict"
+</IfModule>
+
+# Limiter les méthodes HTTP autorisées
+<LimitExcept GET POST PUT DELETE OPTIONS>
+    Deny from all
+</LimitExcept>
+
+# Limiter la taille des requêtes
+<IfModule mod_php.c>
+    php_value post_max_size 10M
+    php_value upload_max_filesize 5M
+    php_value max_execution_time 30
+    php_value max_input_time 30
+    php_value memory_limit 128M
+    php_value session.gc_maxlifetime 1440
+</IfModule> 

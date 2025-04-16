@@ -1,0 +1,33 @@
+# Activer le moteur de réécriture
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Rediriger toutes les requêtes vers index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Configuration de sécurité
+<IfModule mod_headers.c>
+    # Désactiver l'indexation par les moteurs de recherche en environnement de développement
+    <If "env('APP_ENV') == 'development'">
+        Header set X-Robots-Tag "noindex, nofollow"
+    </If>
+    
+    # Désactiver la mise en cache pour l'API
+    <FilesMatch "index\.php">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+</IfModule>
+
+# Limiter la taille des requêtes et configurer la durée de vie des sessions
+<IfModule mod_php.c>
+    php_flag session.cookie_httponly on
+    php_flag session.cookie_secure on
+    php_flag session.use_only_cookies on
+    php_value session.cookie_lifetime 3600
+    php_value session.gc_maxlifetime 3600
+</IfModule> 

@@ -18,7 +18,7 @@ ENV HUSKY=0
 
 # Nettoyer et installer les dépendances
 RUN rm -rf node_modules package-lock.json
-RUN npm cache clean --force && npm install
+RUN npm cache clean --force && npm install --legacy-peer-deps
 
 # Copier le reste du code source
 COPY . .

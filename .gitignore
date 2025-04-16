@@ -47,5 +47,6 @@ coverage
 # TypeScript
 *.tsbuildinfo
 
-# Exclude backend folder from frontend linting
-backend/
+# PHP
+backend/vendor
+backend/.env
