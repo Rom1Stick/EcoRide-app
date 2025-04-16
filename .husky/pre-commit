@@ -1,5 +1,14 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+# Exécuter les outils de la racine du projet
+npm run lint
+npm run format
+
+# Exécuter les outils spécifiques à frontend/  
+cd frontend
+npm run lint
+npm run format
+
 # Exécuter lint-staged pour ne traiter que les fichiers modifiés
 npx lint-staged 

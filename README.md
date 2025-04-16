@@ -45,6 +45,23 @@ EcoRide suit les principes d'écoconception suivants:
 - **Légèreté** : compression des assets, lazy loading, code splitting
 - **Durée de vie** : compatibilité étendue avec les anciens appareils
 
+## 🏗️ Architecture du projet
+
+Le projet EcoRide suit une architecture modulaire et optimisée pour l'écoconception :
+
+- Séparation claire entre le front-end (dossier `frontend/`) et le back-end (dossier `backend/`)
+- Fichiers de configuration spécifiques à chaque partie du projet
+- Utilisation de Docker pour isoler les environnements
+- Optimisation des outils de vérification (ESLint, Stylelint) pour ne scanner que les parties pertinentes
+
+Cette architecture offre plusieurs avantages :
+
+✅ Modularité accrue : chaque équipe peut travailler de manière indépendante
+✅ Sobriété numérique : évite les traitements inutiles et optimise les ressources
+✅ Évolutivité : les règles peuvent évoluer indépendamment pour chaque partie du projet
+✅ Docker-ready : chaque conteneur peut embarquer sa propre logique sans conflit
+✅ Cohérence avec l'écoconception : réduit les temps de build et de test, isole les environnements
+
 ## 👥 Contribution
 
 Nous encourageons les contributions à ce projet ! Veuillez consulter notre [guide de contribution](CONTRIBUTING.md) pour connaître nos normes de code, conventions de commits et procédures de pull request.

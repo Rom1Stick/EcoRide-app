@@ -11,3 +11,41 @@ backend/vendor
 # Logs & Docker
 logs/
 db_data/
+
+# Logs supplémentaires
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# MacOS
+.DS_Store
+
+# Build & coverage
+frontend/dist-ssr
+dist
+dist-ssr
+coverage
+*.local
+
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
+
+# Fichiers d'éditeur
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# TypeScript
+*.tsbuildinfo
+
+# Exclude backend folder from frontend linting
+backend/

@@ -6,20 +6,20 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "vite --config config/vite.config.js",
-    "build": "vite build --config config/vite.config.js",
-    "preview": "vite preview --config config/vite.config.js",
-    "lint": "eslint --config config/eslint.config.js --ext .js,.vue,.ts frontend && stylelint --config config/stylelint.config.js \"frontend/**/*.{css,scss,vue}\"",
-    "format": "prettier --config config/prettier.config.js --write .",
+    "dev": "vite --config frontend/config/vite.config.js",
+    "build": "vite build --config frontend/config/vite.config.js",
+    "preview": "vite preview --config frontend/config/vite.config.js",
+    "lint": "eslint --config frontend/config/.eslintrc.cjs --ext .js,.vue,.ts frontend",
+    "format": "prettier --config frontend/config/.prettierrc --write frontend",
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,vue}": [
-      "eslint --config config/eslint.config.js --fix",
-      "prettier --config config/prettier.config.js --write"
+    "frontend/**/*.{js,jsx,ts,tsx,vue}": [
+      "eslint --config frontend/config/.eslintrc.cjs --fix",
+      "prettier --config frontend/config/.prettierrc --write"
     ],
-    "*.{css,scss,vue}": [
-      "stylelint --config config/stylelint.config.js --fix"
+    "frontend/**/*.{css,scss,vue}": [
+      "stylelint --config frontend/config/.stylelintrc --fix"
     ]
   },
   "config": {
@@ -31,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vitejs/plugin-vue": "^4.0.0",
+    "@vue/eslint-config-typescript": "^14.5.0",
     "commitizen": "^4.3.1",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.0.0",
@@ -54,4 +55,4 @@
     "vue-router": "^4.2.0"
   },
   "keywords": []
-} 
+}
