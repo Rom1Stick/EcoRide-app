@@ -10,7 +10,7 @@ module.exports = {
     sourceType: 'module',
   },
   extends: ['plugin:vue/vue3-recommended', '@vue/eslint-config-typescript'],
-  ignorePatterns: ['dist/**'],
+  ignorePatterns: ['**/dist/**', '**/dist', 'dist', 'dist/**', '**/node_modules/**'],
   rules: {
     'vue/script-setup-uses-vars': 'error',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],

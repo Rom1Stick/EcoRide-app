@@ -56,6 +56,81 @@ Nous surveillons activement les indicateurs suivants :
 - JavaScript < 150KB compressé
 - Consommation CPU/RAM en veille < 2%
 
+## 🌿 Guide de développement éco-responsable
+
+Pour participer au projet tout en respectant notre engagement écologique, voici les pratiques à suivre :
+
+### Frontend
+
+1. **Images et médias**
+   - Utiliser des formats modernes (WebP, AVIF) pour les images
+   - Optimiser systématiquement les images (compression, redimensionnement)
+   - Implémenter le lazy loading pour tout contenu hors écran
+   - Privilégier SVG pour les icônes et éléments d'interface
+
+2. **JavaScript**
+   - Éviter les librairies lourdes, privilégier les solutions légères ou natives
+   - Utiliser le code splitting et le tree shaking
+   - Implémenter une stratégie de cache efficace (service workers)
+   - Minimiser les manipulations DOM coûteuses
+
+3. **CSS**
+   - Éviter les animations complexes et les transitions coûteuses
+   - Utiliser les media queries pour adapter le contenu au device
+   - Privilégier les propriétés CSS modernes qui utilisent le GPU
+   - Éviter les frameworks CSS lourds, utiliser des approches atomiques
+
+4. **Requêtes réseau**
+   - Regrouper les requêtes quand c'est possible
+   - Mettre en cache les réponses API
+   - Utiliser des stratégies d'invalidation de cache intelligentes
+   - Implémenter des solutions de data prefetching uniquement si nécessaire
+
+### Backend
+
+1. **Base de données**
+   - Optimiser les requêtes et créer des index appropriés
+   - Éviter les requêtes N+1
+   - Paginer les résultats et limiter les volumétries
+   - Nettoyer régulièrement les données obsolètes
+
+2. **API**
+   - Concevoir des endpoints minimalistes (retourner uniquement les données nécessaires)
+   - Compresser les réponses API (gzip, brotli)
+   - Utiliser des mécanismes de rate limiting
+   - Implémenter des niveaux de cache appropriés
+
+3. **Serveur**
+   - Utiliser des containers légers
+   - Optimiser les ressources allouées
+   - Implémenter l'autoscaling pour s'adapter à la charge
+   - Privilégier des régions de datacenter utilisant des énergies renouvelables
+
+### DevOps et CI/CD
+
+1. **Tests**
+   - Optimiser la suite de tests pour réduire la consommation des ressources CI
+   - Paralléliser les tests quand c'est pertinent
+   - Utiliser des stratégies de cache pour les dépendances
+
+2. **Déploiement**
+   - Optimiser le processus de build
+   - Limiter le nombre de builds inutiles
+   - Utiliser des images de base légères
+   - Automatiser les audits d'éco-conception
+
+### Monitoring et analyse
+
+1. **Mesure d'impact**
+   - Suivre les métriques d'éco-conception à chaque déploiement
+   - Analyser l'empreinte carbone des services
+   - Mesurer les écarts par rapport aux objectifs fixés
+
+2. **Amélioration continue**
+   - Identifier les points faibles et prioriser les corrections
+   - Partager les bonnes pratiques découvertes
+   - Documenter les optimisations réalisées
+
 ## 🏗️ Architecture du projet
 
 Le projet EcoRide suit une architecture modulaire et optimisée pour l'écoconception :

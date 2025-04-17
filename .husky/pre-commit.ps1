@@ -11,5 +11,5 @@ npm run lint
 npm run format
 Pop-Location
 
-# Exécuter lint-staged pour ne traiter que les fichiers modifiés
-npx lint-staged 
+# Désactivé temporairement pour éviter les conflits
+# npx lint-staged 
