@@ -9,7 +9,7 @@
     "dev": "vite --config frontend/config/vite.config.js",
     "build": "vite build --config frontend/config/vite.config.js",
     "preview": "vite preview --config frontend/config/vite.config.js",
-    "lint": "eslint --config frontend/config/.eslintrc.cjs --ext .js,.vue,.ts --ignore-pattern '**/*.min.js' --ignore-pattern '**/dist/**' --ignore-pattern '**/node_modules/**' frontend",
+    "lint": "eslint --config frontend/config/.eslintrc.cjs --ext .js,.vue,.ts --ignore-pattern 'frontend/dist/**' frontend",
     "format": "prettier --config frontend/config/.prettierrc --write frontend",
     "prepare": "husky install"
   },
@@ -28,6 +28,8 @@
     }
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vitejs/plugin-vue": "^4.0.0",
