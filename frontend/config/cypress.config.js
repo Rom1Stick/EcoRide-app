@@ -1,4 +1,4 @@
-import { defineConfig } from 'cypress';
+import { defineConfig } from 'cypress'
 
 export default defineConfig({
   e2e: {
@@ -9,9 +9,9 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // On détecte dynamiquement le port disponible
       if (process.env.PORT) {
-        config.baseUrl = `http://localhost:${process.env.PORT}`;
+        config.baseUrl = `http://localhost:${process.env.PORT}`
       }
-      return config;
-    }
-  }
-}); 
+      return config
+    },
+  },
+})
