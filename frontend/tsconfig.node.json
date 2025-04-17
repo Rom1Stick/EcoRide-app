@@ -1,18 +1,17 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
+    "cypress.config.js",
+    "vite.config.js",
     "*.config.js",
-    "*.config.cjs",
-    "../*.config.js",
-    "../vite.config.js",
-    "../env.d.ts"
+    "env.d.ts"
   ],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
-    "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "types": ["node"]
   }
-} 
+}

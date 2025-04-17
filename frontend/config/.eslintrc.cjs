@@ -3,15 +3,18 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    jest: true,
+    jest: true
   },
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: 'module',
+    sourceType: 'module'
   },
-  extends: ['plugin:vue/vue3-recommended', '@vue/eslint-config-typescript'],
+  extends: [
+    'plugin:vue/vue3-recommended',
+    '@vue/eslint-config-typescript'
+  ],
   rules: {
     'vue/script-setup-uses-vars': 'error',
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-  },
-}
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
+  }
+};
