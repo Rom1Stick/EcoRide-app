@@ -6,7 +6,7 @@ import vue from '@vitejs/plugin-vue'
 // import Inspect from 'vite-plugin-inspect'
 
 // Chemin vers la racine du projet frontend
-const rootDir = resolve(__dirname, '..');
+const rootDir = resolve(__dirname, '..')
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -22,6 +22,6 @@ export default defineConfig({
   },
   build: {
     outDir: resolve(rootDir, 'dist'),
-    emptyOutDir: true
-  }
+    emptyOutDir: true,
+  },
 })
