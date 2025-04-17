@@ -1,14 +1,20 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+if command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -ExecutionPolicy Bypass -File "$0.ps1" "$@"
+else
+  # Fallback to standard bash if PowerShell not available
+  . "$(dirname "$0")/_/husky.sh"
 
-# Exécuter les outils de la racine du projet
-npm run lint
-npm run format
+  # Exécuter les outils de la racine du projet
+  npm run lint
+  npm run format
 
-# Exécuter les outils spécifiques à frontend/  
-cd frontend
-npm run lint
-npm run format
+  # Exécuter les outils spécifiques à frontend/  
+  cd frontend
+  npm run lint
+  npm run format
+  cd ..
 
-# Exécuter lint-staged pour ne traiter que les fichiers modifiés
-npx lint-staged 
+  # Exécuter lint-staged pour ne traiter que les fichiers modifiés
+  npx lint-staged
+fi 
