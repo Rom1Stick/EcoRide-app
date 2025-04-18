@@ -1,0 +1,27 @@
+# Fichiers générés
+frontend/dist
+frontend/dist/**
+**/dist
+**/dist/**
+dist
+dist/**
+
+# Node modules
+node_modules
+**/node_modules/**
+
+# Fichiers de build
+build
+**/build/**
+
+# Fichiers de cache
+.cache
+**/.cache/**
+
+# Fichiers de couverture de test
+coverage
+**/coverage/**
+
+# Fichiers de configuration externe
+.vscode
+.github 

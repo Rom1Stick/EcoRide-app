@@ -13,6 +13,17 @@ Notre backend est conçu selon les principes d'éco-conception suivants :
 - **Nettoyage automatique des données** : Politique de rétention et suppression automatique des données obsolètes
 - **API optimisée** : Réponses JSON allégées avec seulement les champs nécessaires
 
+## Outils de qualité de code
+
+Le backend d'EcoRide implémente plusieurs outils pour garantir la qualité et la fiabilité du code :
+
+- **PHPUnit** : Framework de tests unitaires et fonctionnels
+- **API de test** : Infrastructure dédiée aux tests fonctionnels de l'API REST
+- **Tests automatisés** : Tests exécutés automatiquement via GitHub Actions à chaque commit
+- **Docker pour les tests** : Environnement de test isolé et reproductible
+
+Ces outils permettent de valider systématiquement le comportement du backend et d'éviter les régressions lors de l'ajout de nouvelles fonctionnalités.
+
 ## Architecture
 
 Architecture MVC légère et personnalisée avec les composants suivants :
@@ -43,6 +54,9 @@ backend/
 ├── storage/            # Stockage des données
 │   └── data.sqlite     # Base de données SQLite
 ├── tests/              # Tests unitaires et fonctionnels
+│   ├── Feature/        # Tests fonctionnels de l'API
+│   │   └── ApiRoutesTest.php # Tests des routes API
+│   └── Unit/           # Tests unitaires
 ├── .env.example        # Exemple de fichier de configuration d'environnement
 ├── composer.json       # Dépendances PHP
 └── README.md           # Documentation
@@ -50,14 +64,14 @@ backend/
 
 ## Mesures d'éco-conception
 
-| Mesure | Description | Impact |
-|--------|-------------|--------|
-| Mise en cache | Cache des requêtes fréquentes | -30% requêtes SQL |
-| Optimisation SQL | Index et requêtes optimisées | -50% temps de traitement |
-| Compression | Compression gzip des réponses | -70% bande passante |
-| Logs SQLite | Utilisation de SQLite pour les logs | Économie de ressources |
-| Pagination | Limitation des résultats par page | Réduction des données transférées |
-| JWT léger | Tokens d'authentification optimisés | Réduction de la taille des en-têtes |
+| Mesure           | Description                         | Impact                              |
+| ---------------- | ----------------------------------- | ----------------------------------- |
+| Mise en cache    | Cache des requêtes fréquentes       | -30% requêtes SQL                   |
+| Optimisation SQL | Index et requêtes optimisées        | -50% temps de traitement            |
+| Compression      | Compression gzip des réponses       | -70% bande passante                 |
+| Logs SQLite      | Utilisation de SQLite pour les logs | Économie de ressources              |
+| Pagination       | Limitation des résultats par page   | Réduction des données transférées   |
+| JWT léger        | Tokens d'authentification optimisés | Réduction de la taille des en-têtes |
 
 ## Installation
 
@@ -70,17 +84,20 @@ backend/
 ### Installation avec Docker (recommandée)
 
 1. Cloner le dépôt :
+
    ```bash
    git clone https://github.com/votre-utilisateur/ecoride.git
    cd ecoride
    ```
 
 2. Copier le fichier d'environnement :
+
    ```bash
    cp backend/.env.example backend/.env
    ```
 
 3. Lancer Docker Compose :
+
    ```bash
    docker-compose up -d
    ```
@@ -90,18 +107,21 @@ backend/
 ### Installation locale (sans Docker)
 
 1. Installer les dépendances PHP :
+
    ```bash
    cd backend
    composer install
    ```
 
 2. Configurer l'environnement :
+
    ```bash
    cp .env.example .env
    # Éditer .env avec vos paramètres locaux
    ```
 
 3. Initialiser la base de données :
+
    ```bash
    php scripts/init-db.php
    ```
@@ -155,6 +175,19 @@ docker-compose run tests ./vendor/bin/phpunit -c config/phpunit.xml --testsuite 
 docker-compose run tests ./vendor/bin/phpunit -c config/phpunit.xml --testsuite Feature
 ```
 
+### Tests fonctionnels de l'API
+
+Notre backend intègre un système complet de tests fonctionnels pour l'API REST. Ces tests permettent de vérifier le bon fonctionnement des routes, des contrôleurs et des middlewares dans un environnement proche de la production.
+
+Le fichier `ApiRoutesTest.php` contient plusieurs tests qui valident :
+
+- Le fonctionnement des routes avec paramètres
+- La reconnaissance des méthodes HTTP
+- La gestion des erreurs 404
+- Le routage correct vers les contrôleurs
+
+Ces tests s'exécutent automatiquement à chaque commit et sont intégrés à notre pipeline CI/CD.
+
 ## Contribution
 
 Veuillez consulter le fichier CONTRIBUTING.md à la racine du projet pour les directives de contribution.
@@ -170,4 +203,4 @@ Nous surveillons activement les performances du backend pour maintenir notre eng
 
 ## Licence
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails. 
+Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.

@@ -1,15 +1,18 @@
 module.exports = {
   root: true,
   env: {
+    browser: true,
     node: true,
+    jest: true,
   },
-  extends: ['plugin:vue/vue3-essential', 'eslint:recommended'],
   parserOptions: {
     ecmaVersion: 2020,
-    parser: '@typescript-eslint/parser',
+    sourceType: 'module',
   },
+  extends: ['plugin:vue/vue3-recommended', '@vue/eslint-config-typescript'],
+  ignorePatterns: ['**/dist/**', '**/dist', 'dist', 'dist/**', '**/node_modules/**'],
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'vue/script-setup-uses-vars': 'error',
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
   },
 }

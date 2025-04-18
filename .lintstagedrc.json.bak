@@ -1,0 +1,23 @@
+{
+  "*.{js,jsx,ts,tsx,vue}": [
+    "prettier --write",
+    "eslint --fix"
+  ],
+  "*.{css,scss}": [
+    "prettier --write",
+    "stylelint --fix"
+  ],
+  "frontend/src/**/*.{js,ts,vue}": [
+    "prettier --config frontend/config/.prettierrc --write",
+    "eslint --config frontend/config/.eslintrc.cjs --fix"
+  ],
+  "frontend/src/**/*.{css,scss}": [
+    "prettier --config frontend/config/.prettierrc --write"
+  ],
+  "config/**/*.{js,cjs,ts}": [
+    "prettier --write"
+  ],
+  "*.md": [
+    "prettier --write"
+  ]
+} 

@@ -4,8 +4,8 @@ import { RouterView } from 'vue-router'
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
     <div class="wrapper">
+      <h1>EcoRide</h1>
       <nav>
         <!-- Ajoute ici tes liens de navigation réels -->
       </nav>
@@ -20,9 +20,12 @@ header {
   max-height: 100vh;
 }
 
-.logo {
+h1 {
   display: block;
   margin: 0 auto 2rem;
+  font-size: 2rem;
+  color: #42b883;
+  text-align: center;
 }
 
 nav {
@@ -57,7 +60,7 @@ nav a:first-of-type {
     padding-right: calc(var(--section-gap) / 2);
   }
 
-  .logo {
+  h1 {
     margin: 0 2rem 0 0;
   }
 
