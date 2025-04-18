@@ -5,13 +5,13 @@ module.exports = {
     '^.+\\.vue$': [
       '@vue/vue3-jest',
       {
-        tsConfig: './config/tsconfig.json',
+        tsConfig: '<rootDir>/tsconfig.test.json',
       },
     ],
     '^.+\\.(ts|js)$': [
       'ts-jest',
       {
-        tsconfig: './config/tsconfig.json',
+        tsconfig: '<rootDir>/tsconfig.test.json',
       },
     ],
   },
@@ -27,10 +27,10 @@ module.exports = {
   },
   globals: {
     'ts-jest': {
-      tsconfig: '<rootDir>/config/tsconfig.json',
+      tsconfig: '<rootDir>/tsconfig.test.json',
     },
     'vue-jest': {
-      tsConfig: '<rootDir>/config/tsconfig.json',
+      tsConfig: '<rootDir>/tsconfig.test.json',
     },
   },
 }

@@ -10,7 +10,10 @@ import CounterComponent from '../components/CounterComponent.vue'
 
     <section class="demo-section">
       <h2>Démonstration des composants</h2>
-      <CounterComponent title="Compteur de trajets" :initial-value="3" />
+      <CounterComponent 
+        title="Compteur de trajets" 
+        :initial-value="3" 
+      />
     </section>
   </main>
 </template>

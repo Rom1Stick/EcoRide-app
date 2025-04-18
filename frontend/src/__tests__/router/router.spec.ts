@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals'
 import { createRouter, createWebHistory } from 'vue-router'
-import { routes } from '../../router'
+import router from '../../router'
 
 describe('Router Configuration', () => {
   const router = createRouter({
