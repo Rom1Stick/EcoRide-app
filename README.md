@@ -17,6 +17,7 @@ EcoRide est une application de covoiturage conçue avec une approche d'écoconce
 ## 🔧 Installation
 
 ### Prérequis
+
 - Docker et Docker Compose
 - Git
 
@@ -49,12 +50,29 @@ EcoRide suit les principes d'écoconception suivants :
 - **Optimisation du stockage** : politique de nettoyage des données obsolètes, types optimisés
 
 ### Métriques d'éco-conception
+
 Nous surveillons activement les indicateurs suivants :
+
 - Score Lighthouse Performance > 90
 - First Contentful Paint < 1.5s
 - Taille totale de page < 500KB
 - JavaScript < 150KB compressé
 - Consommation CPU/RAM en veille < 2%
+
+## 🛠️ Outils de qualité de code
+
+Le projet EcoRide intègre plusieurs outils pour garantir une qualité de code constante :
+
+- **ESLint** : Analyse statique du code JavaScript/TypeScript/Vue avec configuration optimisée
+- **Prettier** : Formatage cohérent du code source
+- **Stylelint** : Linting pour les feuilles de style CSS/SCSS
+- **Commitlint** : Validation des messages de commit (conventional commits)
+- **Husky** : Hooks Git pour exécution automatique des linters et tests
+- **lint-staged** : Optimisation des linters pour ne vérifier que les fichiers modifiés
+- **Jest** et **Cypress** : Tests unitaires et e2e
+- **Lighthouse CI** : Analyse automatique des performances et de l'accessibilité
+
+Ces outils sont configurés pour fonctionner ensemble de manière optimale. Les hooks pre-commit vérifient automatiquement le formatage et les erreurs de lint avant chaque commit, et notre configuration lint-staged assure que seuls les fichiers modifiés sont vérifiés pour de meilleures performances.
 
 ## 🌿 Guide de développement éco-responsable
 
@@ -63,18 +81,21 @@ Pour participer au projet tout en respectant notre engagement écologique, voici
 ### Frontend
 
 1. **Images et médias**
+
    - Utiliser des formats modernes (WebP, AVIF) pour les images
    - Optimiser systématiquement les images (compression, redimensionnement)
    - Implémenter le lazy loading pour tout contenu hors écran
    - Privilégier SVG pour les icônes et éléments d'interface
 
 2. **JavaScript**
+
    - Éviter les librairies lourdes, privilégier les solutions légères ou natives
    - Utiliser le code splitting et le tree shaking
    - Implémenter une stratégie de cache efficace (service workers)
    - Minimiser les manipulations DOM coûteuses
 
 3. **CSS**
+
    - Éviter les animations complexes et les transitions coûteuses
    - Utiliser les media queries pour adapter le contenu au device
    - Privilégier les propriétés CSS modernes qui utilisent le GPU
@@ -89,12 +110,14 @@ Pour participer au projet tout en respectant notre engagement écologique, voici
 ### Backend
 
 1. **Base de données**
+
    - Optimiser les requêtes et créer des index appropriés
    - Éviter les requêtes N+1
    - Paginer les résultats et limiter les volumétries
    - Nettoyer régulièrement les données obsolètes
 
 2. **API**
+
    - Concevoir des endpoints minimalistes (retourner uniquement les données nécessaires)
    - Compresser les réponses API (gzip, brotli)
    - Utiliser des mécanismes de rate limiting
@@ -109,6 +132,7 @@ Pour participer au projet tout en respectant notre engagement écologique, voici
 ### DevOps et CI/CD
 
 1. **Tests**
+
    - Optimiser la suite de tests pour réduire la consommation des ressources CI
    - Paralléliser les tests quand c'est pertinent
    - Utiliser des stratégies de cache pour les dépendances
@@ -122,6 +146,7 @@ Pour participer au projet tout en respectant notre engagement écologique, voici
 ### Monitoring et analyse
 
 1. **Mesure d'impact**
+
    - Suivre les métriques d'éco-conception à chaque déploiement
    - Analyser l'empreinte carbone des services
    - Mesurer les écarts par rapport aux objectifs fixés
@@ -153,6 +178,12 @@ Cette architecture offre plusieurs avantages :
 ## 👥 Contribution
 
 Nous encourageons les contributions à ce projet ! Veuillez consulter notre [guide de contribution](CONTRIBUTING.md) pour connaître nos normes de code, conventions de commits et procédures de pull request.
+
+Les contributions suivent un workflow standardisé grâce à nos outils automatisés :
+
+- **Husky** exécute automatiquement les linters et tests avant les commits
+- **lint-staged** optimise le processus en vérifiant uniquement les fichiers modifiés
+- **Commitlint** assure des messages de commit normalisés
 
 ```bash
 # Installation des hooks Git pour les contributeurs
