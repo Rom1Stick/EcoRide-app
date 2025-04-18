@@ -17,7 +17,8 @@
     "format": "prettier --config config/.prettierrc --write src",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "bundle:check": "node scripts/size-check.js"
+    "bundle:check": "node scripts/size-check.js",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "pinia": "^3.0.1",
@@ -81,5 +82,14 @@
       ],
       "limit": "200 KB"
     }
-  ]
+  ],
+  "lint-staged": {
+    "src/**/*.{js,ts,vue}": [
+      "prettier --config config/.prettierrc --write",
+      "eslint --config config/.eslintrc.cjs --fix"
+    ],
+    "src/**/*.{css,scss}": [
+      "prettier --config config/.prettierrc --write"
+    ]
+  }
 }
