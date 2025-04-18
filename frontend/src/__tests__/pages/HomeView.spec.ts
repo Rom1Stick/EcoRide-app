@@ -21,17 +21,17 @@ describe('HomeView.vue', () => {
 
     expect(wrapper.find('main').exists()).toBe(true)
   })
-  
+
   it('contient la section de démonstration des composants', () => {
     const wrapper = shallowMount(HomeView)
-    
+
     expect(wrapper.find('.demo-section').exists()).toBe(true)
     expect(wrapper.find('.demo-section h2').text()).toBe('Démonstration des composants')
   })
-  
+
   it('inclut le composant CounterComponent', () => {
     const wrapper = shallowMount(HomeView)
-    
+
     // Vérifier que le composant Counter est présent avec les bonnes props
     const counter = wrapper.findComponent(CounterComponent)
     expect(counter.exists()).toBe(true)

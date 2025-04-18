@@ -10,7 +10,7 @@ describe('Counter Store', () => {
   it('increments count', () => {
     const store = useCounterStore()
     expect(store.count).toBe(0)
-    
+
     store.increment()
     expect(store.count).toBe(1)
   })
@@ -18,7 +18,7 @@ describe('Counter Store', () => {
   it('decrements count', () => {
     const store = useCounterStore()
     expect(store.count).toBe(0)
-    
+
     store.decrement()
     expect(store.count).toBe(-1)
   })
@@ -26,7 +26,7 @@ describe('Counter Store', () => {
   it('resets count', () => {
     const store = useCounterStore()
     store.count = 5
-    
+
     store.reset()
     expect(store.count).toBe(0)
   })
@@ -34,7 +34,7 @@ describe('Counter Store', () => {
   it('returns double count', () => {
     const store = useCounterStore()
     store.count = 2
-    
+
     expect(store.doubleCount).toBe(4)
   })
 

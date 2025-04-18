@@ -5,18 +5,10 @@
       {{ count }}
     </div>
     <div class="counter-actions">
-      <button 
-        class="counter-button decrement" 
-        aria-label="Décrémenter"
-        @click="decrement"
-      >
+      <button class="counter-button decrement" aria-label="Décrémenter" @click="decrement">
         -
       </button>
-      <button 
-        class="counter-button increment" 
-        aria-label="Incrémenter"
-        @click="increment"
-      >
+      <button class="counter-button increment" aria-label="Incrémenter" @click="increment">
         +
       </button>
     </div>
@@ -91,4 +83,4 @@ function decrement() {
 .decrement {
   background-color: #f44336;
 }
-</style> 
+</style>
