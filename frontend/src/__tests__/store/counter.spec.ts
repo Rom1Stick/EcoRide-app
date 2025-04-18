@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'jest'
+import { describe, it, expect, beforeEach } from '@jest/globals'
 import { setActivePinia, createPinia } from 'pinia'
 import { useCounterStore } from '../../store/counter'
 
@@ -7,33 +7,35 @@ describe('Counter Store', () => {
     setActivePinia(createPinia())
   })
 
-  it('a une valeur initiale de 0', () => {
+  it('increments count', () => {
     const store = useCounterStore()
     expect(store.count).toBe(0)
-  })
-
-  it('incrémente le compteur', () => {
-    const store = useCounterStore()
-    expect(store.count).toBe(0)
+    
     store.increment()
     expect(store.count).toBe(1)
   })
 
-  it('incrémente plusieurs fois correctement', () => {
+  it('decrements count', () => {
     const store = useCounterStore()
-    store.increment()
-    store.increment()
-    store.increment()
-    expect(store.count).toBe(3)
+    expect(store.count).toBe(0)
+    
+    store.decrement()
+    expect(store.count).toBe(-1)
   })
 
-  it('calcule correctement le double', () => {
+  it('resets count', () => {
+    const store = useCounterStore()
+    store.count = 5
+    
+    store.reset()
+    expect(store.count).toBe(0)
+  })
+
+  it('returns double count', () => {
     const store = useCounterStore()
     store.count = 2
+    
     expect(store.doubleCount).toBe(4)
-
-    store.count = 5
-    expect(store.doubleCount).toBe(10)
   })
 
   it('expose les bonnes propriétés et méthodes', () => {

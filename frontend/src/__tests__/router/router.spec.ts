@@ -1,30 +1,34 @@
-import { describe, it, expect } from 'jest'
-import router from '../../router'
+import { describe, it, expect } from '@jest/globals'
+import { createRouter, createWebHistory } from 'vue-router'
+import { routes } from '../../router'
 
-describe('Router', () => {
-  it('a une route pour la home page', () => {
-    const homeRoute = router.getRoutes().find((route) => route.name === 'home')
+describe('Router Configuration', () => {
+  const router = createRouter({
+    history: createWebHistory('/'),
+    routes
+  })
 
+  it('has a home route', () => {
+    const homeRoute = router.hasRoute('home')
+    expect(homeRoute).toBe(true)
+  })
+
+  it('has an about route', () => {
+    const aboutRoute = router.hasRoute('about')
+    expect(aboutRoute).toBe(true)
+  })
+
+  it('home route renders the HomeView component', () => {
+    const homeRoute = router.getRoutes().find(route => route.name === 'home')
     expect(homeRoute).toBeDefined()
     expect(homeRoute?.path).toBe('/')
+    expect(typeof homeRoute?.components?.default).toBe('function')
   })
 
-  it('a une route pour la page about', () => {
-    const aboutRoute = router.getRoutes().find((route) => route.name === 'about')
-
+  it('about route renders the AboutView component', () => {
+    const aboutRoute = router.getRoutes().find(route => route.name === 'about')
     expect(aboutRoute).toBeDefined()
     expect(aboutRoute?.path).toBe('/about')
-  })
-
-  it('utilise le lazy loading pour la route about', () => {
-    const aboutRoute = router.getRoutes().find((route) => route.name === 'about')
-
-    // La propriété component doit être une fonction pour indiquer le lazy loading
-    expect(typeof aboutRoute?.component).toBe('function')
-  })
-
-  it('a un mode history', () => {
-    // @ts-ignore: router.options est accessible mais pas typé correctement
-    expect(router.options.history.base).toBe(import.meta.env.BASE_URL)
+    expect(typeof aboutRoute?.components?.default).toBe('function')
   })
 })

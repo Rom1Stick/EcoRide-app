@@ -1,6 +1,10 @@
 // placeholder Jest test
 // Ce test permet à Jest de passer sans erreur même si aucun autre test n'est présent
 
-test('placeholder', () => {
-  expect(true).toBe(true)
+import { describe, it, expect } from '@jest/globals'
+
+describe('placeholder', () => {
+  it('should pass', () => {
+    expect(true).toBe(true)
+  })
 })
