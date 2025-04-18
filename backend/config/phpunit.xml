@@ -26,4 +26,9 @@
             <directory suffix=".php">../app/Core/helpers.php</directory>
         </exclude>
     </coverage>
+    <logging>
+        <log type="coverage-html" target="tests/coverage" charset="UTF-8"/>
+        <log type="clover" target="coverage.xml" charset="UTF-8"/>
+        <log type="junit" target="tests/junit.xml"/>
+    </logging>
 </phpunit> 

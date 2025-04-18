@@ -9,18 +9,10 @@
     "dev": "vite --config frontend/config/vite.config.js",
     "build": "vite build --config frontend/config/vite.config.js",
     "preview": "vite preview --config frontend/config/vite.config.js",
-    "lint": "eslint --config frontend/config/.eslintrc.cjs --ext .js,.vue,.ts frontend",
+    "lint": "eslint --config frontend/config/.eslintrc.cjs --ext .js,.vue,.ts --ignore-pattern 'frontend/dist/**' --ignore-pattern '**/dist/**' --ignore-pattern 'dist/**' frontend",
     "format": "prettier --config frontend/config/.prettierrc --write frontend",
-    "prepare": "husky install"
-  },
-  "lint-staged": {
-    "frontend/**/*.{js,jsx,ts,tsx,vue}": [
-      "eslint --config frontend/config/.eslintrc.cjs --fix",
-      "prettier --config frontend/config/.prettierrc --write"
-    ],
-    "frontend/**/*.{css,scss,vue}": [
-      "stylelint --config frontend/config/.stylelintrc --fix"
-    ]
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
   },
   "config": {
     "commitizen": {
@@ -28,6 +20,8 @@
     }
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vitejs/plugin-vue": "^4.0.0",
