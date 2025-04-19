@@ -1,6 +1,6 @@
 #!/bin/sh
-# Utiliser uniquement PowerShell sur Windows
-pwsh -NoProfile -ExecutionPolicy Bypass -File "$0.ps1" "$@"
+# Utiliser PowerShell standard sur Windows
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$0.ps1" "$@"
 
 # Exécuter les outils de la racine du projet
 npm run lint
