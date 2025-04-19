@@ -4,7 +4,7 @@ namespace App\Core;
 
 /**
  * Classe Application principale
- * 
+ *
  * Cette classe initialise et orchestre les différents composants
  * de l'application (routeur, base de données, etc.)
  */
@@ -31,7 +31,7 @@ class Application
     {
         // Initialiser le routeur
         $this->router = new Router();
-        
+
         // Initialiser la connexion à la base de données
         $this->database = new Database();
     }
@@ -65,13 +65,13 @@ class Application
     {
         // Vérifier le verbe HTTP
         $method = $_SERVER['REQUEST_METHOD'];
-        
+
         // Obtenir l'URL de la requête
         $uri = $_SERVER['REQUEST_URI'];
-        
+
         // Traiter la requête avec le routeur
         $response = $this->router->dispatch($method, $uri);
-        
+
         // Envoyer la réponse
         $this->sendResponse($response);
     }
@@ -79,20 +79,20 @@ class Application
     /**
      * Envoie la réponse au client
      *
-     * @param mixed $response Données de réponse
+     * @param  mixed $response Données de réponse
      * @return void
      */
     private function sendResponse($response): void
     {
         // Définir l'en-tête Content-Type
         header('Content-Type: application/json');
-        
+
         // Si la réponse n'est pas déjà une chaîne JSON, la convertir
         if (!is_string($response)) {
             $response = json_encode($response);
         }
-        
+
         // Envoyer la réponse
         echo $response;
     }
-} 
+}

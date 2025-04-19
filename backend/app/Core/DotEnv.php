@@ -74,7 +74,7 @@ class DotEnv
     /**
      * Résout les variables imbriquées comme ${APP_NAME}
      *
-     * @param string $value La valeur à résoudre
+     * @param  string $value La valeur à résoudre
      * @return string
      */
     private function resolveNestedVariables(string $value): string
@@ -89,7 +89,7 @@ class DotEnv
                 $value
             );
         }
-        
+
         return $value;
     }
-} 
+}
