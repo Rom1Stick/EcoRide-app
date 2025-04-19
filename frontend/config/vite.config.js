@@ -44,6 +44,8 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       // Forcer le lancement même si le port est occupé
       strictPort: true,
+      // Ajouter cette option pour éviter les problèmes CI en environnement GitHub Actions
+      cors: true,
     },
     // Configuration des tests unitaires avec Vitest
     test: {
