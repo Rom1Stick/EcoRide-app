@@ -117,7 +117,15 @@ jobs:
       - name: Install back dependencies
         run: cd backend && composer install --prefer-dist
       - name: Run backend tests
-        run: cd backend && vendor/bin/phpunit -c phpunit.xml
+        run: |
+          cd backend
+          # Vérifier l'installation et les dépendances
+          php -v
+          composer --version
+          # Exécuter les tests via le script composer
+          composer test
+        env:
+          XDEBUG_MODE: coverage
       - name: Upload PHP coverage report
         uses: actions/upload-artifact@v4
         with:

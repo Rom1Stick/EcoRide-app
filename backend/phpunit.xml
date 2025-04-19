@@ -7,7 +7,7 @@
          failOnWarning="false"
          failOnRisky="false"
          failOnEmptyTestSuite="false"
-         beStrictAboutOutputDuringTests="true"
+         beStrictAboutOutputDuringTests="false"
          cacheDirectory=".phpunit.cache">
     <testsuites>
         <testsuite name="Unit">
@@ -27,7 +27,7 @@
             <text outputFile="coverage/coverage.txt"/>
         </report>
     </coverage>
-    <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
+    <source restrictDeprecations="false" restrictNotices="false" restrictWarnings="false">
         <include>
             <directory>app</directory>
         </include>

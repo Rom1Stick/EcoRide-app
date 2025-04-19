@@ -25,11 +25,11 @@
         }
     },
     "scripts": {
-        "test": "phpunit -c config/phpunit.xml",
-        "test:unit": "phpunit -c config/phpunit.xml --testsuite Unit",
-        "test:feature": "phpunit -c config/phpunit.xml --testsuite Feature",
-        "test:coverage": "phpunit -c config/phpunit.xml --coverage-html tests/coverage",
-        "test:ci": "phpunit -c config/phpunit.xml --coverage-clover=coverage.xml",
+        "test": "phpunit",
+        "test:unit": "phpunit --testsuite Unit",
+        "test:feature": "phpunit --testsuite Feature",
+        "test:coverage": "phpunit --coverage-html tests/coverage",
+        "test:ci": "phpunit --coverage-clover=coverage.xml",
         "docker:test": "./run-tests.sh",
         "docker:test:unit": "./run-tests.sh --unit",
         "docker:test:feature": "./run-tests.sh --feature",
