@@ -1,9 +1,6 @@
 #!/bin/sh
-if command -v pwsh >/dev/null 2>&1; then
-  pwsh -NoProfile -ExecutionPolicy Bypass -File "$0.ps1" "$@"
-else
-  # Fallback to standard bash if PowerShell not available
-. "$(dirname "$0")/_/husky.sh"
+# Utiliser uniquement PowerShell sur Windows
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$0.ps1" "$@"
 
 # Exécuter les outils de la racine du projet
 npm run lint
@@ -17,4 +14,3 @@ cd ..
 
 # Exécution de lint-staged pour les fichiers modifiés uniquement
 npm run lint-staged
-fi 
