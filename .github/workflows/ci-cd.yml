@@ -91,7 +91,7 @@ jobs:
           retention-days: 7
       - name: Start app for e2e tests
         continue-on-error: true
-        run: cd frontend && npm run dev & npx wait-on http://localhost:3000
+        run: cd frontend && npm run dev & npx wait-on http://localhost:5173 --timeout 60000
       - name: Run e2e tests
         continue-on-error: true
         run: cd frontend && npm run test:e2e:ci
