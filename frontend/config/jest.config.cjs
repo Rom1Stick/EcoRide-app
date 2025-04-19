@@ -25,12 +25,5 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  globals: {
-    'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.test.json',
-    },
-    'vue-jest': {
-      tsConfig: '<rootDir>/tsconfig.test.json',
-    },
-  },
+  setupFilesAfterEnv: ['<rootDir>/config/jest.setup.js'],
 }
