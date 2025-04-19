@@ -39,7 +39,7 @@ $pdo = new PDO(
 // Connexion MongoDB
 require 'vendor/autoload.php'; // Inclure l'autoloader de Composer
 
-$mongoUri = 'mongodb://mongo:changeme@mongodb:27017/ecoride_nosql';
+$mongoUri = 'mongodb://mongo:changeme@mongodb:27017/admin';
 $client = new MongoDB\Client($mongoUri);
 $database = $client->selectDatabase('ecoride_nosql');
 $collection = $database->selectCollection('rides');
@@ -59,7 +59,7 @@ DB_USERNAME=ecorider
 DB_PASSWORD=securepass
 
 # MongoDB
-NOSQL_URI=mongodb://mongo:changeme@mongodb:27017/ecoride_nosql
+NOSQL_URI=mongodb://mongo:changeme@mongodb:27017/admin
 ```
 
 ## Script de test de connexion
@@ -77,7 +77,7 @@ $dbPort = $_ENV['DB_PORT'] ?? '3306';
 $dbName = $_ENV['DB_DATABASE'] ?? 'ecoride';
 $dbUser = $_ENV['DB_USERNAME'] ?? 'ecorider';
 $dbPass = $_ENV['DB_PASSWORD'] ?? 'securepass';
-$mongoUri = $_ENV['NOSQL_URI'] ?? 'mongodb://mongo:changeme@mongodb:27017/ecoride_nosql';
+$mongoUri = $_ENV['NOSQL_URI'] ?? 'mongodb://mongo:changeme@mongodb:27017/admin';
 
 // Test MySQL
 try {

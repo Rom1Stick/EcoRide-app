@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Script pour exécuter les tests unitaires et fonctionnels
 
