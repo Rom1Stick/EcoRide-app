@@ -5,7 +5,7 @@ export default defineConfig({
     // Emplacement des specs E2E
     specPattern: 'cypress/e2e/**/*.cy.{js,ts}',
     supportFile: false,
-    baseUrl: 'http://localhost:3001',
+    baseUrl: 'http://localhost:3000',
     setupNodeEvents(on, config) {
       // On détecte dynamiquement le port disponible
       if (process.env.PORT) {

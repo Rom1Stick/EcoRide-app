@@ -24,4 +24,12 @@ export default defineConfig({
     outDir: resolve(rootDir, 'dist'),
     emptyOutDir: true,
   },
+  server: {
+    // Permettre l'accès depuis n'importe quelle adresse IP dans CI
+    host: '0.0.0.0',
+    // Port par défaut qui correspond à notre configuration
+    port: 5173,
+    // Forcer le lancement même si le port est occupé (utile en CI)
+    strictPort: true,
+  },
 })

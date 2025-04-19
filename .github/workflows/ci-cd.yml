@@ -89,9 +89,6 @@ jobs:
           name: test-coverage
           path: frontend/coverage
           retention-days: 7
-      - name: Start app for e2e tests
-        continue-on-error: true
-        run: cd frontend && npm run dev & npx wait-on http://localhost:5173 --timeout 60000
       - name: Run e2e tests
         continue-on-error: true
         run: cd frontend && npm run test:e2e:ci
@@ -112,7 +109,7 @@ jobs:
       - name: Install back dependencies
         run: cd backend && composer install --prefer-dist
       - name: Run backend tests
-        run: cd backend && vendor/bin/phpunit
+        run: cd backend && vendor/bin/phpunit --configuration phpunit.xml
 
   build:
     needs: test
