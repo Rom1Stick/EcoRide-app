@@ -8,7 +8,7 @@ Notre backend est conçu selon les principes d'éco-conception suivants :
 
 - **Architecture légère** : Framework minimaliste fait maison sans dépendances lourdes
 - **Empreinte mémoire réduite** : Optimisation des requêtes SQL et du cache
-- **Double système de base de données** : MySQL pour les données critiques, SQLite pour les logs (économie de ressources)
+- **Base de données optimisée** : MySQL pour toutes les données avec optimisation des requêtes
 - **Pagination systématique** : Limite la consommation de bande passante et de ressources serveur
 - **Nettoyage automatique des données** : Politique de rétention et suppression automatique des données obsolètes
 - **API optimisée** : Réponses JSON allégées avec seulement les champs nécessaires
@@ -29,8 +29,7 @@ Ces outils permettent de valider systématiquement le comportement du backend et
 Architecture MVC légère et personnalisée avec les composants suivants :
 
 - PHP 8.2 via PHP-FPM (optimisé pour la performance)
-- MySQL 8.0 pour les données relationnelles (utilisateurs, trajets, réservations)
-- SQLite embarqué pour les données non relationnelles (logs, cache, statistiques)
+- MySQL 8.0 pour toutes les données (utilisateurs, trajets, réservations, logs)
 - API REST pour l'authentification, les trajets, les réservations, etc.
 - Dockerisé pour un déploiement facile et une configuration cohérente
 
@@ -52,7 +51,6 @@ backend/
 ├── routes/             # Définitions des routes
 │   └── api.php         # Routes de l'API
 ├── storage/            # Stockage des données
-│   └── data.sqlite     # Base de données SQLite
 ├── tests/              # Tests unitaires et fonctionnels
 │   ├── Feature/        # Tests fonctionnels de l'API
 │   │   └── ApiRoutesTest.php # Tests des routes API
@@ -69,7 +67,7 @@ backend/
 | Mise en cache    | Cache des requêtes fréquentes       | -30% requêtes SQL                   |
 | Optimisation SQL | Index et requêtes optimisées        | -50% temps de traitement            |
 | Compression      | Compression gzip des réponses       | -70% bande passante                 |
-| Logs SQLite      | Utilisation de SQLite pour les logs | Économie de ressources              |
+| Tables dédiées   | Tables optimisées pour les logs     | Économie de ressources              |
 | Pagination       | Limitation des résultats par page   | Réduction des données transférées   |
 | JWT léger        | Tokens d'authentification optimisés | Réduction de la taille des en-têtes |
 

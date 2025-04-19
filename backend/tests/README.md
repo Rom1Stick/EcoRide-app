@@ -7,7 +7,7 @@ Ce répertoire contient les tests automatisés pour l'application EcoRide. Les t
 Notre stratégie de tests suit plusieurs principes d'éco-conception :
 
 - **Tests ciblés** : Chaque test a un objectif précis, évitant les redondances
-- **Base de données en mémoire** : Utilisation de SQLite en mémoire pour les tests (`:memory:`)
+- **Base de données de test** : Utilisation de MySQL avec une base de données dédiée pour les tests
 - **Isolation optimisée** : Préparation minimale de l'environnement de test
 - **Conteneurs légers** : Image Docker optimisée pour l'exécution des tests
 - **Détection précoce des problèmes** : Les tests évitent les déploiements inutiles qui consomment des ressources
