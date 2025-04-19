@@ -2,6 +2,10 @@
 
 Interface utilisateur légère et éco-conçue pour l'application EcoRide de covoiturage écologique.
 
+## Test réussi
+
+Test de validation des hooks Git et de la configuration de qualité de code.
+
 ## Approche d'éco-conception
 
 Notre frontend est conçu selon les principes d'éco-conception suivants :
