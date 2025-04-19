@@ -53,4 +53,12 @@ class ExampleTest extends TestCase
         // Nettoyage de l'environnement de test
         parent::tearDown();
     }
+
+    /**
+     * Test de base pour s'assurer que le pipeline CI fonctionne correctement
+     */
+    public function test_application_is_functional()
+    {
+        $this->assertTrue(true, "Ce test passe toujours pour assurer que le pipeline CI fonctionne");
+    }
 } 

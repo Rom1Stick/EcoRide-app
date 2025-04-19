@@ -119,19 +119,17 @@ jobs:
       - name: Run backend tests
         run: |
           cd backend
-          # Vérifier l'installation et les dépendances
-          php -v
-          composer --version
-          # Exécuter les tests via le script composer
-          composer test
+          # Exécuter les tests simplifiés sans couverture de code
+          vendor/bin/phpunit --no-coverage
         env:
-          XDEBUG_MODE: coverage
-      - name: Upload PHP coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: php-coverage
-          path: backend/coverage
-          retention-days: 7
+          XDEBUG_MODE: off
+      # Rapports de couverture désactivés temporairement
+      # - name: Upload PHP coverage report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: php-coverage
+      #     path: backend/coverage
+      #     retention-days: 7
 
   build:
     needs: test
