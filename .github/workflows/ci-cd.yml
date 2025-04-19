@@ -77,14 +77,12 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
       - name: Install front dependencies
         run: cd frontend && npm ci
-      - name: Run unit tests
-        run: cd frontend && npm test
-      - name: Check test coverage
-        run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
-      - name: Upload coverage report
+      - name: Run unit tests (Vitest)
+        run: cd frontend && npm run test:unit
+      - name: Upload frontend coverage
         uses: actions/upload-artifact@v4
         with:
-          name: test-coverage
+          name: frontend-coverage
           path: frontend/coverage
           retention-days: 7
       - name: Build for E2E tests
@@ -115,7 +113,7 @@ jobs:
       - name: Install back dependencies
         run: cd backend && composer install --prefer-dist
       - name: Run backend tests
-        run: cd backend && vendor/bin/phpunit -c phpunit.xml --coverage-clover coverage/clover.xml
+        run: cd backend && vendor/bin/phpunit -c phpunit.xml
       - name: Upload PHP coverage report
         uses: actions/upload-artifact@v4
         with:

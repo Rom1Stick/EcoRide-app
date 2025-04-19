@@ -45,5 +45,20 @@ export default defineConfig(({ mode }) => {
       // Forcer le lancement même si le port est occupé
       strictPort: true,
     },
+    // Configuration des tests unitaires avec Vitest
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      transformMode: {
+        web: [/\.vue$/],
+      },
+      coverage: {
+        provider: 'c8',
+        reporter: ['text', 'lcov'],
+      },
+      deps: {
+        inline: [/vue/, /@vue\/test-utils/],
+      },
+    },
   }
 })

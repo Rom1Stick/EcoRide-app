@@ -15,6 +15,7 @@ module.exports = {
       },
     ],
   },
+  transformIgnorePatterns: ['node_modules/(?!(vue|@vue/test-utils|@vue/vue3-jest)/)'],
   moduleFileExtensions: ['ts', 'js', 'json', 'vue'],
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.{ts,vue}', '!src/main.ts'],
@@ -25,5 +26,5 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/config/jest.setup.js'],
+  setupFiles: ['<rootDir>/config/jest.setup.js'],
 }

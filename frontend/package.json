@@ -8,7 +8,9 @@
     "build": "vite build --config config/vite.config.js",
     "preview": "vite preview --config config/vite.config.js",
     "lint": "eslint --config config/.eslintrc.cjs \"src/**/*.{js,ts,vue}\"",
-    "test": "jest --config=config/jest.config.cjs --coverage --passWithNoTests",
+    "test": "vitest",
+    "test:unit": "vitest run --coverage",
+    "test:unit:watch": "vitest",
     "test:coverage": "node scripts/test-coverage-report.cjs",
     "test:e2e": "cypress run --config-file config/cypress.config.js --reporter mocha-junit-reporter",
     "test:e2e:ci": "vite build --config config/vite.config.js && vite preview --host --port 3000 --config config/vite.config.js & wait-on http://localhost:3000 && cypress run --config-file config/cypress.config.js --reporter mocha-junit-reporter",
@@ -52,7 +54,8 @@
     "typescript": "~5.1.6",
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2",
-    "vue-tsc": "^2.2.8"
+    "vue-tsc": "^2.2.8",
+    "vitest": "^3.1.1"
   },
   "overrides": {
     "@typescript-eslint/typescript-estree": {
