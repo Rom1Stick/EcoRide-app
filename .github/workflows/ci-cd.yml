@@ -78,10 +78,8 @@ jobs:
       - name: Install front dependencies
         run: cd frontend && npm ci
       - name: Run unit tests
-        continue-on-error: true
         run: cd frontend && npm test
       - name: Check test coverage
-        continue-on-error: true
         run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -89,18 +87,26 @@ jobs:
           name: test-coverage
           path: frontend/coverage
           retention-days: 7
+      - name: Build for E2E tests
+        run: cd frontend && npm run build
       - name: Run e2e tests
-        continue-on-error: true
-        run: cd frontend && npm run test:e2e:ci
+        run: cd frontend && npm run test:e2e:ci:timeout
+        env:
+          CYPRESS_baseUrl: http://localhost:3000
+          NODE_ENV: test
+      - name: Upload Cypress screenshots if tests fail
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+          retention-days: 3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: pdo, json
-      - name: Verify PHP version
-        run: php -v
-      - name: Update composer.lock
-        run: cd backend && composer update --lock --no-install
+          coverage: xdebug
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
@@ -109,7 +115,13 @@ jobs:
       - name: Install back dependencies
         run: cd backend && composer install --prefer-dist
       - name: Run backend tests
-        run: cd backend && vendor/bin/phpunit --configuration phpunit.xml
+        run: cd backend && vendor/bin/phpunit -c phpunit.xml --coverage-clover coverage/clover.xml
+      - name: Upload PHP coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-coverage
+          path: backend/coverage
+          retention-days: 7
 
   build:
     needs: test

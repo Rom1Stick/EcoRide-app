@@ -4,6 +4,10 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          executionOrder="random"
+         failOnWarning="false"
+         failOnRisky="false"
+         failOnEmptyTestSuite="false"
+         beStrictAboutOutputDuringTests="true"
          cacheDirectory=".phpunit.cache">
     <testsuites>
         <testsuite name="Unit">
@@ -13,6 +17,16 @@
             <directory>tests/Feature</directory>
         </testsuite>
     </testsuites>
+    <coverage>
+        <include>
+            <directory suffix=".php">app</directory>
+        </include>
+        <report>
+            <html outputDirectory="coverage/html"/>
+            <clover outputFile="coverage/clover.xml"/>
+            <text outputFile="coverage/coverage.txt"/>
+        </report>
+    </coverage>
     <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
         <include>
             <directory>app</directory>
@@ -22,5 +36,10 @@
         <env name="APP_ENV" value="testing"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
+        <ini name="error_reporting" value="E_ALL"/>
+        <ini name="display_errors" value="On"/>
     </php>
+    <logging>
+        <junit outputFile="junit/junit.xml"/>
+    </logging>
 </phpunit> 
