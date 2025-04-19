@@ -11,6 +11,7 @@ const rootDir = resolve(__dirname, '..')
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const isTest = process.env.NODE_ENV === 'test' || mode === 'test'
+  const isCI = process.env.CI === 'true'
 
   return {
     root: rootDir,
@@ -28,6 +29,8 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       // Mode minification réduite en environnement de test pour faciliter le débogage
       minify: isTest ? false : 'esbuild',
+      // Réduire le parallélisme en CI pour éviter les problèmes de mémoire
+      ...(isCI ? { assetsInlineLimit: 4096, cssCodeSplit: false } : {}),
     },
     server: {
       // Permettre l'accès depuis n'importe quelle adresse IP
@@ -46,6 +49,8 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       // Ajouter cette option pour éviter les problèmes CI en environnement GitHub Actions
       cors: true,
+      // Assurer que le serveur est accessible en environnement CI
+      hmr: isCI ? false : true,
     },
     // Configuration des tests unitaires avec Vitest
     test: {

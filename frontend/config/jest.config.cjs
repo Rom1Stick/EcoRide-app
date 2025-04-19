@@ -12,6 +12,7 @@ module.exports = {
       'ts-jest',
       {
         tsconfig: '<rootDir>/tsconfig.test.json',
+        useESM: true,
       },
     ],
   },
@@ -25,6 +26,13 @@ module.exports = {
   verbose: true,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   setupFiles: ['<rootDir>/config/jest.setup.js'],
+  extensionsToTreatAsEsm: ['.ts', '.tsx', '.vue'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
+  },
 }

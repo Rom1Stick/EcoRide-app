@@ -88,10 +88,14 @@ jobs:
       - name: Build for E2E tests
         run: cd frontend && npm run build
       - name: Run e2e tests
-        run: cd frontend && npm run test:e2e:ci
+        run: |
+          cd frontend
+          npm run test:e2e:ci
         env:
           CYPRESS_baseUrl: http://localhost:3000
           NODE_ENV: test
+          CI: true
+          DEBUG: start-server-and-test
       - name: Upload Cypress screenshots if tests fail
         if: failure()
         uses: actions/upload-artifact@v4
