@@ -87,10 +87,18 @@ jobs:
           retention-days: 7
       - name: Build for E2E tests
         run: cd frontend && npm run build
+      - name: Start frontend server
+        run: |
+          cd frontend
+          npm run start:ci &
+          npx wait-on http://localhost:3000 --timeout 60000
+        env:
+          NODE_ENV: test
+          CI: true
       - name: Run e2e tests
         run: |
           cd frontend
-          npm run test:e2e:ci
+          npm run cypress:run
         env:
           CYPRESS_baseUrl: http://localhost:3000
           NODE_ENV: test

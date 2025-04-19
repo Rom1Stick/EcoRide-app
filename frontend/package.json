@@ -24,7 +24,8 @@
     "size": "size-limit",
     "size:why": "size-limit --why",
     "bundle:check": "node scripts/size-check.js",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "start:ci": "npm run build && npm run preview:ci"
   },
   "dependencies": {
     "pinia": "^3.0.1",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@size-limit/file": "^11.2.0",
     "@size-limit/preset-app": "^11.2.0",
+    "@testing-library/jest-dom": "^6.6.3",
     "@tsconfig/node22": "^22.0.1",
     "@types/node": "^22.14.0",
     "@types/vue": "^1.0.31",
