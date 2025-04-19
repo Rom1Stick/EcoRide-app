@@ -79,10 +79,21 @@ class Security
      */
     public static function rateLimit(string $key, int $maxAttempts = 5, int $period = 60): bool
     {
-        $db = app()->getDatabase()->getSqliteConnection();
+        $db = app()->getDatabase()->getMysqlConnection();
+
+        // Créer la table si elle n'existe pas
+        $db->exec('
+            CREATE TABLE IF NOT EXISTS rate_limits (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                rate_key VARCHAR(255) NOT NULL,
+                expires_at TIMESTAMP NOT NULL,
+                INDEX (rate_key),
+                INDEX (expires_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ');
 
         // Nettoyer les anciennes entrées
-        $stmt = $db->prepare('DELETE FROM rate_limits WHERE expires_at < datetime("now")');
+        $stmt = $db->prepare('DELETE FROM rate_limits WHERE expires_at < NOW()');
         $stmt->execute();
 
         // Vérifier le nombre de tentatives
@@ -95,8 +106,8 @@ class Security
         }
 
         // Enregistrer la tentative
-        $stmt = $db->prepare('INSERT INTO rate_limits (rate_key, expires_at) VALUES (?, datetime("now", "+' . $period . ' seconds"))');
-        $stmt->execute([$key]);
+        $stmt = $db->prepare('INSERT INTO rate_limits (rate_key, expires_at) VALUES (?, DATE_ADD(NOW(), INTERVAL ? SECOND))');
+        $stmt->execute([$key, $period]);
 
         return true;
     }

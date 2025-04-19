@@ -252,21 +252,23 @@ class AuthController extends Controller
      */
     private function logAuthActivity(int $userId, string $action, bool $success, ?string $email = null): void
     {
-        $db = $this->app->getDatabase()->getSqliteConnection();
+        $db = $this->app->getDatabase()->getMysqlConnection();
 
         // Créer la table si elle n'existe pas
         $db->exec(
             '
             CREATE TABLE IF NOT EXISTS auth_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                action TEXT NOT NULL,
-                success INTEGER NOT NULL,
-                email TEXT,
-                ip_address TEXT,
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                action VARCHAR(50) NOT NULL,
+                success TINYINT(1) NOT NULL,
+                email VARCHAR(255),
+                ip_address VARCHAR(45),
                 user_agent TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX (user_id),
+                INDEX (created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         '
         );
 

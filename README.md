@@ -11,7 +11,7 @@ EcoRide est une application de covoiturage conçue avec une approche d'écoconce
 - Architecture modulaire pour une maintenance facilitée et une longévité accrue
 - Approche "mobile-first" avec design responsive et adaptatif
 - Respect des normes RGPD pour la protection des données
-- Backend sobre utilisant SQLite pour les logs et MySQL pour les données principales
+- Backend sobre utilisant MySQL pour les données principales
 - API REST optimisée pour minimiser les échanges de données
 
 ## 🔧 Installation

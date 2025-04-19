@@ -33,8 +33,12 @@ class TestCase extends BaseTestCase
         // Variables d'environnement pour les tests
         $_ENV['APP_ENV'] = 'testing';
         $_ENV['APP_DEBUG'] = 'true';
-        $_ENV['DB_CONNECTION'] = 'sqlite';
-        $_ENV['DB_DATABASE'] = ':memory:';
+        $_ENV['DB_CONNECTION'] = 'mysql';
+        $_ENV['DB_HOST'] = 'mysql';
+        $_ENV['DB_PORT'] = '3306';
+        $_ENV['DB_DATABASE'] = 'ecoride_test';
+        $_ENV['DB_USERNAME'] = 'ecorider';
+        $_ENV['DB_PASSWORD'] = 'securepass';
         $_ENV['JWT_SECRET'] = 'test_secret_key';
         
         // Ajouter ces variables à $_SERVER et à getenv() également
