@@ -48,6 +48,8 @@ jobs:
           extensions: pdo, json
       - name: Verify PHP version
         run: php -v
+      - name: Update composer.lock
+        run: cd backend && composer update --lock --no-install
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
@@ -96,6 +98,8 @@ jobs:
           extensions: pdo, json
       - name: Verify PHP version
         run: php -v
+      - name: Update composer.lock
+        run: cd backend && composer update --lock --no-install
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
