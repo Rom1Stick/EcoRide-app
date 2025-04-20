@@ -7,6 +7,24 @@ EcoRide utilise deux systèmes de base de données :
 1. **MySQL** : Pour toutes les données relationnelles (utilisateurs, trajets, réservations, logs, etc.)
 2. **MongoDB** : Pour les données non-relationnelles (documents, statistiques avancées, etc.)
 
+## Bonnes pratiques de sécurité
+
+Pour sécuriser vos identifiants de base de données, suivez ces recommandations:
+
+1. **Ne stockez jamais les identifiants en clair dans le code source versionné**
+   - Utilisez des variables d'environnement dans docker-compose.yml
+   - N'incluez jamais le fichier .env dans votre dépôt Git (ajoutez-le à .gitignore)
+   - Utilisez le fichier .env.example comme modèle (sans mots de passe réels)
+
+2. **Utilisez des mots de passe forts et différents pour chaque environnement**
+   - En développement: au moins 12 caractères avec majuscules, minuscules, chiffres et symboles
+   - En production: utilisez un générateur de mots de passe avec au moins 16 caractères
+
+3. **Pour la production, envisagez d'utiliser:**
+   - Docker Secrets pour gérer les identifiants
+   - Un gestionnaire de secrets comme HashiCorp Vault, AWS Secrets Manager, etc.
+   - Des rotations régulières des mots de passe
+
 ## Chaînes de connexion
 
 ### MySQL
