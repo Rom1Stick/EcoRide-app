@@ -40,10 +40,10 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: ecoride
-      MYSQL_USER: ecorider
-      MYSQL_PASSWORD: securepass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ecoride}
+      MYSQL_USER: ${MYSQL_USER:-ecorider}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-securepass}
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -53,9 +53,9 @@ services:
     image: mongo:7.0
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: changeme
-      MONGO_INITDB_DATABASE: ecoride_nosql
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-mongo}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-changeme}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-ecoride_nosql}
     volumes:
       - mongo_data:/data/db
     networks:
@@ -94,9 +94,9 @@ services:
       DB_CONNECTION: "mysql"
       DB_HOST: "mysql"
       DB_PORT: "3306"
-      DB_DATABASE: "ecoride_test"
-      DB_USERNAME: "ecorider"
-      DB_PASSWORD: "securepass"
+      DB_DATABASE: "${MYSQL_DATABASE_TEST:-ecoride_test}"
+      DB_USERNAME: "${MYSQL_USER:-ecorider}"
+      DB_PASSWORD: "${MYSQL_PASSWORD:-securepass}"
     # Ce service ne démarre pas automatiquement, il faut l'exécuter manuellement avec:
     # docker-compose run tests
     profiles:
@@ -108,8 +108,8 @@ services:
       - "8081:80"
     environment:
       PMA_HOST: mysql
-      PMA_USER: ecorider
-      PMA_PASSWORD: securepass
+      PMA_USER: ${MYSQL_USER:-ecorider}
+      PMA_PASSWORD: ${MYSQL_PASSWORD:-securepass}
     depends_on:
       - mysql
     networks:
@@ -120,9 +120,11 @@ services:
     ports:
       - "8082:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: mongo
-      ME_CONFIG_MONGODB_ADMINPASSWORD: changeme
-      ME_CONFIG_MONGODB_URL: mongodb://mongo:changeme@mongodb:27017/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME:-mongo}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-changeme}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME:-mongo}:${MONGO_PASSWORD:-changeme}@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-pass}
     depends_on:
       - mongodb
     networks:
