@@ -4,7 +4,7 @@ namespace App\Core;
 
 /**
  * Classe Route
- * 
+ *
  * Cette classe représente une route dans l'application
  */
 class Route
@@ -40,8 +40,9 @@ class Route
     /**
      * Constructeur
      *
-     * @param string $method Méthode HTTP
-     * @param string $path Chemin de la route
+     * @param string $method  Méthode
+     *                        HTTP
+     * @param string $path    Chemin de la route
      * @param string $handler Handler de la route
      */
     public function __construct(string $method, string $path, string $handler)
@@ -94,7 +95,7 @@ class Route
     /**
      * Ajoute un middleware à la route
      *
-     * @param string $middleware Nom du middleware
+     * @param  string $middleware Nom du middleware
      * @return self
      */
     public function middleware(string $middleware): self
@@ -102,4 +103,4 @@ class Route
         $this->middlewares[] = $middleware;
         return $this;
     }
-} 
+}

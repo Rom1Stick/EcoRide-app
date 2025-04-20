@@ -4,11 +4,13 @@
     "type": "project",
     "require": {
         "php": "^8.2",
+        "ext-json": "*",
         "ext-pdo": "*",
-        "ext-json": "*"
+        "mongodb/mongodb": "^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^10.0",
+        "squizlabs/php_codesniffer": "^3.12"
     },
     "autoload": {
         "psr-4": {
@@ -32,7 +34,9 @@
         "docker:test": "./run-tests.sh",
         "docker:test:unit": "./run-tests.sh --unit",
         "docker:test:feature": "./run-tests.sh --feature",
-        "docker:test:coverage": "./run-tests.sh --coverage"
+        "docker:test:coverage": "./run-tests.sh --coverage",
+        "cs:check": "phpcs --standard=config/phpcs.xml app",
+        "cs:fix": "phpcbf --standard=config/phpcs.xml app"
     },
     "config": {
         "optimize-autoloader": true,
@@ -41,4 +45,4 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true
-} 
+}
