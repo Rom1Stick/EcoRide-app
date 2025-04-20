@@ -205,3 +205,76 @@ Nous évaluons régulièrement notre conformité aux principes d'éco-conception
 - **Sécurité et robustesse** : Protection des données et fiabilité
 - **Maintenabilité et évolutivité** : Architecture facilitant les évolutions futures
 - **Transparence** : Information claire sur l'impact environnemental de l'application
+
+# Base de données EcoRide
+
+Ce projet contient la structure de base de données relationnelle pour l'application EcoRide, une plateforme de covoiturage éco-responsable.
+
+## Structure du projet
+
+- `schema.sql` : Script SQL complet de création du schéma en 3FN
+- `docs/data-dictionary.md` : Documentation détaillée des tables et colonnes
+- `docs/architecture/mcd.md` : Description du modèle conceptuel de données
+
+## Principes d'écoconception appliqués
+
+Cette base de données a été conçue avec des principes d'écoconception :
+
+1. **Normalisation complète (3FN)** pour éviter la redondance de données
+2. **Optimisation du stockage** (types de données appropriés, liens vers fichiers externes)
+3. **Indexation sélective** pour limiter l'empreinte de stockage tout en garantissant les performances
+4. **Gestion intelligente des cascades** pour maintenir l'intégrité des données
+
+## Installation
+
+### Prérequis
+
+- MySQL 5.7+ ou MariaDB 10.3+
+- Droits suffisants pour créer des bases de données et des tables
+
+### Étapes d'installation
+
+1. Créer une base de données vide :
+
+```sql
+CREATE DATABASE ecoride CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE ecoride;
+```
+
+2. Exécuter le script de création :
+
+```bash
+mysql -u username -p ecoride < schema.sql
+```
+
+## Structure principale
+
+Le schéma est composé des entités principales suivantes :
+
+- **Utilisateur** : Gestion des comptes avec système de rôles
+- **Covoiturage** : Trajets proposés par les chauffeurs
+- **Participation** : Réservations des passagers
+- **Voiture** : Véhicules utilisés pour les trajets
+- **Avis** : Évaluations des trajets
+- **Crédit** : Système de gestion de crédits (solde et transactions)
+
+## Considérations de performance
+
+Pour les requêtes fréquentes, des index ont été définis sur :
+- Les clés étrangères utilisées pour les jointures
+- Les colonnes de filtrage courantes (dates, lieux, statuts)
+- Les colonnes de tri fréquentes (notes, dates)
+
+## Évolution et maintenance
+
+Pour étendre le schéma :
+
+1. Respecter la normalisation existante
+2. Ajouter les index seulement sur les colonnes essentielles
+3. Maintenir la documentation à jour
+4. Préserver les contraintes d'intégrité référentielle
+5. Tester les scripts de migration sur un environnement de test avant production
+
+## Licence
+
+Voir le fichier LICENSE pour les détails.
