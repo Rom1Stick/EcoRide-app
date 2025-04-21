@@ -124,4 +124,24 @@ db.createCollection("configurations", {
       }
     }
   }
+});
+
+// Création de la collection reviews
+db.createCollection("reviews", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["rideId", "authorUserId", "rating", "date"],
+      properties: {
+        rideId:       { bsonType: "int",    description: "ID du covoiturage (SQL)" },
+        authorUserId: { bsonType: "int",    description: "ID de l'auteur (SQL)" },
+        rating:       { bsonType: "int",    minimum: 1, maximum: 5, description: "Note de 1 à 5" },
+        comment:      { bsonType: "string", maxLength: 1000, description: "Commentaire (optionnel)" },
+        date:         { bsonType: "date",   description: "Date de publication" },
+        validated:    { bsonType: "bool",   description: "Modéré : true si validé", default: false },
+        moderatedBy:  { bsonType: "string", description: "Pseudo ou ID de l'admin (optionnel)" },
+        moderatedAt:  { bsonType: "date",   description: "Date de modération (optionnel)" }
+      }
+    }
+  }
 }); 

@@ -148,4 +148,42 @@ db.configurations.updateOne(
       "modifiePar": "admin"
     } 
   }
+);
+
+// 6. REQUÊTES SUR LES REVIEWS
+
+// Récupérer tous les avis pour un trajet spécifique, triés par note
+db.reviews.find({ rideId: 1 }).sort({ rating: -1 });
+
+// Rechercher des avis contenant certains mots-clés
+db.reviews.find(
+  { $text: { $search: "agréable sympathique" } },
+  { score: { $meta: "textScore" } }
+).sort({ score: { $meta: "textScore" } });
+
+// Calculer la note moyenne pour un trajet
+db.reviews.aggregate([
+  { $match: { rideId: 1, validated: true } },
+  { 
+    $group: {
+      _id: "$rideId",
+      noteAverage: { $avg: "$rating" },
+      count: { $sum: 1 }
+    }
+  }
+]);
+
+// Trouver tous les avis en attente de modération
+db.reviews.find({ validated: false }).sort({ date: 1 });
+
+// Mettre à jour le statut de validation d'un avis
+db.reviews.updateOne(
+  { rideId: 2, authorUserId: 1 },
+  {
+    $set: {
+      validated: true,
+      moderatedBy: "admin",
+      moderatedAt: new Date()
+    }
+  }
 ); 
