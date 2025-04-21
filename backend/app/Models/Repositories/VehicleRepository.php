@@ -31,7 +31,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
     public function findAll(int $page = 1, int $limit = 20): array
     {
         $offset = ($page - 1) * $limit;
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->tableName} ORDER BY {$this->primaryKey} DESC LIMIT :limit OFFSET :offset");
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} ORDER BY {$this->primaryKey} DESC LIMIT :limit OFFSET :offset");
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -49,11 +49,22 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
      * Récupère un véhicule par son ID
      * 
      * @param int $id ID du véhicule
+     * @return array|null Données du véhicule trouvé ou null
+     */
+    public function findById(int $id): ?array
+    {
+        return parent::findById($id);
+    }
+    
+    /**
+     * Récupère un véhicule par son ID et le convertit en objet Vehicle
+     * 
+     * @param int $id ID du véhicule
      * @return Vehicle|null Véhicule trouvé ou null
      */
-    public function findById(int $id)
+    public function findVehicleById(int $id): ?Vehicle
     {
-        $result = parent::findById($id);
+        $result = $this->findById($id);
         
         return $result ? Vehicle::fromArray($result) : null;
     }
@@ -66,7 +77,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
      */
     public function findByImmatriculation(string $immatriculation): ?Vehicle
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE immatriculation = :immatriculation LIMIT 1");
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE immatriculation = :immatriculation LIMIT 1");
         $stmt->bindValue(':immatriculation', $immatriculation, PDO::PARAM_STR);
         $stmt->execute();
         
@@ -85,7 +96,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
     public function findByUserId(int $userId, int $page = 1, int $limit = 20): array
     {
         $offset = ($page - 1) * $limit;
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE utilisateur_id = :userId ORDER BY {$this->primaryKey} DESC LIMIT :limit OFFSET :offset");
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE utilisateur_id = :userId ORDER BY {$this->primaryKey} DESC LIMIT :limit OFFSET :offset");
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
@@ -111,7 +122,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
     public function findByEnergieId(int $energieId, int $page = 1, int $limit = 20): array
     {
         $offset = ($page - 1) * $limit;
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE energie_id = :energieId LIMIT :limit OFFSET :offset");
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE energie_id = :energieId LIMIT :limit OFFSET :offset");
         $stmt->bindValue(':energieId', $energieId, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -134,7 +145,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
      */
     public function countByUserId(int $userId): int
     {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM {$this->tableName} WHERE utilisateur_id = :userId");
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM {$this->table} WHERE utilisateur_id = :userId");
         $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
         $stmt->execute();
         
@@ -150,7 +161,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
      */
     public function registrationExists(string $registration, ?int $excludeId = null): bool
     {
-        $sql = "SELECT COUNT(*) FROM {$this->tableName} WHERE immatriculation = :registration";
+        $sql = "SELECT COUNT(*) FROM {$this->table} WHERE immatriculation = :registration";
         $params = [':registration' => $registration];
         
         if ($excludeId !== null) {
@@ -178,7 +189,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
      */
     public function search(?int $modeleId = null, ?int $energieId = null, ?string $immatriculation = null, ?string $couleur = null): array
     {
-        $sql = "SELECT * FROM {$this->tableName} WHERE 1=1";
+        $sql = "SELECT * FROM {$this->table} WHERE 1=1";
         $params = [];
         
         if ($modeleId !== null) {
@@ -232,14 +243,17 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
         $fields = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
         
-        $sql = "INSERT INTO {$this->tableName} ($fields) VALUES ($placeholders)";
+        $sql = "INSERT INTO {$this->table} ($fields) VALUES ($placeholders)";
         
-        $id = $this->executeInsert($sql, $data);
-        if (!$id) {
-            throw new \RuntimeException("Échec de la création du véhicule");
+        $stmt = $this->pdo->prepare($sql);
+        
+        foreach ($data as $key => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue(":$key", $value, $paramType);
         }
         
-        return $id;
+        $stmt->execute();
+        return (int) $this->pdo->lastInsertId();
     }
     
     /**
@@ -250,6 +264,10 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
      */
     public function update($vehicle): bool
     {
+        if (!($vehicle instanceof Vehicle)) {
+            throw new \InvalidArgumentException('L\'entité doit être une instance de Vehicle');
+        }
+        
         if ($vehicle->voiture_id === null) {
             return false;
         }
@@ -264,11 +282,17 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
         }
         
         $setClause = implode(', ', $setParts);
-        $sql = "UPDATE {$this->tableName} SET $setClause WHERE {$this->primaryKey} = :id";
+        $sql = "UPDATE {$this->table} SET $setClause WHERE {$this->primaryKey} = :id";
         
-        $data['id'] = $id;
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         
-        return $this->executeUpdate($sql, $data);
+        foreach ($data as $key => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue(":$key", $value, $paramType);
+        }
+        
+        return $stmt->execute();
     }
     
     /**
@@ -287,7 +311,7 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
                 e.nom AS energie_nom,
                 u.nom AS utilisateur_nom,
                 u.prenom AS utilisateur_prenom
-            FROM {$this->tableName} v
+            FROM {$this->table} v
             LEFT JOIN Modele m ON v.modele_id = m.modele_id
             LEFT JOIN Marque ma ON m.marque_id = ma.marque_id
             LEFT JOIN Energie e ON v.energie_id = e.energie_id
@@ -295,7 +319,11 @@ class VehicleRepository extends BaseRepository implements IVehicleRepository
             WHERE v.{$this->primaryKey} = :id
         ";
         
-        $result = $this->fetchOne($sql, ['id' => $id]);
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ?: null;
     }
 } 

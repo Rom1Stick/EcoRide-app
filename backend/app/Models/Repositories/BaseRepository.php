@@ -2,28 +2,29 @@
 
 namespace App\Models\Repositories;
 
+use App\Repositories\Interfaces\IRepository;
 use PDO;
 
 /**
- * Classe de base pour tous les repositories SQL
+ * Classe de base pour tous les repositories
  */
-abstract class BaseRepository
+abstract class BaseRepository implements IRepository
 {
     protected PDO $pdo;
-    protected string $tableName;
+    protected string $table;
     protected string $primaryKey;
     
     /**
      * Constructeur
      *
      * @param PDO $pdo Instance de PDO
-     * @param string $tableName Nom de la table
+     * @param string $table Nom de la table
      * @param string $primaryKey Nom de la clé primaire
      */
-    public function __construct(PDO $pdo, string $tableName, string $primaryKey)
+    public function __construct(PDO $pdo, string $table, string $primaryKey)
     {
         $this->pdo = $pdo;
-        $this->tableName = $tableName;
+        $this->table = $table;
         $this->primaryKey = $primaryKey;
     }
     
@@ -84,61 +85,75 @@ abstract class BaseRepository
     }
     
     /**
-     * Compte le nombre total d'enregistrements dans la table
+     * Récupère tous les enregistrements avec pagination
      *
-     * @return int Nombre total d'enregistrements
-     */
-    public function count(): int
-    {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM {$this->tableName}");
-        $stmt->execute();
-        return (int)$stmt->fetchColumn();
-    }
-    
-    /**
-     * Récupère tous les enregistrements de la table avec pagination
-     *
-     * @param int $page Numéro de page (commence à 1)
-     * @param int $limit Nombre d'enregistrements par page
-     * @return array Enregistrements de la page
+     * @param int $page Numéro de page
+     * @param int $limit Nombre d'éléments par page
+     * @return array Tableau d'enregistrements
      */
     public function findAll(int $page = 1, int $limit = 20): array
     {
         $offset = ($page - 1) * $limit;
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->tableName} LIMIT :limit OFFSET :offset");
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} ORDER BY {$this->primaryKey} DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     /**
-     * Récupère un enregistrement par sa clé primaire
+     * Récupère un enregistrement par son ID
      *
-     * @param int $id Valeur de la clé primaire
-     * @return array|null Enregistrement ou null si non trouvé
+     * @param int $id ID de l'enregistrement
+     * @return array|null Enregistrement trouvé ou null si inexistant
      */
     public function findById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->tableName} WHERE {$this->primaryKey} = :id");
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ?: null;
+        return $result !== false ? $result : null;
     }
     
     /**
-     * Supprime un enregistrement par sa clé primaire
+     * Compte le nombre total d'enregistrements
      *
-     * @param int $id Valeur de la clé primaire
+     * @return int Nombre d'enregistrements
+     */
+    public function count(): int
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM {$this->table}");
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
+    }
+    
+    /**
+     * Supprime un enregistrement par son ID
+     *
+     * @param int $id ID de l'enregistrement à supprimer
      * @return bool Succès de l'opération
      */
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM {$this->tableName} WHERE {$this->primaryKey} = :id");
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE {$this->primaryKey} = :id");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
+    }
+    
+    /**
+     * Vérifie si un enregistrement existe par son ID
+     *
+     * @param int $id ID de l'enregistrement
+     * @return bool Existence de l'enregistrement
+     */
+    public function exists(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM {$this->table} WHERE {$this->primaryKey} = :id");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn() > 0;
     }
 } 

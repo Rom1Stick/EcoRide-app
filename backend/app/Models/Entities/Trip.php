@@ -3,368 +3,207 @@
 namespace App\Models\Entities;
 
 /**
- * Classe représentant un covoiturage dans le système EcoRide
+ * Classe représentant un covoiturage
  */
-class Trip
+class Trip implements EntityInterface
 {
-    private ?int $id = null;
-    private int $departureLocationId;
-    private int $arrivalLocationId;
-    private string $departureDate;
-    private string $departureTime;
-    private ?string $arrivalDate = null;
-    private ?string $arrivalTime = null;
-    private int $statusId;
-    private int $availableSeats;
-    private float $pricePerPerson;
-    private int $vehicleId;
-    private ?string $creationDate = null;
-    private ?float $carbonFootprint = null;
+    public ?int $covoiturage_id = null;
+    public ?int $voiture_id = null;
+    public ?int $lieu_depart_id = null;
+    public ?int $lieu_arrivee_id = null;
+    public ?string $date_depart = null;
+    public ?string $heure_depart = null;
+    public ?string $date_arrivee = null;
+    public ?string $heure_arrivee = null;
+    public ?int $nb_place = null;
+    public ?float $prix_personne = null;
+    public ?int $statut_id = null;
+    public ?string $date_creation = null;
+    public ?float $empreinte_carbone = null;
     
     /**
-     * Constructeur avec les champs obligatoires
-     *
-     * @param int $departureLocationId Identifiant du lieu de départ
-     * @param int $arrivalLocationId Identifiant du lieu d'arrivée
-     * @param string $departureDate Date de départ (format Y-m-d)
-     * @param string $departureTime Heure de départ (format H:i:s)
-     * @param int $statusId Identifiant du statut
-     * @param int $availableSeats Nombre de places disponibles
-     * @param float $pricePerPerson Prix par personne
-     * @param int $vehicleId Identifiant du véhicule
+     * Constructeur
      */
     public function __construct(
-        int $departureLocationId,
-        int $arrivalLocationId,
-        string $departureDate,
-        string $departureTime,
-        int $statusId,
-        int $availableSeats,
-        float $pricePerPerson,
-        int $vehicleId
+        ?int $covoiturage_id = null,
+        ?int $voiture_id = null,
+        ?int $lieu_depart_id = null,
+        ?int $lieu_arrivee_id = null,
+        ?string $date_depart = null,
+        ?string $heure_depart = null,
+        ?string $date_arrivee = null,
+        ?string $heure_arrivee = null,
+        ?int $nb_place = null,
+        ?float $prix_personne = null,
+        ?int $statut_id = null,
+        ?string $date_creation = null,
+        ?float $empreinte_carbone = null
     ) {
-        $this->departureLocationId = $departureLocationId;
-        $this->arrivalLocationId = $arrivalLocationId;
-        $this->departureDate = $departureDate;
-        $this->departureTime = $departureTime;
-        $this->statusId = $statusId;
-        $this->availableSeats = $availableSeats;
-        $this->pricePerPerson = $pricePerPerson;
-        $this->vehicleId = $vehicleId;
-        
-        // Date de création par défaut à l'instantiation
-        $this->creationDate = date('Y-m-d H:i:s');
+        $this->covoiturage_id = $covoiturage_id;
+        $this->voiture_id = $voiture_id;
+        $this->lieu_depart_id = $lieu_depart_id;
+        $this->lieu_arrivee_id = $lieu_arrivee_id;
+        $this->date_depart = $date_depart;
+        $this->heure_depart = $heure_depart;
+        $this->date_arrivee = $date_arrivee;
+        $this->heure_arrivee = $heure_arrivee;
+        $this->nb_place = $nb_place;
+        $this->prix_personne = $prix_personne;
+        $this->statut_id = $statut_id;
+        $this->date_creation = $date_creation ?? date('Y-m-d H:i:s');
+        $this->empreinte_carbone = $empreinte_carbone;
     }
     
     /**
-     * Valide les données du covoiturage avant persistance
+     * Obtient l'ID du covoiturage
      *
-     * @return array Tableau d'erreurs de validation (vide si aucune erreur)
+     * @return int|null ID du covoiturage
+     */
+    public function getId(): ?int
+    {
+        return $this->covoiturage_id;
+    }
+    
+    /**
+     * Définit l'ID du covoiturage
+     *
+     * @param int $id Nouvel ID
+     * @return self
+     */
+    public function setId(int $id): self
+    {
+        $this->covoiturage_id = $id;
+        return $this;
+    }
+    
+    /**
+     * Obtient le nombre de places disponibles
+     *
+     * @return int Nombre de places disponibles
+     */
+    public function getAvailableSeats(): int
+    {
+        return $this->nb_place;
+    }
+    
+    /**
+     * Définit l'empreinte carbone du covoiturage
+     *
+     * @param float $value Empreinte carbone en kg CO2
+     * @return self
+     */
+    public function setCarbonFootprint(float $value): self
+    {
+        $this->empreinte_carbone = $value;
+        return $this;
+    }
+    
+    /**
+     * Création d'une instance depuis un tableau de données
+     */
+    public static function fromArray(array $data): self
+    {
+        $trip = new self();
+        $trip->covoiturage_id = $data['covoiturage_id'] ?? null;
+        $trip->voiture_id = $data['voiture_id'] ?? null;
+        $trip->lieu_depart_id = $data['lieu_depart_id'] ?? null;
+        $trip->lieu_arrivee_id = $data['lieu_arrivee_id'] ?? null;
+        $trip->date_depart = $data['date_depart'] ?? null;
+        $trip->heure_depart = $data['heure_depart'] ?? null;
+        $trip->date_arrivee = $data['date_arrivee'] ?? null;
+        $trip->heure_arrivee = $data['heure_arrivee'] ?? null;
+        $trip->nb_place = $data['nb_place'] ?? null;
+        $trip->prix_personne = $data['prix_personne'] ?? null;
+        $trip->statut_id = $data['statut_id'] ?? null;
+        $trip->date_creation = $data['date_creation'] ?? null;
+        $trip->empreinte_carbone = $data['empreinte_carbone'] ?? null;
+
+        return $trip;
+    }
+    
+    /**
+     * Convertit l'entité en tableau
+     */
+    public function toArray(): array
+    {
+        return [
+            'covoiturage_id' => $this->covoiturage_id,
+            'voiture_id' => $this->voiture_id,
+            'lieu_depart_id' => $this->lieu_depart_id,
+            'lieu_arrivee_id' => $this->lieu_arrivee_id,
+            'date_depart' => $this->date_depart,
+            'heure_depart' => $this->heure_depart,
+            'date_arrivee' => $this->date_arrivee,
+            'heure_arrivee' => $this->heure_arrivee,
+            'nb_place' => $this->nb_place,
+            'prix_personne' => $this->prix_personne,
+            'statut_id' => $this->statut_id,
+            'date_creation' => $this->date_creation,
+            'empreinte_carbone' => $this->empreinte_carbone
+        ];
+    }
+    
+    /**
+     * Valide les données de l'entité
      */
     public function validate(): array
     {
         $errors = [];
         
-        if ($this->departureLocationId <= 0) {
-            $errors['departureLocationId'] = 'Le lieu de départ est obligatoire';
+        if (empty($this->voiture_id)) {
+            $errors['voiture_id'] = 'Le véhicule est obligatoire';
         }
         
-        if ($this->arrivalLocationId <= 0) {
-            $errors['arrivalLocationId'] = 'Le lieu d\'arrivée est obligatoire';
+        if (empty($this->lieu_depart_id)) {
+            $errors['lieu_depart_id'] = 'Le lieu de départ est obligatoire';
         }
         
-        if (empty($this->departureDate)) {
-            $errors['departureDate'] = 'La date de départ est obligatoire';
+        if (empty($this->lieu_arrivee_id)) {
+            $errors['lieu_arrivee_id'] = 'Le lieu d\'arrivée est obligatoire';
+        }
+        
+        if ($this->lieu_depart_id === $this->lieu_arrivee_id) {
+            $errors['lieu_arrivee_id'] = 'Le lieu d\'arrivée doit être différent du lieu de départ';
+        }
+        
+        if (empty($this->date_depart)) {
+            $errors['date_depart'] = 'La date de départ est obligatoire';
         } else {
-            $date = \DateTime::createFromFormat('Y-m-d', $this->departureDate);
-            if (!$date || $date->format('Y-m-d') !== $this->departureDate) {
-                $errors['departureDate'] = 'Format de date de départ invalide (YYYY-MM-DD)';
+            // Valider le format de la date
+            $date = \DateTime::createFromFormat('Y-m-d', $this->date_depart);
+            if (!$date || $date->format('Y-m-d') !== $this->date_depart) {
+                $errors['date_depart'] = 'Format de date invalide (YYYY-MM-DD)';
             }
         }
         
-        if (empty($this->departureTime)) {
-            $errors['departureTime'] = 'L\'heure de départ est obligatoire';
+        if (empty($this->heure_depart)) {
+            $errors['heure_depart'] = 'L\'heure de départ est obligatoire';
         } else {
-            $time = \DateTime::createFromFormat('H:i:s', $this->departureTime);
-            if (!$time || $time->format('H:i:s') !== $this->departureTime) {
-                $errors['departureTime'] = 'Format d\'heure de départ invalide (HH:MM:SS)';
+            // Valider le format de l'heure
+            $time = \DateTime::createFromFormat('H:i:s', $this->heure_depart);
+            if (!$time || $time->format('H:i:s') !== $this->heure_depart) {
+                $errors['heure_depart'] = 'Format d\'heure invalide (HH:MM:SS)';
             }
         }
         
-        if ($this->arrivalDate !== null) {
-            $date = \DateTime::createFromFormat('Y-m-d', $this->arrivalDate);
-            if (!$date || $date->format('Y-m-d') !== $this->arrivalDate) {
-                $errors['arrivalDate'] = 'Format de date d\'arrivée invalide (YYYY-MM-DD)';
-            }
-            
-            // Vérifier que la date d'arrivée est postérieure à la date de départ
-            if (empty($errors['departureDate']) && empty($errors['arrivalDate'])) {
-                $departureDateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $this->departureDate . ' ' . $this->departureTime);
-                $arrivalDateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $this->arrivalDate . ' ' . ($this->arrivalTime ?? '00:00:00'));
-                
-                if ($arrivalDateTime < $departureDateTime) {
-                    $errors['arrivalDate'] = 'La date et heure d\'arrivée doivent être postérieures à la date et heure de départ';
-                }
-            }
+        if (empty($this->nb_place)) {
+            $errors['nb_place'] = 'Le nombre de places est obligatoire';
+        } elseif ($this->nb_place <= 0) {
+            $errors['nb_place'] = 'Le nombre de places doit être supérieur à 0';
+        } elseif ($this->nb_place > 8) {
+            $errors['nb_place'] = 'Le nombre de places ne peut pas dépasser 8';
         }
         
-        if ($this->arrivalTime !== null) {
-            $time = \DateTime::createFromFormat('H:i:s', $this->arrivalTime);
-            if (!$time || $time->format('H:i:s') !== $this->arrivalTime) {
-                $errors['arrivalTime'] = 'Format d\'heure d\'arrivée invalide (HH:MM:SS)';
-            }
+        if (empty($this->prix_personne)) {
+            $errors['prix_personne'] = 'Le prix est obligatoire';
+        } elseif ($this->prix_personne < 0) {
+            $errors['prix_personne'] = 'Le prix ne peut pas être négatif';
         }
         
-        if ($this->statusId <= 0) {
-            $errors['statusId'] = 'Le statut est obligatoire';
-        }
-        
-        if ($this->availableSeats <= 0) {
-            $errors['availableSeats'] = 'Le nombre de places doit être supérieur à 0';
-        } elseif ($this->availableSeats > 8) {
-            $errors['availableSeats'] = 'Le nombre de places ne peut pas dépasser 8';
-        }
-        
-        if ($this->pricePerPerson < 0) {
-            $errors['pricePerPerson'] = 'Le prix par personne ne peut pas être négatif';
-        }
-        
-        if ($this->vehicleId <= 0) {
-            $errors['vehicleId'] = 'Le véhicule est obligatoire';
-        }
-        
-        if ($this->carbonFootprint !== null && $this->carbonFootprint < 0) {
-            $errors['carbonFootprint'] = 'L\'empreinte carbone ne peut pas être négative';
+        if (empty($this->statut_id)) {
+            $errors['statut_id'] = 'Le statut est obligatoire';
         }
         
         return $errors;
-    }
-    
-    // Getters & Setters
-    
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-    
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-    
-    public function getDepartureLocationId(): int
-    {
-        return $this->departureLocationId;
-    }
-    
-    public function setDepartureLocationId(int $departureLocationId): self
-    {
-        $this->departureLocationId = $departureLocationId;
-        return $this;
-    }
-    
-    public function getArrivalLocationId(): int
-    {
-        return $this->arrivalLocationId;
-    }
-    
-    public function setArrivalLocationId(int $arrivalLocationId): self
-    {
-        $this->arrivalLocationId = $arrivalLocationId;
-        return $this;
-    }
-    
-    public function getDepartureDate(): string
-    {
-        return $this->departureDate;
-    }
-    
-    public function setDepartureDate(string $departureDate): self
-    {
-        $this->departureDate = $departureDate;
-        return $this;
-    }
-    
-    public function getDepartureTime(): string
-    {
-        return $this->departureTime;
-    }
-    
-    public function setDepartureTime(string $departureTime): self
-    {
-        $this->departureTime = $departureTime;
-        return $this;
-    }
-    
-    public function getArrivalDate(): ?string
-    {
-        return $this->arrivalDate;
-    }
-    
-    public function setArrivalDate(?string $arrivalDate): self
-    {
-        $this->arrivalDate = $arrivalDate;
-        return $this;
-    }
-    
-    public function getArrivalTime(): ?string
-    {
-        return $this->arrivalTime;
-    }
-    
-    public function setArrivalTime(?string $arrivalTime): self
-    {
-        $this->arrivalTime = $arrivalTime;
-        return $this;
-    }
-    
-    public function getStatusId(): int
-    {
-        return $this->statusId;
-    }
-    
-    public function setStatusId(int $statusId): self
-    {
-        $this->statusId = $statusId;
-        return $this;
-    }
-    
-    public function getAvailableSeats(): int
-    {
-        return $this->availableSeats;
-    }
-    
-    public function setAvailableSeats(int $availableSeats): self
-    {
-        $this->availableSeats = $availableSeats;
-        return $this;
-    }
-    
-    public function getPricePerPerson(): float
-    {
-        return $this->pricePerPerson;
-    }
-    
-    public function setPricePerPerson(float $pricePerPerson): self
-    {
-        $this->pricePerPerson = $pricePerPerson;
-        return $this;
-    }
-    
-    public function getVehicleId(): int
-    {
-        return $this->vehicleId;
-    }
-    
-    public function setVehicleId(int $vehicleId): self
-    {
-        $this->vehicleId = $vehicleId;
-        return $this;
-    }
-    
-    public function getCreationDate(): ?string
-    {
-        return $this->creationDate;
-    }
-    
-    public function setCreationDate(?string $creationDate): self
-    {
-        $this->creationDate = $creationDate;
-        return $this;
-    }
-    
-    public function getCarbonFootprint(): ?float
-    {
-        return $this->carbonFootprint;
-    }
-    
-    public function setCarbonFootprint(?float $carbonFootprint): self
-    {
-        $this->carbonFootprint = $carbonFootprint;
-        return $this;
-    }
-    
-    /**
-     * Crée une instance de covoiturage à partir d'un tableau de données
-     *
-     * @param array $data Données du covoiturage
-     * @return Trip
-     */
-    public static function fromArray(array $data): self
-    {
-        $trip = new self(
-            $data['lieu_depart_id'] ?? 0,
-            $data['lieu_arrivee_id'] ?? 0,
-            $data['date_depart'] ?? '',
-            $data['heure_depart'] ?? '',
-            $data['statut_id'] ?? 0,
-            $data['nb_place'] ?? 0,
-            $data['prix_personne'] ?? 0.0,
-            $data['voiture_id'] ?? 0
-        );
-        
-        if (isset($data['covoiturage_id'])) {
-            $trip->setId((int)$data['covoiturage_id']);
-        }
-        
-        if (isset($data['date_arrivee'])) {
-            $trip->setArrivalDate($data['date_arrivee']);
-        }
-        
-        if (isset($data['heure_arrivee'])) {
-            $trip->setArrivalTime($data['heure_arrivee']);
-        }
-        
-        if (isset($data['date_creation'])) {
-            $trip->setCreationDate($data['date_creation']);
-        }
-        
-        if (isset($data['empreinte_carbone'])) {
-            $trip->setCarbonFootprint((float)$data['empreinte_carbone']);
-        }
-        
-        return $trip;
-    }
-    
-    /**
-     * Convertit le covoiturage en tableau pour la persistance
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        $data = [
-            'lieu_depart_id' => $this->departureLocationId,
-            'lieu_arrivee_id' => $this->arrivalLocationId,
-            'date_depart' => $this->departureDate,
-            'heure_depart' => $this->departureTime,
-            'statut_id' => $this->statusId,
-            'nb_place' => $this->availableSeats,
-            'prix_personne' => $this->pricePerPerson,
-            'voiture_id' => $this->vehicleId
-        ];
-        
-        if ($this->id !== null) {
-            $data['covoiturage_id'] = $this->id;
-        }
-        
-        if ($this->arrivalDate !== null) {
-            $data['date_arrivee'] = $this->arrivalDate;
-        }
-        
-        if ($this->arrivalTime !== null) {
-            $data['heure_arrivee'] = $this->arrivalTime;
-        }
-        
-        if ($this->creationDate !== null) {
-            $data['date_creation'] = $this->creationDate;
-        }
-        
-        if ($this->carbonFootprint !== null) {
-            $data['empreinte_carbone'] = $this->carbonFootprint;
-        }
-        
-        return $data;
     }
 } 

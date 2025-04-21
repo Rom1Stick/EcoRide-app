@@ -1,99 +1,74 @@
 ﻿#!/bin/bash
 
-# Script pour exécuter les tests unitaires et fonctionnels
+# Script pour exécuter les tests d'intégration de l'application EcoRide
 
 # Couleurs pour les messages
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Fonction pour afficher un message d'aide
-function show_help {
-    echo -e "${BLUE}Usage: $0 [options]${NC}"
+echo -e "${BLUE}=== Tests d'intégration EcoRide ===${NC}"
+echo ""
+
+# Vérifier que MySQL est disponible
+echo -e "${YELLOW}Vérification de MySQL...${NC}"
+mysql --version > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo -e "${RED}MySQL n'est pas disponible. Veuillez installer MySQL ou démarrer le service.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}MySQL est disponible.${NC}"
+echo ""
+
+# Vérifier que les dépendances sont installées
+echo -e "${YELLOW}Vérification des dépendances...${NC}"
+if [ ! -d "vendor" ]; then
+    echo -e "${YELLOW}Installation des dépendances...${NC}"
+    composer install
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Impossible d'installer les dépendances.${NC}"
+        exit 1
+    fi
+fi
+echo -e "${GREEN}Les dépendances sont installées.${NC}"
+echo ""
+
+# Configurer la base de données de test
+echo -e "${YELLOW}Configuration de la base de données de test...${NC}"
+mysql -u root < database/scripts/setup_test_db.sql
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Impossible de configurer la base de données de test.${NC}"
+    echo -e "${YELLOW}Essai avec un mot de passe...${NC}"
+    read -s -p "Entrez le mot de passe root MySQL: " rootpw
     echo ""
-    echo "Options:"
-    echo "  -h, --help           Affiche ce message d'aide"
-    echo "  -u, --unit           Exécute uniquement les tests unitaires"
-    echo "  -f, --feature        Exécute uniquement les tests fonctionnels"
-    echo "  -c, --coverage       Génère un rapport de couverture de code"
-    echo "  -t, --testdox        Affiche les résultats en format testdox"
-    echo ""
-    echo "Examples:"
-    echo "  $0                   Exécute tous les tests"
-    echo "  $0 --unit --coverage Exécute les tests unitaires avec rapport de couverture"
-    echo "  $0 --feature         Exécute les tests fonctionnels"
-}
-
-# Variables par défaut
-RUN_UNIT=true
-RUN_FEATURE=true
-COVERAGE=false
-TESTDOX=false
-
-# Analyser les arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -h|--help)
-            show_help
-            exit 0
-            ;;
-        -u|--unit)
-            RUN_UNIT=true
-            RUN_FEATURE=false
-            shift
-            ;;
-        -f|--feature)
-            RUN_UNIT=false
-            RUN_FEATURE=true
-            shift
-            ;;
-        -c|--coverage)
-            COVERAGE=true
-            shift
-            ;;
-        -t|--testdox)
-            TESTDOX=true
-            shift
-            ;;
-        *)
-            echo -e "${RED}Option inconnue: $1${NC}"
-            show_help
-            exit 1
-            ;;
-    esac
-done
-
-# Préparer la commande de base
-cmd="docker-compose run --rm tests ./vendor/bin/phpunit -c config/phpunit.xml"
-
-# Ajouter les options
-if [ "$TESTDOX" = true ]; then
-    cmd="$cmd --testdox"
+    mysql -u root -p"$rootpw" < database/scripts/setup_test_db.sql
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Impossible de configurer la base de données de test.${NC}"
+        exit 1
+    fi
 fi
+echo -e "${GREEN}Base de données de test configurée.${NC}"
+echo ""
 
-if [ "$COVERAGE" = true ]; then
-    cmd="$cmd --coverage-html ./tests/coverage"
-fi
-
-# Ajouter les suites de tests à exécuter
-if [ "$RUN_UNIT" = true ] && [ "$RUN_FEATURE" = false ]; then
-    cmd="$cmd --testsuite Unit"
-elif [ "$RUN_UNIT" = false ] && [ "$RUN_FEATURE" = true ]; then
-    cmd="$cmd --testsuite Feature"
-fi
-
-# Afficher la commande
-echo -e "${BLUE}Exécution de: ${cmd}${NC}"
-
-# Exécuter la commande
-eval $cmd
-
-# Vérifier le résultat
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Tests réussis!${NC}"
-    exit 0
+# Exécuter les tests
+echo -e "${YELLOW}Exécution des tests d'intégration...${NC}"
+if [ -z "$1" ]; then
+    # Exécuter tous les tests d'intégration si aucun argument n'est fourni
+    vendor/bin/phpunit --testsuite Integration --colors=always
 else
+    # Exécuter un test spécifique
+    vendor/bin/phpunit --filter $1 --colors=always
+fi
+
+# Vérifier le résultat des tests
+if [ $? -ne 0 ]; then
     echo -e "${RED}Des tests ont échoué.${NC}"
     exit 1
-fi 
+else
+    echo -e "${GREEN}Tous les tests ont réussi.${NC}"
+fi
+
+echo ""
+echo -e "${BLUE}=== Fin des tests d'intégration ===${NC}" 

@@ -12,6 +12,14 @@ use App\Models\Entities\Vehicle;
 interface IVehicleRepository extends IRepository
 {
     /**
+     * Récupère un véhicule par son ID et le convertit en objet Vehicle
+     * 
+     * @param int $id ID du véhicule
+     * @return Vehicle|null Véhicule trouvé ou null
+     */
+    public function findVehicleById(int $id): ?Vehicle;
+    
+    /**
      * Trouve un véhicule par son immatriculation
      *
      * @param string $immatriculation Immatriculation du véhicule

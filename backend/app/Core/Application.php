@@ -11,6 +11,12 @@ namespace App\Core;
 class Application
 {
     /**
+     * Environnement d'exécution (development, production, testing)
+     * @var string
+     */
+    public static $env = 'development';
+
+    /**
      * Instance du routeur
      *
      * @var Router
