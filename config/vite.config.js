@@ -1,43 +1,12 @@
-// Importation plus robuste pour environnement Docker
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const { defineConfig } = require('vite');
-const vue = require('@vitejs/plugin-vue');
-const path = require('path');
-const compression = require('vite-plugin-compression');
+// Fichier de compatibilité - Redirection vers le fichier de configuration dans le dossier frontend
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
 
-// Obtenir le chemin absolu du répertoire racine
-const rootPath = path.resolve(__dirname, '..');
+// Importer la configuration Vite du frontend
+const frontendViteConfig = require(resolve(__dirname, '../frontend/config/vite.config.js'));
 
+// Exporter la configuration du frontend avec quelques modifications possibles
 export default defineConfig({
-  plugins: [vue(), compression()],
-  resolve: {
-    alias: {
-      '@': path.resolve(rootPath, 'frontend/src')
-    }
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@import "${rootPath}/frontend/src/assets/scss/utils/_variables.scss"; @import "${rootPath}/frontend/src/assets/scss/utils/_mixins.scss";`
-      }
-    }
-  },
-  server: {
-    host: '0.0.0.0',
-    port: 5173,
-    proxy: {
-      '^/api/.*': {
-        target: 'http://localhost:8080',
-        changeOrigin: true
-      }
-    }
-  },
-  build: {
-    outDir: path.resolve(rootPath, 'frontend/dist'),
-    emptyOutDir: true,
-    brotliSize: false,
-    reportCompressedSize: false,
-    sourcemap: false
-  }
+  ...frontendViteConfig.default,
+  // Vous pouvez ajouter ou modifier des options spécifiques ici si nécessaire
 }); 

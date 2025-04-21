@@ -1,5 +1,4 @@
 // Fichier de compatibilité - Redirection vers le fichier de configuration dans le dossier config
-// Ce fichier est conservé pour la compatibilité avec les outils et scripts existants
 {
   "extends": "./config/tsconfig.node.json"
 }

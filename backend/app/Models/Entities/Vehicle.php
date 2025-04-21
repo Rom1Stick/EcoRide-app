@@ -108,4 +108,26 @@ class Vehicle implements EntityInterface
         
         return $errors;
     }
+    
+    /**
+     * Récupère l'ID du véhicule
+     * 
+     * @return int|null L'ID du véhicule
+     */
+    public function getId(): ?int
+    {
+        return $this->voiture_id;
+    }
+    
+    /**
+     * Définit l'ID du véhicule
+     * 
+     * @param int|null $id L'ID du véhicule
+     * @return self
+     */
+    public function setId(?int $id): self
+    {
+        $this->voiture_id = $id;
+        return $this;
+    }
 } 

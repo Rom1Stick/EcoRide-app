@@ -30,6 +30,7 @@ services:
       - "8080:80"
     depends_on:
       - mysql
+      - mongodb
     networks:
       - ecoride-net
 
@@ -44,6 +45,35 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./docker/mysql/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - ecoride-net
+
+  mongodb:
+    image: mongo:6
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-mongo}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-changeme}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-ecoride_nosql}
+    volumes:
+      - mongo_data:/data/db
+      - ./docker/mongodb/init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "27017:27017"
+    networks:
+      - ecoride-net
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME:-mongo}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-changeme}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME:-mongo}:${MONGO_PASSWORD:-changeme}@mongodb:27017/
+    depends_on:
+      - mongodb
     networks:
       - ecoride-net
 
@@ -71,6 +101,7 @@ services:
       - ./backend:/var/www/html
     depends_on:
       - mysql
+      - mongodb
     networks:
       - ecoride-net
     environment:
@@ -81,6 +112,7 @@ services:
       DB_DATABASE: "${MYSQL_DATABASE_TEST:-ecoride_test}"
       DB_USERNAME: "${MYSQL_USER:-ecorider}"
       DB_PASSWORD: "${MYSQL_PASSWORD:-securepass}"
+      NOSQL_URI: "mongodb://${MONGO_USERNAME:-mongo}:${MONGO_PASSWORD:-changeme}@mongodb:27017/${MONGO_DATABASE:-ecoride_nosql}"
     # Ce service ne démarre pas automatiquement, il faut l'exécuter manuellement avec:
     # docker-compose run tests
     profiles:
@@ -101,6 +133,7 @@ services:
 
 volumes:
   db_data:
+  mongo_data:
 
 networks:
   ecoride-net:

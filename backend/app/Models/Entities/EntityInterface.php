@@ -3,29 +3,29 @@
 namespace App\Models\Entities;
 
 /**
- * Interface pour les entités du modèle
+ * Interface pour toutes les entités
  */
 interface EntityInterface
 {
     /**
-     * Création d'une instance depuis un tableau de données
-     *
-     * @param array $data Données sources
-     * @return self Instance de l'entité
-     */
-    public static function fromArray(array $data): self;
-    
-    /**
-     * Convertit l'entité en tableau
-     *
-     * @return array Représentation sous forme de tableau
+     * Transforme l'entité en tableau
+     * 
+     * @return array
      */
     public function toArray(): array;
     
     /**
-     * Valide les données de l'entité
-     *
-     * @return array Tableau des erreurs de validation (vide si aucune erreur)
+     * Crée une instance d'entité à partir d'un tableau
+     * 
+     * @param array $data
+     * @return self
+     */
+    public static function fromArray(array $data): self;
+    
+    /**
+     * Valide l'entité
+     * 
+     * @return array Erreurs de validation (vide si tout est valide)
      */
     public function validate(): array;
 } 
