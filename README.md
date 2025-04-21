@@ -278,3 +278,58 @@ Pour étendre le schéma :
 ## Licence
 
 Voir le fichier LICENSE pour les détails.
+
+## Configuration sécurisée pour MySQL
+
+Pour exécuter des commandes MySQL de manière sécurisée (sans exposer les mots de passe en ligne de commande), utilisez le script `mysql-secure.sh` :
+
+### Exemples d'utilisation:
+
+1. Tester la fonction de calcul de distance:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh distance
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh distance
+   ```
+
+2. Exécuter une requête SQL:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh query "SELECT * FROM Utilisateur LIMIT 5;"
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh query "SELECT * FROM Utilisateur LIMIT 5;"
+   ```
+
+3. Exécuter un benchmark sur une fonction:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh benchmark calculer_distance_km "48.8566, 2.3522, 43.2965, 5.3698" 50000 distance
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh benchmark calculer_distance_km "48.8566, 2.3522, 43.2965, 5.3698" 50000 distance
+   ```
+
+4. Exécuter un fichier SQL:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh file test_distance.sql
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh file test_distance.sql
+   ```
+
+## Avantages de cette approche
+
+- Évite l'avertissement "Using a password on the command line interface can be insecure"
+- Protège les identifiants en les stockant dans un fichier de configuration protégé
+- Améliore la sécurité en évitant que les mots de passe apparaissent dans l'historique des commandes ou les journaux système
+- Simplifie la maintenance en centralisant les identifiants
+
+## Documentation des fonctions SQL
+
+Les fonctions et procédures stockées sont documentées directement dans les fichiers SQL avec des commentaires détaillés expliquant leur usage, paramètres et exemples d'utilisation.
+
+Consultez le fichier `backend/database/scripts/06_create_triggers_and_funcs.sql` pour la documentation complète.
