@@ -46,6 +46,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-securepass}
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker/mysql/init-scripts:/docker-entrypoint-initdb.d
     networks:
       - ecoride-net
 
