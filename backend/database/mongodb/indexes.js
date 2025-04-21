@@ -24,4 +24,14 @@ db.geo_data.createIndex({ covoiturageId: 1 });
 
 // Collection configurations
 // Index pour recherche rapide des configurations par code
-db.configurations.createIndex({ code: 1 }, { unique: true }); 
+db.configurations.createIndex({ code: 1 }, { unique: true });
+
+// Collection reviews
+// Index pour recherche rapide des avis par trajet
+db.reviews.createIndex({ rideId: 1 });
+// Index pour recherche des avis par auteur
+db.reviews.createIndex({ authorUserId: 1 });
+// Index textuel pour recherche dans les commentaires
+db.reviews.createIndex({ comment: "text" });
+// Index composite pour les requêtes combinées (par trajet et note)
+db.reviews.createIndex({ rideId: 1, rating: -1 }); 
