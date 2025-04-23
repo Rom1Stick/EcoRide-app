@@ -4,7 +4,7 @@ namespace App\DataAccess\NoSql\Service;
 
 use App\DataAccess\DataAccessException;
 use App\DataAccess\NoSql\Model\Review;
-use App\DataAccess\NoSql\MongoServiceInterface;
+use App\DataAccess\NoSql\Service\MongoServiceInterface;
 use Exception;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
@@ -38,7 +38,7 @@ class ReviewService extends AbstractMongoService
      *
      * @var Collection
      */
-    private Collection $collection;
+    protected Collection $collection;
     
     /**
      * Constructeur
