@@ -18,7 +18,7 @@ class DataAccessException extends Exception
      *
      * @var string
      */
-    private string $dbType;
+    private $dbType;
 
     /**
      * Constructeur
@@ -43,7 +43,7 @@ class DataAccessException extends Exception
      *
      * @return string Type de base de données
      */
-    public function getDbType(): string
+    public function getDbType()
     {
         return $this->dbType;
     }
@@ -53,7 +53,7 @@ class DataAccessException extends Exception
      *
      * @return bool True si c'est une erreur de connexion, False sinon
      */
-    public function isConnectionError(): bool
+    public function isConnectionError()
     {
         $previous = $this->getPrevious();
 
@@ -69,8 +69,10 @@ class DataAccessException extends Exception
             $code = $previous->getCode();
             return in_array($code, $connectionErrorCodes);
         } elseif (
-            $previous instanceof \MongoDB\Driver\Exception\ConnectionTimeoutException ||
-            $previous instanceof \MongoDB\Driver\Exception\ConnectionException
+            class_exists('\\MongoDB\\Driver\\Exception\\ConnectionTimeoutException') &&
+            class_exists('\\MongoDB\\Driver\\Exception\\ConnectionException') && 
+            ($previous instanceof \MongoDB\Driver\Exception\ConnectionTimeoutException ||
+            $previous instanceof \MongoDB\Driver\Exception\ConnectionException)
         ) {
             return true;
         }
