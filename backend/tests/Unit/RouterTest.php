@@ -163,6 +163,13 @@ class RouterTest extends TestCase
         $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
         
+        // S'assurer que $params est initialisé pour findRoute
+        if ($methodName === 'findRoute' && count($parameters) > 2) {
+            if (!isset($parameters[2])) {
+                $parameters[2] = [];
+            }
+        }
+        
         return $method->invokeArgs($this->router, $parameters);
     }
     
