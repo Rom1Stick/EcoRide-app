@@ -56,7 +56,10 @@ jobs:
       - name: Install back dependencies
         run: cd backend && composer install --no-progress --prefer-dist --ignore-platform-req=ext-mongodb
       - name: Lint back
-        run: cd backend && vendor/bin/phpcs 
+        run: |
+          cd backend
+          # Utiliser le fichier de configuration phpcs qui existe dans config/phpcs.xml
+          vendor/bin/phpcs --standard=config/phpcs.xml app src tests
   
   test:
     needs: lint
