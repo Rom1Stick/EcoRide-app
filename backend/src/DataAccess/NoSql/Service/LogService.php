@@ -2,7 +2,7 @@
 
 namespace App\DataAccess\NoSql\Service;
 
-use App\DataAccess\DataAccessException;
+use App\DataAccess\Exception\DataAccessException;
 use App\DataAccess\NoSql\Model\Log;
 use App\DataAccess\NoSql\MongoServiceInterface;
 use DateTime;

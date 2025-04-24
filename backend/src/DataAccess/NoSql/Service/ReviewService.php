@@ -2,7 +2,7 @@
 
 namespace App\DataAccess\NoSql\Service;
 
-use App\DataAccess\DataAccessException;
+use App\DataAccess\Exception\DataAccessException;
 use App\DataAccess\NoSql\Model\Review;
 use App\DataAccess\NoSql\Service\MongoServiceInterface;
 use Exception;
