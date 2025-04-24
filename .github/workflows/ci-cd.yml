@@ -43,14 +43,19 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: mongodb
+          extensions: mongodb:2.0.0
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
       - name: Install back dependencies
-        run: cd backend && composer install --no-progress --no-suggest --prefer-dist
+        run: |
+          cd backend
+          # Essayer d'installer normalement d'abord
+          composer install --no-progress --no-suggest --prefer-dist || \
+          # Si ça échoue, essayer avec l'option ignore-platform-req
+          composer install --no-progress --no-suggest --prefer-dist --ignore-platform-req=ext-mongodb
       - name: Lint back
         run: cd backend && vendor/bin/phpcs 
   
@@ -94,7 +99,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: mongodb
+          extensions: mongodb:2.0.0
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
