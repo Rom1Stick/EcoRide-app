@@ -34,7 +34,7 @@ class LogService extends AbstractMongoService
      *
      * @var Collection
      */
-    private Collection $collection;
+    protected Collection $collection;
     
     /**
      * Constructeur

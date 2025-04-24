@@ -21,11 +21,11 @@ class DriverPreferenceService extends AbstractMongoService
     private const COLLECTION_NAME = 'driver_preferences';
     
     /**
-     * Collection MongoDB des préférences
-     * 
+     * Collection MongoDB
+     *
      * @var Collection
      */
-    private Collection $collection;
+    protected Collection $collection;
     
     /**
      * Constructeur

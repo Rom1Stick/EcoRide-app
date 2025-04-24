@@ -22,11 +22,11 @@ class TripStatsService extends AbstractMongoService
     private const COLLECTION_NAME = 'trip_stats';
     
     /**
-     * Collection MongoDB des statistiques de trajet
-     * 
+     * Collection MongoDB
+     *
      * @var Collection
      */
-    private Collection $collection;
+    protected Collection $collection;
     
     /**
      * Constructeur
@@ -519,5 +519,246 @@ class TripStatsService extends AbstractMongoService
         } catch (\Exception $e) {
             throw new DataAccessException("Erreur lors de la suppression des statistiques du conducteur : " . $e->getMessage(), 0, $e);
         }
+    }
+    
+    /**
+     * Analyser les trajets par tranches horaires et distances
+     * 
+     * @param array $options Options pour l'analyse
+     * @return array
+     * @throws DataAccessException En cas d'erreur d'accès aux données
+     */
+    public function analyzeByTimeAndDistance(array $options = []): array
+    {
+        try {
+            // Tranches horaires par défaut (format 24h)
+            $timeSlots = $options['timeSlots'] ?? [
+                'morning' => ['start' => 6, 'end' => 10],
+                'midday' => ['start' => 10, 'end' => 14],
+                'afternoon' => ['start' => 14, 'end' => 18],
+                'evening' => ['start' => 18, 'end' => 22],
+                'night' => ['start' => 22, 'end' => 6]
+            ];
+            
+            // Tranches de distance en km
+            $distanceRanges = $options['distanceRanges'] ?? [
+                'short' => ['min' => 0, 'max' => 50],
+                'medium' => ['min' => 50, 'max' => 200],
+                'long' => ['min' => 200, 'max' => 500],
+                'very_long' => ['min' => 500, 'max' => null]
+            ];
+            
+            // Période d'analyse
+            $startDate = isset($options['startDate']) ? new \MongoDB\BSON\UTCDateTime(strtotime($options['startDate']) * 1000) : null;
+            $endDate = isset($options['endDate']) ? new \MongoDB\BSON\UTCDateTime(strtotime($options['endDate']) * 1000) : null;
+            
+            // Pipeline d'agrégation MongoDB
+            $pipeline = [];
+            
+            // Étape 1: Filtre par période si spécifiée
+            if ($startDate && $endDate) {
+                $pipeline[] = [
+                    '$match' => [
+                        'updatedAt' => [
+                            '$gte' => $startDate,
+                            '$lte' => $endDate
+                        ]
+                    ]
+                ];
+            }
+            
+            // Étape 2: Décomposer l'historique mensuel pour analyse
+            $pipeline[] = [
+                '$project' => [
+                    'driver_id' => 1,
+                    'totalTrips' => 1,
+                    'totalDistance' => 1,
+                    'totalDuration' => 1,
+                    'totalEarnings' => 1,
+                    'averageOccupancyRate' => 1,
+                    'tripsByDayOfWeek' => 1,
+                    'monthlyHistory' => [
+                        '$objectToArray' => '$monthlyTripHistory'
+                    ]
+                ]
+            ];
+            
+            // Étape 3: Dégrouper l'historique mensuel
+            $pipeline[] = [
+                '$unwind' => '$monthlyHistory'
+            ];
+            
+            // Étape 4: Préparer l'analyse par tranches horaires et distances
+            $pipeline[] = [
+                '$group' => [
+                    '_id' => null,
+                    'totalDrivers' => ['$addToSet' => '$driver_id'],
+                    'totalTrips' => ['$sum' => '$totalTrips'],
+                    'totalDistance' => ['$sum' => '$totalDistance'],
+                    'totalDuration' => ['$sum' => '$totalDuration'],
+                    'totalEarnings' => ['$sum' => '$totalEarnings'],
+                    'tripsByDayOfWeek' => [
+                        '$mergeObjects' => '$tripsByDayOfWeek'
+                    ],
+                    'monthlyStats' => [
+                        '$push' => [
+                            'month' => '$monthlyHistory.k',
+                            'trips' => '$monthlyHistory.v.count',
+                            'earnings' => '$monthlyHistory.v.earnings'
+                        ]
+                    ],
+                    // Analyse par tranches de distance
+                    'distanceStats' => [
+                        '$push' => [
+                            'distanceRange' => [
+                                '$switch' => [
+                                    'branches' => [
+                                        [
+                                            'case' => ['$lte' => ['$totalDistance', $distanceRanges['short']['max']]],
+                                            'then' => 'short'
+                                        ],
+                                        [
+                                            'case' => [
+                                                '$and' => [
+                                                    ['$gt' => ['$totalDistance', $distanceRanges['short']['max']]],
+                                                    ['$lte' => ['$totalDistance', $distanceRanges['medium']['max']]]
+                                                ]
+                                            ],
+                                            'then' => 'medium'
+                                        ],
+                                        [
+                                            'case' => [
+                                                '$and' => [
+                                                    ['$gt' => ['$totalDistance', $distanceRanges['medium']['max']]],
+                                                    ['$lte' => ['$totalDistance', $distanceRanges['long']['max']]]
+                                                ]
+                                            ],
+                                            'then' => 'long'
+                                        ]
+                                    ],
+                                    'default' => 'very_long'
+                                ]
+                            ],
+                            'distance' => '$totalDistance',
+                            'trips' => '$totalTrips',
+                            'earnings' => '$totalEarnings'
+                        ]
+                    ]
+                ]
+            ];
+            
+            // Étape 5: Formater le résultat final
+            $pipeline[] = [
+                '$project' => [
+                    '_id' => 0,
+                    'summary' => [
+                        'totalDrivers' => ['$size' => '$totalDrivers'],
+                        'totalTrips' => '$totalTrips',
+                        'totalDistance' => ['$round' => ['$totalDistance', 2]],
+                        'totalDuration' => '$totalDuration',
+                        'totalEarnings' => ['$round' => ['$totalEarnings', 2]],
+                        'averageDistancePerTrip' => [
+                            '$round' => [
+                                '$cond' => [
+                                    'if' => ['$gt' => ['$totalTrips', 0]],
+                                    'then' => ['$divide' => ['$totalDistance', '$totalTrips']],
+                                    'else' => 0
+                                ],
+                                2
+                            ]
+                        ],
+                        'averageEarningsPerTrip' => [
+                            '$round' => [
+                                '$cond' => [
+                                    'if' => ['$gt' => ['$totalTrips', 0]],
+                                    'then' => ['$divide' => ['$totalEarnings', '$totalTrips']],
+                                    'else' => 0
+                                ],
+                                2
+                            ]
+                        ]
+                    ],
+                    'tripsByDayOfWeek' => '$tripsByDayOfWeek',
+                    'monthlyStats' => [
+                        '$sortArray' => [
+                            'input' => '$monthlyStats',
+                            'sortBy' => ['month' => 1]
+                        ]
+                    ],
+                    'distanceAnalysis' => [
+                        '$map' => [
+                            'input' => [
+                                '$setUnion' => [
+                                    ['$objectToArray' => $distanceRanges]
+                                ]
+                            ],
+                            'as' => 'range',
+                            'in' => [
+                                'range' => '$$range.k',
+                                'minDistance' => '$$range.v.min',
+                                'maxDistance' => '$$range.v.max',
+                                'stats' => [
+                                    '$filter' => [
+                                        'input' => '$distanceStats',
+                                        'as' => 'stat',
+                                        'cond' => ['$eq' => ['$$stat.distanceRange', '$$range.k']]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+            
+            // Exécuter l'agrégation
+            $result = $this->collection->aggregate($pipeline)->toArray();
+            
+            // Si aucun résultat, retourner un résultat vide structuré
+            if (empty($result)) {
+                return [
+                    'summary' => [
+                        'totalDrivers' => 0,
+                        'totalTrips' => 0,
+                        'totalDistance' => 0,
+                        'totalDuration' => 0,
+                        'totalEarnings' => 0,
+                        'averageDistancePerTrip' => 0,
+                        'averageEarningsPerTrip' => 0
+                    ],
+                    'tripsByDayOfWeek' => array_fill_keys(array_keys($this->getEmptyDayOfWeekArray()), 0),
+                    'monthlyStats' => [],
+                    'distanceAnalysis' => array_map(function($key, $value) {
+                        return [
+                            'range' => $key,
+                            'minDistance' => $value['min'],
+                            'maxDistance' => $value['max'],
+                            'stats' => []
+                        ];
+                    }, array_keys($distanceRanges), $distanceRanges)
+                ];
+            }
+            
+            return $result[0];
+        } catch (\Exception $e) {
+            throw new DataAccessException("Erreur lors de l'analyse des trajets par tranches horaires et distances : " . $e->getMessage(), 0, $e);
+        }
+    }
+    
+    /**
+     * Retourne un tableau vide pour les jours de la semaine
+     * 
+     * @return array
+     */
+    private function getEmptyDayOfWeekArray(): array
+    {
+        return [
+            'monday' => 0,
+            'tuesday' => 0,
+            'wednesday' => 0,
+            'thursday' => 0,
+            'friday' => 0,
+            'saturday' => 0,
+            'sunday' => 0
+        ];
     }
 } 
