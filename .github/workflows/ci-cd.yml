@@ -107,6 +107,8 @@ jobs:
           mongosh --eval "db.createCollection('trip_stats')"
           mongosh --eval "db.createCollection('booking_stats')"
           mongosh --eval "db.createCollection('geo_data')"
+          mongosh --eval "db.createCollection('reviews')"
+          mongosh --eval "db.createCollection('configurations')"
       - name: Run backend SQL tests
         run: cd backend && vendor/bin/phpunit --exclude-group mongodb
       - name: Run MongoDB NoSQL tests

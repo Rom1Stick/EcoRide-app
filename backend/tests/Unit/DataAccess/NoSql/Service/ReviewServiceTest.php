@@ -50,6 +50,9 @@ class TestReviewService extends ReviewService
     }
 }
 
+/**
+ * @group mongodb
+ */
 class ReviewServiceTest extends TestCase
 {
     private $mockCollection;

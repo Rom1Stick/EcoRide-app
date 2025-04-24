@@ -48,6 +48,9 @@ class TestConfigurationService extends ConfigurationService
     }
 }
 
+/**
+ * @group mongodb
+ */
 class ConfigurationServiceTest extends TestCase
 {
     private $mockCollection;
