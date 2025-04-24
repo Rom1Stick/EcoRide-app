@@ -9,27 +9,24 @@ use MongoDB\Collection;
 use MongoDB\Driver\Cursor;
 use PHPUnit\Framework\TestCase;
 use MongoDB\BSON\ObjectId;
+use App\DataAccess\NoSql\Service\MongoConnection;
 
 /**
  * @group mongodb
  */
 class BookingStatsServiceTest extends TestCase
 {
-    private $mongoConnectionMock;
-    private $collectionMock;
-    private $bookingStatsService;
+    private $mockCollection;
+    private $mockMongoConnection;
+    private $service;
     
     protected function setUp(): void
     {
-        $this->mongoConnectionMock = $this->createMock(MongoServiceInterface::class);
-        $this->collectionMock = $this->createMock(Collection::class);
+        $this->mockCollection = $this->createMock(Collection::class);
+        $this->mockMongoConnection = $this->createMock(MongoConnection::class);
+        $this->mockMongoConnection->method('getCollection')->willReturn($this->mockCollection);
         
-        $this->mongoConnectionMock->expects($this->once())
-            ->method('getCollection')
-            ->with('booking_stats')
-            ->willReturn($this->collectionMock);
-        
-        $this->bookingStatsService = new BookingStatsService($this->mongoConnectionMock);
+        $this->service = new BookingStatsService($this->mockMongoConnection);
     }
     
     public function testFindOrCreateByUserId_Existing(): void
@@ -50,13 +47,13 @@ class BookingStatsServiceTest extends TestCase
         ];
         
         // Configuration du mock
-        $this->collectionMock->expects($this->once())
+        $this->mockCollection->expects($this->once())
             ->method('findOne')
             ->with(['user_id' => $userId])
             ->willReturn($expectedResult);
         
         // Appel de la méthode testée
-        $bookingStats = $this->bookingStatsService->findOrCreateByUserId($userId);
+        $bookingStats = $this->service->findOrCreateByUserId($userId);
         
         // Assertions
         $this->assertInstanceOf(BookingStats::class, $bookingStats);

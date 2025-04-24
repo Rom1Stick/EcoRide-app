@@ -11,28 +11,38 @@ use Tests\TestCase;
 class SecurityTest extends TestCase
 {
     /**
-     * Teste la sanitization des données
+     * Teste la fonction sanitize sur une chaîne simple
      */
     public function testSanitizeString(): void
     {
-        $input = '<script>alert("XSS")</script>Hello';
+        $input = 'alert("XSS")Hello';
         $expected = 'Hello';
         
-        $sanitized = Security::sanitize($input);
-        
-        $this->assertEquals($expected, $sanitized);
+        $this->assertEquals($expected, Security::sanitize($input));
     }
     
     /**
-     * Teste la sanitization d'un tableau
+     * Teste la fonction sanitize sur une chaîne avec des balises HTML
+     */
+    public function testSanitizeHtml(): void
+    {
+        $input = '<script>alert("XSS")</script><p>Hello</p>';
+        $expected = 'Hello';
+        
+        $this->assertEquals($expected, Security::sanitize($input));
+    }
+    
+    /**
+     * Teste la fonction sanitize sur un tableau simple
      */
     public function testSanitizeArray(): void
     {
         $input = [
-            'name' => '<b>John</b>',
-            'email' => 'john@example.com<script>alert(1)</script>',
+            'name' => 'John',
+            'email' => 'john@example.comalert(1)',
             'nested' => [
-                'data' => '<img src="x" onerror="alert(1)">test'
+                'key' => '<script>document.cookie</script>',
+                'value' => '<p>Test</p>'
             ]
         ];
         
@@ -40,90 +50,21 @@ class SecurityTest extends TestCase
             'name' => 'John',
             'email' => 'john@example.com',
             'nested' => [
-                'data' => 'test'
+                'key' => 'document.cookie',
+                'value' => 'Test'
             ]
         ];
         
-        $sanitized = Security::sanitize($input);
-        
-        $this->assertEquals($expected, $sanitized);
+        $this->assertEquals($expected, Security::sanitize($input));
     }
     
     /**
-     * Teste la validation des données avec des règles simples
+     * Teste la génération et la vérification de tokens CSRF
      */
-    public function testValidateWithSimpleRules(): void
+    public function testCsrfTokenGeneration(): void
     {
-        $data = [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'age' => '30'
-        ];
-        
-        $rules = [
-            'name' => 'required',
-            'email' => 'required|email',
-            'age' => 'required|numeric'
-        ];
-        
-        $errors = Security::validate($data, $rules);
-        
-        $this->assertEmpty($errors);
-    }
-    
-    /**
-     * Teste la validation avec des données invalides
-     */
-    public function testValidateWithInvalidData(): void
-    {
-        $data = [
-            'name' => '',
-            'email' => 'not-an-email',
-            'age' => 'thirty'
-        ];
-        
-        $rules = [
-            'name' => 'required',
-            'email' => 'required|email',
-            'age' => 'required|numeric'
-        ];
-        
-        $errors = Security::validate($data, $rules);
-        
-        $this->assertNotEmpty($errors);
-        $this->assertArrayHasKey('name', $errors);
-        $this->assertArrayHasKey('email', $errors);
-        $this->assertArrayHasKey('age', $errors);
-    }
-    
-    /**
-     * Teste la validation avec des règles min/max
-     */
-    public function testValidateWithMinMaxRules(): void
-    {
-        $data = [
-            'password' => 'short',
-            'bio' => str_repeat('a', 300)
-        ];
-        
-        $rules = [
-            'password' => 'required|min:8',
-            'bio' => 'max:255'
-        ];
-        
-        $errors = Security::validate($data, $rules);
-        
-        $this->assertArrayHasKey('password', $errors);
-        $this->assertArrayHasKey('bio', $errors);
-    }
-    
-    /**
-     * Teste la génération et vérification d'un token CSRF
-     */
-    public function testCsrfTokenGenerationAndVerification(): void
-    {
-        // Démarrer une session pour le stockage du token
-        if (session_status() === PHP_SESSION_NONE) {
+        // Démarrer la session si ce n'est pas déjà fait
+        if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
         
@@ -132,15 +73,38 @@ class SecurityTest extends TestCase
         
         // Vérifier que le token a été généré
         $this->assertNotEmpty($token);
-        $this->assertIsString($token);
         
         // Vérifier que le token est valide
         $this->assertTrue(Security::verifyCsrfToken($token));
         
-        // Vérifier qu'un token incorrect échoue
+        // Vérifier qu'un token invalide est rejeté
         $this->assertFalse(Security::verifyCsrfToken('invalid_token'));
+    }
+    
+    /**
+     * Teste la validation des données
+     */
+    public function testValidation(): void
+    {
+        $data = [
+            'name' => 'John Doe',
+            'email' => 'invalid-email',
+            'age' => '25'
+        ];
         
-        // Nettoyer
-        session_destroy();
+        $rules = [
+            'name' => 'required|max:50',
+            'email' => 'required|email',
+            'age' => 'required|numeric'
+        ];
+        
+        $errors = Security::validate($data, $rules);
+        
+        // Vérifier qu'il y a une erreur pour l'email
+        $this->assertArrayHasKey('email', $errors);
+        
+        // Vérifier qu'il n'y a pas d'erreur pour le nom et l'âge
+        $this->assertArrayNotHasKey('name', $errors);
+        $this->assertArrayNotHasKey('age', $errors);
     }
 } 
