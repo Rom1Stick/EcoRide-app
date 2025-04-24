@@ -44,18 +44,17 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: mongodb
+      - name: Check PHP Version and Extensions
+        run: |
+          php -v
+          php -m | grep mongodb
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
       - name: Install back dependencies
-        run: |
-          cd backend
-          # Essayer d'installer normalement d'abord
-          composer install --no-progress --no-suggest --prefer-dist || \
-          # Si ça échoue, essayer avec l'option ignore-platform-req
-          composer install --no-progress --no-suggest --prefer-dist --ignore-platform-req=ext-mongodb
+        run: cd backend && composer install --no-progress --prefer-dist --ignore-platform-req=ext-mongodb
       - name: Lint back
         run: cd backend && vendor/bin/phpcs 
   
@@ -100,18 +99,17 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: mongodb
+      - name: Check PHP Version and Extensions
+        run: |
+          php -v
+          php -m | grep mongodb
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
       - name: Install back dependencies
-        run: |
-          cd backend
-          # Essayer d'installer normalement d'abord
-          composer install --no-progress --no-suggest --prefer-dist || \
-          # Si ça échoue, essayer avec l'option ignore-platform-req
-          composer install --no-progress --no-suggest --prefer-dist --ignore-platform-req=ext-mongodb
+        run: cd backend && composer install --no-progress --prefer-dist --ignore-platform-req=ext-mongodb
       - name: Create MongoDB test database
         run: |
           mongosh --eval "use ecoride_test"
