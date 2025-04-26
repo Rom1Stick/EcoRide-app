@@ -43,23 +43,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: mongodb
-      - name: Check PHP Version and Extensions
-        run: |
-          php -v
-          php -m | grep mongodb
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
       - name: Install back dependencies
-        run: cd backend && composer install --no-progress --prefer-dist --ignore-platform-req=ext-mongodb
+        run: cd backend && composer install --no-progress --no-suggest --prefer-dist
       - name: Lint back
-        run: |
-          cd backend
-          # Utiliser le fichier de configuration phpcs qui existe dans config/phpcs.xml
-          vendor/bin/phpcs --standard=config/phpcs.xml app src tests
+        run: cd backend && vendor/bin/phpcs 
   
   test:
     needs: lint
@@ -102,25 +94,19 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: mongodb
-      - name: Check PHP Version and Extensions
-        run: |
-          php -v
-          php -m | grep mongodb
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
       - name: Install back dependencies
-        run: cd backend && composer install --no-progress --prefer-dist --ignore-platform-req=ext-mongodb
+        run: cd backend && composer install --no-progress --no-suggest --prefer-dist
       - name: Create MongoDB test database
         run: |
           mongosh --eval "use ecoride_test"
           mongosh --eval "db.createCollection('trip_stats')"
           mongosh --eval "db.createCollection('booking_stats')"
           mongosh --eval "db.createCollection('geo_data')"
-          mongosh --eval "db.createCollection('reviews')"
-          mongosh --eval "db.createCollection('configurations')"
       - name: Run backend SQL tests
         run: cd backend && vendor/bin/phpunit --exclude-group mongodb
       - name: Run MongoDB NoSQL tests

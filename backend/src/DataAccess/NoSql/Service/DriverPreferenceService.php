@@ -2,7 +2,7 @@
 
 namespace App\DataAccess\NoSql\Service;
 
-use App\DataAccess\Exception\DataAccessException;
+use App\DataAccess\DataAccessException;
 use App\DataAccess\NoSql\Model\DriverPreference;
 use MongoDB\Collection;
 use MongoDB\BSON\ObjectId;

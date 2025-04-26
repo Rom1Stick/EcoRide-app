@@ -2,7 +2,7 @@
 
 namespace App\DataAccess\NoSql\Service;
 
-use App\DataAccess\Exception\DataAccessException;
+use App\DataAccess\DataAccessException;
 use App\DataAccess\NoSql\Model\GeoData;
 use App\DataAccess\NoSql\MongoServiceInterface;
 use Exception;

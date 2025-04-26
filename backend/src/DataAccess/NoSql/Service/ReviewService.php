@@ -2,9 +2,9 @@
 
 namespace App\DataAccess\NoSql\Service;
 
-use App\DataAccess\Exception\DataAccessException;
+use App\DataAccess\DataAccessException;
 use App\DataAccess\NoSql\Model\Review;
-use App\DataAccess\NoSql\Service\MongoServiceInterface;
+use App\DataAccess\NoSql\MongoConnection;
 use Exception;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Collection;
@@ -43,9 +43,9 @@ class ReviewService extends AbstractMongoService
     /**
      * Constructeur
      *
-     * @param MongoServiceInterface $mongoConnection
+     * @param MongoConnection $mongoConnection
      */
-    public function __construct(MongoServiceInterface $mongoConnection)
+    public function __construct(MongoConnection $mongoConnection)
     {
         parent::__construct($mongoConnection);
     }
@@ -55,7 +55,8 @@ class ReviewService extends AbstractMongoService
      */
     protected function initService(): void
     {
-        $this->collection = $this->getCollection(self::COLLECTION_NAME);
+        $this->collectionName = self::COLLECTION_NAME;
+        $this->collection = $this->connection->getCollection(self::COLLECTION_NAME);
         $this->ensureIndexes();
     }
     

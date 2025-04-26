@@ -2,7 +2,7 @@
 
 namespace App\DataAccess\NoSql\Service;
 
-use App\DataAccess\Exception\DataAccessException;
+use App\DataAccess\DataAccessException;
 use App\DataAccess\NoSql\Model\TripStats;
 use App\DataAccess\Sql\Entity\Trip;
 use MongoDB\Collection;
