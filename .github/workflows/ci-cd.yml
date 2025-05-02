@@ -44,8 +44,6 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: mongodb-2.0.0
-      - name: Verify MongoDB extension version
-        run: php --ri mongodb || echo "MongoDB extension not found or inactive"
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
