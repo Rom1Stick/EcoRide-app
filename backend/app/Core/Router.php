@@ -243,4 +243,3 @@ class Router
         return '/^' . $pattern . '$/';
     }
 }
-

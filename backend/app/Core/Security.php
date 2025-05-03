@@ -207,4 +207,3 @@ class Security
         return $errors;
     }
 }
-
