@@ -11,6 +11,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: write
+
 concurrency:
   group: eco-ride-${{ github.ref }}
   cancel-in-progress: false
@@ -56,6 +60,9 @@ jobs:
   
   test:
     needs: lint
+    permissions:
+      contents: read
+      actions: write
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -81,7 +88,7 @@ jobs:
       - name: Check test coverage
         run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
       - name: Upload coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: test-coverage
           path: frontend/coverage
@@ -116,7 +123,7 @@ jobs:
         if: success() || failure()
         run: cd backend && vendor/bin/phpunit --group mongodb --log-junit mongodb-test-report.xml
       - name: Upload MongoDB test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: mongodb-test-report
           path: backend/mongodb-test-report.xml
@@ -144,7 +151,7 @@ jobs:
       - name: Check bundle size
         run: cd frontend && npm run bundle:check
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: frontend-build
           path: frontend/dist
