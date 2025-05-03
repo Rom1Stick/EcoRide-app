@@ -2,6 +2,7 @@
 # Note: Les avertissements VS Code concernant les références aux secrets (${{ secrets.X }})
 # peuvent être ignorés. Ces secrets sont définis dans l'environnement GitHub et
 # fonctionneront correctement lors de l'exécution du workflow.
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: CI/CD EcoRide
 
 on:
@@ -14,6 +15,7 @@ on:
 permissions:
   contents: read
   actions: write
+  metadata: read
 
 concurrency:
   group: eco-ride-${{ github.ref }}
@@ -60,9 +62,6 @@ jobs:
   
   test:
     needs: lint
-    permissions:
-      contents: read
-      actions: write
     runs-on: ubuntu-latest
     services:
       mongodb:
@@ -89,13 +88,6 @@ jobs:
         run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
       - name: Debug Coverage Directory
         run: ls -la frontend/coverage
-      - name: Upload coverage report
-        if: success() || failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-coverage
-          path: frontend/coverage
-          retention-days: 7
       - name: Start app for e2e tests
         run: cd frontend && npm run dev & npx wait-on http://localhost:3000
       - name: Run e2e tests
@@ -125,12 +117,8 @@ jobs:
       - name: Generate MongoDB test report
         if: success() || failure()
         run: cd backend && vendor/bin/phpunit --group mongodb --log-junit mongodb-test-report.xml
-      - name: Upload MongoDB test report
-        uses: actions/upload-artifact@v2
-        with:
-          name: mongodb-test-report
-          path: backend/mongodb-test-report.xml
-          retention-days: 7
+      - name: Start build job
+        uses: actions/checkout@v3
 
   build:
     needs: test
@@ -154,7 +142,7 @@ jobs:
       - name: Check bundle size
         run: cd frontend && npm run bundle:check
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-build
           path: frontend/dist
