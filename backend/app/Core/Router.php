@@ -194,6 +194,7 @@ class Router
     private function findRoute(string $method, string $uri, array &$params = []): ?Route
     {
         // Initialiser le tableau de paramètres
+        
         $params = [];
 
         foreach ($this->routes as $route) {
