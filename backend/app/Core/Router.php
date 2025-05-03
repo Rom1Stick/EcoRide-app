@@ -195,7 +195,7 @@ class Router
     {
         // Initialiser le tableau de paramètres
         $params = [];
-        
+
         foreach ($this->routes as $route) {
             // Vérifier si la méthode HTTP correspond
             if ($route->getMethod() !== $method) {
@@ -249,3 +249,4 @@ class Router
         return '/^' . $pattern . '$/';
     }
 }
+
