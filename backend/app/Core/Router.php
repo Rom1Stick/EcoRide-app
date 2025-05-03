@@ -75,8 +75,7 @@ class Router
     /**
      * Ajoute une route au routeur
      *
-     * @param  string $method  Méthode
-     *                         HTTP
+     * @param  string $method  Méthode HTTP
      * @param  string $path    Chemin de la route
      * @param  string $handler Nom du contrôleur et de la méthode (Controller@method)
      * @return Route
@@ -109,8 +108,7 @@ class Router
      * Dispatche une requête vers le contrôleur approprié
      *
      * @param  string $method Méthode HTTP
-     * @param  string $uri    URI de la
-     *                        requête
+     * @param  string $uri    URI de la requête
      * @return mixed
      */
     public function dispatch(string $method, string $uri)
@@ -183,18 +181,14 @@ class Router
     /**
      * Trouve une route correspondant à la méthode HTTP et à l'URI
      *
-     * @param  string $method  Méthode
-     *                         HTTP
-     * @param  string $uri     URI de la
-     *                         requête
-     * @param  array  &$params Paramètres extraits de
-     *                         l'URI
+     * @param  string $method  Méthode HTTP
+     * @param  string $uri     URI de la requête
+     * @param  array  &$params Paramètres extraits de l'URI
      * @return Route|null
      */
     private function findRoute(string $method, string $uri, array &$params = []): ?Route
     {
         // Initialiser le tableau de paramètres
-        
         $params = [];
 
         foreach ($this->routes as $route) {
@@ -224,8 +218,7 @@ class Router
      * Convertit un chemin de route en expression régulière
      *
      * @param  string $path        Chemin de la route
-     * @param  array  &$paramNames Noms des paramètres
-     *                             extraits
+     * @param  array  &$paramNames Noms des paramètres extraits
      * @return string
      */
     private function convertRouteToRegex(string $path, array &$paramNames = null): string
