@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import HomeView from '../../pages/HomeView.vue'
 import CounterComponent from '../../components/CounterComponent.vue'

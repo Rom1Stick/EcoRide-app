@@ -110,12 +110,15 @@ jobs:
           mongosh --eval "db.createCollection('booking_stats')"
           mongosh --eval "db.createCollection('geo_data')"
       - name: Run backend SQL tests
-        run: cd backend && vendor/bin/phpunit --exclude-group mongodb
+        working-directory: backend
+        run: vendor/bin/phpunit --exclude-group mongodb
       - name: Run MongoDB NoSQL tests
-        run: cd backend && vendor/bin/phpunit --group mongodb --testsuite=Unit/DataAccess/NoSql/Service
+        working-directory: backend
+        run: vendor/bin/phpunit --group mongodb --testsuite=Unit/DataAccess/NoSql/Service
       - name: Generate MongoDB test report
         if: success() || failure()
-        run: cd backend && vendor/bin/phpunit --group mongodb --log-junit mongodb-test-report.xml
+        working-directory: backend
+        run: vendor/bin/phpunit --group mongodb --log-junit mongodb-test-report.xml
       - name: Start build job
         uses: actions/checkout@v3
 
