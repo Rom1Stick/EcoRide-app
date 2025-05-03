@@ -15,7 +15,6 @@ on:
 permissions:
   contents: read
   actions: write
-  metadata: read
 
 concurrency:
   group: eco-ride-${{ github.ref }}
