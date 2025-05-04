@@ -10,6 +10,6 @@ describe('App.vue', () => {
 
   it('contains router-view', () => {
     const wrapper = shallowMount(App)
-    expect(wrapper.find('router-view').exists()).toBe(true)
+    expect(wrapper.find('router-view-stub').exists()).toBe(true)
   })
 })

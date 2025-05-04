@@ -12,7 +12,7 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
-    "types": ["node", "jest", "vue", "@testing-library/jest-dom"],
+    "types": ["node", "vitest/globals", "vitest/jsdom", "vue"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2020",

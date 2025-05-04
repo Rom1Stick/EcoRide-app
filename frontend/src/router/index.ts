@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../pages/HomeView.vue'
+// import HomeView from '../pages/HomeView.vue'
 
 // Utiliser une valeur par défaut pour BASE_URL
 const BASE_URL = '/'
@@ -8,7 +8,7 @@ export const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView,
+    component: () => import('../pages/HomeView.vue'),
   },
   {
     path: '/about',

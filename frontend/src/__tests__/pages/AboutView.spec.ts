@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import AboutView from '../../pages/AboutView.vue'
 
@@ -10,7 +10,7 @@ describe('AboutView.vue', () => {
 
   it('displays the main title', () => {
     const wrapper = shallowMount(AboutView)
-    expect(wrapper.find('h1').text()).toBe('À propos')
+    expect(wrapper.find('h1').text()).toBe("À propos d'EcoRide")
   })
 
   it('contains information about the app', () => {

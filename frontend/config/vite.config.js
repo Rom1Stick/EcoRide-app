@@ -57,7 +57,8 @@ export default defineConfig(({ mode }) => {
       globals: true,
       environment: 'jsdom',
       transformMode: {
-        web: [/\.vue$/],
+        web: [/\.[jt]sx?$/],
+        ssr: [/\.vue$/],
       },
       coverage: {
         provider: 'c8',
