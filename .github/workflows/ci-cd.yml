@@ -61,7 +61,8 @@ jobs:
       - name: Install back dependencies
         run: cd backend && composer install --no-progress --no-suggest --prefer-dist
       - name: Lint back
-        run: cd backend && vendor/bin/phpcs --standard=config/phpcs.xml app
+        working-directory: backend
+        run: vendor/bin/phpcs --standard=config/phpcs.xml app
   
   test:
     needs: lint
