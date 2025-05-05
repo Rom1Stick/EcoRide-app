@@ -4,9 +4,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   resolve: {
-    alias: {
-      '@jest/globals': 'vitest',
-    },
+    alias: {},
   },
   test: {
     globals: true,
