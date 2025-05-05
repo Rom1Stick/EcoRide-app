@@ -41,7 +41,11 @@ jobs:
           path: frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
       - name: Install front dependencies
-        run: cd frontend && npm ci
+        run: |
+          cd frontend
+          rm -rf node_modules
+          npm cache clean --force
+          npm install
       - name: Lint front
         run: cd frontend && npm run lint
       - name: Setup PHP
@@ -80,11 +84,29 @@ jobs:
           path: frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
       - name: Install front dependencies
-        run: cd frontend && npm ci
+        run: |
+          cd frontend
+          rm -rf node_modules
+          npm cache clean --force
+          npm install
       - name: Ensure Vue plugin is installed
-        run: cd frontend && npm install --save-dev @vitejs/plugin-vue
+        run: |
+          cd frontend
+          npm install --no-save @vitejs/plugin-vue
+          ls -la node_modules/@vitejs/plugin-vue
+      - name: Debug Vitest config
+        run: |
+          cd frontend
+          echo "Content of vitest.config.js:"
+          cat config/vitest.config.js
+          echo "Testing if Vue plugin is properly imported:"
+          grep -r "vue" config/vitest.config.js
+          echo "Node modules content:"
+          find node_modules -name "*vue*" | grep -i plugin
+          echo "Current directory listing:"
+          find . -name "vitest.config.*" -type f
       - name: Run unit tests
-        run: cd frontend && npm test
+        run: cd frontend && npm test -- --verbose
       - name: Check test coverage
         run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
       - name: Debug Coverage Directory
