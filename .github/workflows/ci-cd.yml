@@ -176,7 +176,7 @@ jobs:
       - name: Debug Coverage Directory
         run: ls -la frontend/coverage
       - name: Start app for e2e tests
-        run: cd frontend && npm run dev -- --host 0.0.0.0 --port 3000 & npx wait-on http://localhost:3000
+        run: cd frontend && npx vite --config config/vite.config.js --host 0.0.0.0 --port 3000 & npx wait-on http://localhost:3000
       - name: Run e2e tests
         run: cd frontend && npm run test:e2e:ci
       - name: Setup PHP
