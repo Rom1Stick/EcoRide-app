@@ -12,5 +12,9 @@ export default defineConfig({
     deps: {
       inline: [/vue/, /@vue\/test-utils/],
     },
+    transformMode: {
+      web: [/\.[jt]sx?$/],
+      ssr: [/\.vue$/],
+    },
   },
 })
