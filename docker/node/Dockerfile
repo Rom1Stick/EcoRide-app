@@ -1,25 +1,37 @@
 # docker/node/Dockerfile
 
-FROM node:18-slim
+FROM node:18-alpine
 
-# Créer un utilisateur non-root
+# Créer l'utilisateur non-root (meilleure sécurité)
 RUN addgroup -g 1001 -S app && adduser -S app -u 1001 -G app
 
-# Définir le dossier de travail dans le frontend
-WORKDIR /app/frontend
+WORKDIR /app
 
-# Copier les fichiers de dépendances du frontend et installer
-COPY frontend/package*.json ./
-RUN npm install --legacy-peer-deps
+# Installer Vite et Husky globalement
+RUN npm install -g vite husky
 
-# Rebuild esbuild pour correspondre à l'OS du container
-RUN npm rebuild esbuild --force --platform=linux --arch=x64
+# Copier les fichiers package.json de la racine
+COPY package*.json ./
 
-# Copier le code source du frontend
-COPY frontend/ ./
+# Désactiver temporairement le hook prepare pour éviter l'erreur
+ENV HUSKY=0
 
-# Exposer le port Vite
+# Nettoyer et installer les dépendances
+RUN rm -rf node_modules package-lock.json
+RUN npm cache clean --force && npm install --legacy-peer-deps
+
+# Copier le reste du code source
+COPY . .
+
+# Réactiver Husky et l'initialiser manuellement
+ENV HUSKY=1
+RUN npx husky install
+
+# Rendre les hooks exécutables
+RUN chmod +x .husky/pre-commit .husky/pre-push .husky/_/husky.sh
+
+# Exposer le port de Vite
 EXPOSE 5173
 
-# Lancer le serveur Vite en dev
+# Lancer le serveur Vite depuis la racine
 CMD ["npm", "run", "dev"]
