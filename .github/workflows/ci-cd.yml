@@ -89,57 +89,12 @@ jobs:
           rm -rf node_modules
           npm cache clean --force
           npm install
-      - name: Fix Vitest configuration
-        run: |
-          cd frontend
-          cat > vitest.config.js << 'EOL'
-          import { fileURLToPath, URL } from 'node:url'
-          import { defineConfig } from 'vitest/config'
-          import vue from '@vitejs/plugin-vue'
-
-          export default defineConfig({
-            plugins: [vue()],
-            resolve: {
-              alias: {
-                '@': fileURLToPath(new URL('./src', import.meta.url)),
-              },
-            },
-            test: {
-              globals: true,
-              environment: 'jsdom',
-              transformMode: {
-                web: [/\.[jt]sx?$/],
-                ssr: [/\.vue$/],
-              },
-              deps: {
-                inline: [/vue/, /@vue\/test-utils/],
-              },
-            },
-          })
-          EOL
       - name: Ensure Vue plugin is installed
         run: |
           cd frontend
           npm install --no-save @vitejs/plugin-vue
-          ls -la node_modules/@vitejs/plugin-vue
-      - name: Remove Jest dependencies
-        run: |
-          cd frontend
-          npm uninstall @jest/globals jest @vue/vue3-jest jest-environment-jsdom ts-jest || true
-          rm -rf node_modules/@jest 2>/dev/null || true
-      - name: Debug Vitest config
-        run: |
-          cd frontend
-          echo "Content of vitest.config.js:"
-          cat config/vitest.config.js
-          echo "Testing if Vue plugin is properly imported:"
-          grep -r "vue" config/vitest.config.js
-          echo "Node modules content:"
-          find node_modules -name "*vue*" | grep -i plugin
-          echo "Current directory listing:"
-          find . -name "vitest.config.*" -type f
       - name: Run unit tests
-        run: cd frontend && npm test || echo "Tests failed but continuing workflow"
+        run: cd frontend && npm test
       - name: Check test coverage
         run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
       - name: Debug Coverage Directory

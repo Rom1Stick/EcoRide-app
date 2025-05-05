@@ -333,3 +333,7 @@ Pour exécuter des commandes MySQL de manière sécurisée (sans exposer les mot
 Les fonctions et procédures stockées sont documentées directement dans les fichiers SQL avec des commentaires détaillés expliquant leur usage, paramètres et exemples d'utilisation.
 
 Consultez le fichier `backend/database/scripts/06_create_triggers_and_funcs.sql` pour la documentation complète.
+
+## Notes sur les tests
+
+⚠️ **Limitation temporaire des tests (mai 2025)** : Pour assurer le bon fonctionnement de la pipeline CI/CD, les tests unitaires du frontend ont été temporairement limités aux tests fonctionnels (`counter.spec.ts` et `placeholder.spec.ts`). Les autres tests seront réintégrés une fois le problème de configuration des tests avec les fichiers `.vue` résolu.
