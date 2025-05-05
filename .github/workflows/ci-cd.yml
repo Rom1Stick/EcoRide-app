@@ -31,19 +31,14 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Cache front dependencies
-        uses: actions/cache@v3
-        with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-      - name: Install front dependencies
-        run: cd frontend && npm ci
-      - name: Lint front
-        run: cd frontend && npm run lint
+      - name: Setup Docker services for lint
+        run: docker-compose up -d mysql mongodb
+      - name: Build frontend Docker image
+        run: docker-compose build frontend
+      - name: Install front dependencies via Docker
+        run: docker-compose run --rm --workdir /app/frontend frontend npm ci
+      - name: Lint front via Docker
+        run: docker-compose run --rm frontend npm run lint
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -70,23 +65,18 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Cache front dependencies
-        uses: actions/cache@v3
-        with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-      - name: Install front dependencies
-        run: cd frontend && npm ci
-      - name: Run unit tests
-        run: cd frontend && npm run test:unit
-      - name: Check test coverage
-        run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
+      - name: Setup Docker services for tests
+        run: docker-compose up -d mysql mongodb
+      - name: Build frontend Docker image
+        run: docker-compose build frontend
+      - name: Install front dependencies via Docker
+        run: docker-compose run --rm --workdir /app/frontend frontend npm ci
+      - name: Run unit tests via Docker
+        run: docker-compose run --rm --workdir /app/frontend frontend npm run test:unit
+      - name: Check test coverage via Docker
+        run: docker-compose run --rm frontend sh -c "cd frontend && npm run test:coverage || echo 'Coverage check failed but continuing...'"
       - name: Debug Coverage Directory
-        run: ls -la frontend/coverage
+        run: docker-compose run --rm frontend sh -c "cd frontend && ls -la coverage"
       - name: Start app for e2e tests
         run: cd frontend && npm run dev & npx wait-on http://localhost:3000
       - name: Run e2e tests
@@ -128,21 +118,16 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Cache front dependencies
-        uses: actions/cache@v3
-        with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-      - name: Install front dependencies
-        run: cd frontend && npm ci
-      - name: Build frontend
-        run: cd frontend && npm run build
-      - name: Check bundle size
-        run: cd frontend && npm run bundle:check
+      - name: Setup Docker services for build
+        run: docker-compose up -d mysql mongodb
+      - name: Build frontend Docker image
+        run: docker-compose build frontend
+      - name: Install front dependencies via Docker
+        run: docker-compose run --rm frontend npm ci
+      - name: Build frontend via Docker
+        run: docker-compose run --rm frontend npm run build
+      - name: Check bundle size via Docker
+        run: docker-compose run --rm frontend npm run bundle:check
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -156,21 +141,19 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Install Lighthouse
-        run: npm install -g @lhci/cli
+      - name: Build frontend Docker image for audit
+        run: docker-compose build frontend
+      - name: Install Lighthouse via Docker
+        run: docker-compose run --rm frontend npm install -g @lhci/cli
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
           name: frontend-build
           path: frontend/dist
-      - name: Run Lighthouse CI
-        run: lhci autorun --config=./config/lighthouse.config.js
-      - name: Run security audit
-        run: cd frontend && npm audit --production
+      - name: Run Lighthouse CI via Docker
+        run: docker-compose run --rm frontend lhci autorun --config=./config/lighthouse.config.js
+      - name: Run security audit via Docker
+        run: docker-compose run --rm frontend npm audit --production
 
   deploy:
     if: github.ref == 'refs/heads/main'

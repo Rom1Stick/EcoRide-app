@@ -7,6 +7,8 @@
   "private": true,
   "scripts": {
     "dev": "vite --config frontend/config/vite.config.js",
+    "test:unit": "cd frontend && npm run test:unit",
+    "test:coverage": "cd frontend && npm run test:coverage",
     "build": "vite build --config frontend/config/vite.config.js",
     "preview": "vite preview --config frontend/config/vite.config.js",
     "lint": "eslint --config frontend/config/.eslintrc.cjs --ext .js,.vue,.ts --ignore-pattern 'frontend/dist/**' --ignore-pattern '**/dist/**' --ignore-pattern 'dist/**' frontend",
