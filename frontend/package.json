@@ -8,7 +8,7 @@
     "build": "vite build --config config/vite.config.js",
     "preview": "vite preview --config config/vite.config.js",
     "lint": "eslint --config config/.eslintrc.cjs \"src/**/*.{js,ts,vue}\"",
-    "test": "vitest",
+    "test": "vitest --config vitest.config.ts",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:unit:watch": "vitest --config vitest.config.ts",
     "test:coverage": "vitest run --coverage",
@@ -25,7 +25,8 @@
     "size:why": "size-limit --why",
     "bundle:check": "node scripts/size-check.js",
     "lint-staged": "lint-staged",
-    "start:ci": "npm run build && npm run preview:ci"
+    "start:ci": "npm run build && npm run preview:ci",
+    "prepublishOnly": "npm install --save-dev @vitejs/plugin-vue"
   },
   "dependencies": {
     "pinia": "^3.0.1",

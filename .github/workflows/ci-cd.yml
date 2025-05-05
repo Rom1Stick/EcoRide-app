@@ -81,8 +81,10 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
       - name: Install front dependencies
         run: cd frontend && npm ci
+      - name: Ensure Vue plugin is installed
+        run: cd frontend && npm install --save-dev @vitejs/plugin-vue
       - name: Run unit tests
-        run: cd frontend && npm run test:unit
+        run: cd frontend && npm test
       - name: Check test coverage
         run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
       - name: Debug Coverage Directory
