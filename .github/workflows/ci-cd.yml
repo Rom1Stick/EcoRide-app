@@ -194,8 +194,10 @@ jobs:
         run: cd backend && composer install --no-progress --no-suggest --prefer-dist
       - name: Install MongoDB client
         run: |
+          wget -qO - https://www.mongodb.org/static/pgp/server-${{ env.MONGODB_VERSION }}.asc | sudo apt-key add -
+          echo "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/${{ env.MONGODB_VERSION }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ env.MONGODB_VERSION }}.list
           sudo apt-get update
-          sudo apt-get install -y mongodb-clients
+          sudo apt-get install -y mongodb-org-shell
       - name: Create MongoDB test database
         run: |
           mongo ecoride_test --eval "db.createCollection('trip_stats')"
