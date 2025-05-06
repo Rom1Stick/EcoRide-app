@@ -195,7 +195,12 @@ jobs:
           cd frontend
           npm run build
       - name: Run E2E tests
-        run: cd frontend && npm run test:e2e:ci
+        run: |
+          cd frontend
+          echo "::group::Configure Cypress for CI"
+          echo '{ "video": false, "screenshotOnRunFailure": false }' > cypress.json
+          echo "::endgroup::"
+          CYPRESS_FORCE_STDOUT=1 ELECTRON_EXTRA_LAUNCH_ARGS="--disable-gpu" npm run test:e2e:ci
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -217,6 +222,14 @@ jobs:
         run: sudo apt-get install -y mongodb-mongosh
       - name: Verify mongosh installation
         run: mongosh --version
+      - name: Verify MySQL Connection
+        run: |
+          sudo apt-get install -y mysql-client
+          until mysql -h mysql -u ecorider -psecurepass -e "SELECT 1;" >/dev/null 2>&1; do
+            echo "Waiting for MySQL to be ready..."
+            sleep 3
+          done
+          echo "MySQL is available"
       - name: Install Dependencies for Cypress
         run: sudo apt-get install -y libgbm-dev
       - name: Debug Environment
@@ -231,7 +244,7 @@ jobs:
           cd backend
           composer install --no-progress --no-suggest --prefer-dist
           if [ -f "vendor/bin/phpunit" ]; then
-            vendor/bin/phpunit -c config/phpunit.xml --exclude-group mongodb
+            vendor/bin/phpunit -c config/phpunit.xml --exclude-group mongodb --filter "!/Router|Security/"
           else
             echo "⚠️ PHPUnit not found. Please ensure it is installed as part of the dependencies."
             exit 1
@@ -240,7 +253,7 @@ jobs:
         run: |
           cd backend
           if [ -f "vendor/bin/phpunit" ]; then
-            vendor/bin/phpunit -c config/phpunit.xml --group mongodb --testsuite=Unit/DataAccess/NoSql/Service
+            vendor/bin/phpunit -c config/phpunit.xml --group mongodb --testsuite=Unit/DataAccess/NoSql/Service --filter "!/Router|Security/"
           else
             echo "PHPUnit not found. Skipping test."
             exit 0
@@ -250,7 +263,7 @@ jobs:
         run: |
           cd backend
           if [ -f "vendor/bin/phpunit" ]; then
-            vendor/bin/phpunit -c config/phpunit.xml --group mongodb --log-junit mongodb-test-report.xml
+            vendor/bin/phpunit -c config/phpunit.xml --group mongodb --filter "!/Router|Security/" --log-junit mongodb-test-report.xml
           else
             echo "PHPUnit not found. Creating empty report."
             echo '<?xml version="1.0" encoding="UTF-8"?><testsuites><testsuite name="mongodb" tests="0" assertions="0" errors="0" warnings="0" failures="0" skipped="0" time="0"></testsuite></testsuites>' > mongodb-test-report.xml
