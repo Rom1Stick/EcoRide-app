@@ -39,7 +39,6 @@
         <report>
             <html outputDirectory="tests/coverage" />
             <clover outputFile="coverage.xml" />
-            <junit outputFile="tests/junit.xml" />
         </report>
     </coverage>
 </phpunit> 
