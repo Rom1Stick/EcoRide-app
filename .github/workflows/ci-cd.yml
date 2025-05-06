@@ -218,7 +218,7 @@ jobs:
           composer install --no-progress --no-suggest --prefer-dist
           if [ -f "vendor/bin/phpunit" ]; then
             # Exécuter uniquement le test Security pour vérifier notre correction
-            vendor/bin/phpunit -c config/phpunit.xml --filter "Tests\\Unit\\SecurityTest" --verbose
+            vendor/bin/phpunit -c config/phpunit.xml --filter "Tests\\Unit\\SecurityTest"
             echo "⚠️ Note: Test exécuté spécifiquement pour vérifier la correction du problème Security::sanitize"
             
             # Exclure tous les tests qui nécessitent une base de données (commenté pour l'instant)
