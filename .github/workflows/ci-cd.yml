@@ -23,7 +23,7 @@ concurrency:
 env:
   NODE_VERSION: '18'
   PHP_VERSION: '8.2'
-  MONGODB_VERSION: '5.0'
+  MONGODB_VERSION: '6.0'
 
 jobs:
   lint:
@@ -199,6 +199,8 @@ jobs:
           sudo apt-get update
       - name: Install MongoDB Shell
         run: sudo apt-get install -y mongodb-org-shell
+      - name: Verify MongoDB Shell Installation
+        run: mongo --version
       - name: Install Dependencies for Cypress
         run: sudo apt-get install -y libgbm-dev
       - name: Debug Environment
