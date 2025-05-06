@@ -27,17 +27,19 @@
         <env name="MONGO_PASSWORD" value="changeme"/>
         <env name="MONGO_DATABASE" value="ecoride_test"/>
     </php>
-    <coverage>
+    <source>
         <include>
             <directory suffix=".php">../app</directory>
         </include>
         <exclude>
             <directory suffix=".php">../app/Core/helpers.php</directory>
         </exclude>
+    </source>
+    <coverage>
+        <report>
+            <html outputDirectory="tests/coverage" />
+            <clover outputFile="coverage.xml" />
+            <junit outputFile="tests/junit.xml" />
+        </report>
     </coverage>
-    <logging>
-        <log type="coverage-html" target="tests/coverage" charset="UTF-8"/>
-        <log type="clover" target="coverage.xml" charset="UTF-8"/>
-        <log type="junit" target="tests/junit.xml"/>
-    </logging>
 </phpunit> 

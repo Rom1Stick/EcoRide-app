@@ -225,10 +225,15 @@ jobs:
             echo "PHPUnit configuration file content:"
             cat config/phpunit.xml | grep -v "<!--" | grep -v "^$" | head -20
             
+            # Vérifier que les tests existent
+            echo "Checking for SecurityTest.php:"
+            ls -la tests/Unit/SecurityTest.php || echo "Test file not found!"
+            
             # Exécuter uniquement le test Security avec redirection des erreurs
             echo "Running SecurityTest:"
-            vendor/bin/phpunit -c config/phpunit.xml --filter "Tests\\Unit\\SecurityTest" 2>&1
+            cd tests/Unit && ../../vendor/bin/phpunit -c ../../config/phpunit.xml SecurityTest.php --no-configuration
             TEST_RESULT=$?
+            cd ../..
             
             echo "PHPUnit exit code: $TEST_RESULT"
             
