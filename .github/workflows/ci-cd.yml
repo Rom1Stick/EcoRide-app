@@ -30,13 +30,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Cache front dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
@@ -54,7 +54,7 @@ jobs:
           php-version: ${{ env.PHP_VERSION }}
           extensions: mongodb-2.0.0
       - name: Cache back dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}-v2
@@ -81,13 +81,13 @@ jobs:
           - 9999:9999
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Cache front dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
@@ -197,7 +197,7 @@ jobs:
           php-version: ${{ env.PHP_VERSION }}
           extensions: mongodb-2.0.0
       - name: Cache back dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}-v2
@@ -262,20 +262,20 @@ jobs:
           echo "Générer un rapport de test vide pour MongoDB"
           echo '<?xml version="1.0" encoding="UTF-8"?><testsuites><testsuite name="mongodb" tests="0" assertions="0" errors="0" warnings="0" failures="0" skipped="0" time="0"></testsuite></testsuites>' > mongodb-test-report.xml
       - name: Start build job
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Cache front dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: frontend/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
@@ -286,7 +286,7 @@ jobs:
       - name: Check bundle size
         run: cd frontend && npm run bundle:check
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist
@@ -297,15 +297,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Lighthouse
         run: npm install -g @lhci/cli
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist
@@ -320,14 +320,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID || '' }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY || '' }}
