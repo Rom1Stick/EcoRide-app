@@ -192,12 +192,17 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}-v2
       - name: Install back dependencies
         run: cd backend && composer install --no-progress --no-suggest --prefer-dist
-      - name: Install MongoDB client
+      - name: Setup MongoDB Repository
         run: |
           wget -qO - https://www.mongodb.org/static/pgp/server-${{ env.MONGODB_VERSION }}.asc | sudo apt-key add -
-          echo "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/${{ env.MONGODB_VERSION }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ env.MONGODB_VERSION }}.list
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/${{ env.MONGODB_VERSION }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ env.MONGODB_VERSION }}.list
           sudo apt-get update
-          sudo apt-get install -y mongodb-org-shell
+      - name: Install MongoDB Shell
+        run: sudo apt-get install -y mongodb-org-shell
+      - name: Install Dependencies for Cypress
+        run: sudo apt-get install -y libgbm-dev
+      - name: Debug Environment
+        run: env
       - name: Create MongoDB test database
         run: |
           mongo ecoride_test --eval "db.createCollection('trip_stats')"
