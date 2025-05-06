@@ -197,10 +197,9 @@ jobs:
       - name: Run E2E tests
         run: |
           cd frontend
-          echo "::group::Configure Cypress for CI"
-          echo '{ "video": false, "screenshotOnRunFailure": false }' > cypress.json
+          echo "::group::Running Cypress E2E Tests"
+          CYPRESS_VIDEO=false CYPRESS_SCREENSHOT_ON_RUN_FAILURE=false CYPRESS_FORCE_STDOUT=1 ELECTRON_EXTRA_LAUNCH_ARGS="--disable-gpu" npm run test:e2e:ci
           echo "::endgroup::"
-          CYPRESS_FORCE_STDOUT=1 ELECTRON_EXTRA_LAUNCH_ARGS="--disable-gpu" npm run test:e2e:ci
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
