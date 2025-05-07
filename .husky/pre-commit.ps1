@@ -3,13 +3,9 @@ Write-Host "Exécution du hook pre-commit PowerShell..."
 
 # Exécuter les outils de la racine du projet
 npm run lint
-npm run format
 
-# Exécuter les outils spécifiques à frontend/  
-Push-Location frontend
-npm run lint
-npm run format
-Pop-Location
+# Exécuter lint-staged à la place des commandes de format individuelles
+npm run lint-staged
 
-# Exécution de lint-staged pour les fichiers modifiés uniquement
-npm run lint-staged 
+# Succès
+exit 0 

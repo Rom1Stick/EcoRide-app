@@ -1,8 +1,11 @@
-# PowerShell script pour commit-msg
-Write-Host "Exécution du hook commit-msg PowerShell..."
+#!/usr/bin/env pwsh
+# PowerShell script pour le hook commit-msg
 
-# Le chemin du fichier commit message est passé comme premier argument
-$commitMsgFile = $args[0]
- 
-# Exécution de commitlint
-npx --no -- commitlint --edit $commitMsgFile 
+$ErrorActionPreference = "Stop"
+Write-Host "Vérification du message de commit par commitlint..."
+
+# Lancer commitlint sur le fichier de message passé en paramètre
+npx --no -- commitlint --edit $args[0]
+
+# Si commitlint échoue, il retourne un code d'erreur non-zéro
+# qui est automatiquement propagé par PowerShell 
