@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dashboard Administration - EcoRide" />
+    <link rel="icon" href="../../assets/images/favicon.ico" />
+    <title>Dashboard Administration - EcoRide</title>
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body class="page-admin">
+    <header class="header header--admin">
+      <div class="header__logo">
+        <img src="../../assets/images/logo.svg" alt="Logo EcoRide" />
+      </div>
+      <nav class="header__nav">
+        <ul class="header__list">
+          <li class="header__item">
+            <a href="dashboard.html" class="header__link header__link--active">Dashboard</a>
+          </li>
+          <li class="header__item">
+            <a href="manage-users.html" class="header__link">Gestion Utilisateurs</a>
+          </li>
+          <li class="header__item">
+            <a href="../public/index.html" class="header__link">Retour au site</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="main main--admin">
+      <div class="admin-header">
+        <h1 class="admin-header__title">Tableau de bord</h1>
+        <div class="admin-header__user">Bienvenue, Admin</div>
+      </div>
+
+      <div class="dashboard">
+        <div class="dashboard__card">
+          <h3 class="dashboard__card-title">Utilisateurs</h3>
+          <p class="dashboard__card-value">125</p>
+          <p class="dashboard__card-change">+12% ce mois</p>
+        </div>
+
+        <div class="dashboard__card">
+          <h3 class="dashboard__card-title">Trajets</h3>
+          <p class="dashboard__card-value">348</p>
+          <p class="dashboard__card-change">+5% ce mois</p>
+        </div>
+
+        <div class="dashboard__card">
+          <h3 class="dashboard__card-title">CO2 économisé</h3>
+          <p class="dashboard__card-value">2.4 tonnes</p>
+          <p class="dashboard__card-change">+18% ce mois</p>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2 class="admin-section__title">Derniers utilisateurs inscrits</h2>
+        <div class="admin-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Date d'inscription</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Les données seront chargées dynamiquement via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    <footer class="footer footer--admin">
+      <p class="footer__text">&copy; 2025 EcoRide - Administration</p>
+    </footer>
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/admin/dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+/*
+ * Styles pour la page d'erreur
+ */
+
+.page-error {
+  .main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 140px);
+  }
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+
+  &__title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+
+  &__text {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: var(--color-text);
+  }
+
+  &__code {
+    font-size: 6rem;
+    font-weight: bold;
+    color: var(--color-secondary);
+    margin: 2rem 0;
+    opacity: 0.4;
+  }
+
+  &__cta {
+    margin-top: 2rem;
+
+    .button {
+      font-size: 1.2rem;
+      padding: 0.75rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    &__title {
+      font-size: 1.5rem;
+    }
+
+    &__text {
+      font-size: 1rem;
+    }
+
+    &__code {
+      font-size: 4rem;
+    }
+  }
+}

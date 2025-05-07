@@ -27,11 +27,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Configuration du répertoire de travail
 WORKDIR /var/www/html
 
-# Copie des fichiers de test
-COPY ./backend /var/www/html
+# Créons un script d'entrée personnalisé
+COPY ./docker/php/docker-entrypoint-tests.sh /usr/local/bin/docker-entrypoint-tests.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint-tests.sh
 
-# Installer les dépendances PHP pour les tests
-RUN composer install --no-interaction --no-progress
+# Définir le point d'entrée
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint-tests.sh"]
 
 # La commande par défaut exécute tous les tests
 CMD ["./vendor/bin/phpunit", "-c", "config/phpunit.xml"] 

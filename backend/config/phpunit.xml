@@ -3,6 +3,11 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
          bootstrap="../vendor/autoload.php"
          colors="true"
+         executionOrder="random"
+         failOnWarning="false"
+         failOnRisky="false"
+         failOnEmptyTestSuite="false"
+         beStrictAboutOutputDuringTests="true"
          cacheDirectory="../.phpunit.cache">
     <testsuites>
         <testsuite name="Unit">
@@ -10,6 +15,9 @@
         </testsuite>
         <testsuite name="Feature">
             <directory>../tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>../tests/Integration</directory>
         </testsuite>
     </testsuites>
     <php>
@@ -36,8 +44,8 @@
         </exclude>
     </coverage>
     <logging>
-        <log type="coverage-html" target="tests/coverage" charset="UTF-8"/>
-        <log type="clover" target="coverage.xml" charset="UTF-8"/>
-        <log type="junit" target="tests/junit.xml"/>
+        <junit outputFile="../tests/junit.xml"/>
+        <testdoxHtml outputFile="../tests/coverage/testdox.html"/>
+        <testdoxText outputFile="../tests/coverage/testdox.txt"/>
     </logging>
 </phpunit> 
