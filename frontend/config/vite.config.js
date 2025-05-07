@@ -39,6 +39,8 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       // Forcer le lancement même si le port est occupé
       strictPort: true,
+      // Ajouter cette option pour s'assurer que le message "ready in" est affiché
+      logLevel: 'info',
     },
     preview: {
       // Permettre l'accès depuis n'importe quelle adresse IP
@@ -51,6 +53,8 @@ export default defineConfig(({ mode }) => {
       cors: true,
       // Assurer que le serveur est accessible en environnement CI
       hmr: isCI ? false : true,
+      // Ajouter cette option pour s'assurer que le message "ready in" est affiché
+      logLevel: 'info',
     },
     // Configuration des tests unitaires avec Vitest
     test: {
@@ -67,6 +71,11 @@ export default defineConfig(({ mode }) => {
       deps: {
         inline: [/vue/, /@vue\/test-utils/],
       },
+    },
+    // Résoudre les problèmes avec le conflit de version TypeScript
+    optimizeDeps: {
+      include: ['vue'],
+      exclude: [],
     },
   }
 })
