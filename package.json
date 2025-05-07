@@ -6,12 +6,14 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "vite --config frontend/config/vite.config.js",
-    "build": "vite build --config frontend/config/vite.config.js",
-    "preview": "vite preview --config frontend/config/vite.config.js",
-    "lint": "eslint --config frontend/config/.eslintrc.cjs --ext .js,.vue,.ts --ignore-pattern 'frontend/dist/**' --ignore-pattern '**/dist/**' --ignore-pattern 'dist/**' frontend",
-    "format": "prettier --config frontend/config/.prettierrc --write frontend",
+    "dev": "npm run scss",
+    "scss": "sass --watch frontend/assets/scss/main.scss:frontend/assets/css/main.css",
+    "build": "sass frontend/assets/scss/main.scss:frontend/assets/css/main.css --style compressed",
+    "preview": "serve frontend",
+    "lint": "eslint 'frontend/assets/js/**/*.js'",
+    "format": "prettier --write 'frontend/assets/js/**/*.js' 'frontend/assets/scss/**/*.scss' 'frontend/**/*.html'",
     "prepare": "husky install",
+    "test:backend": "docker-compose run --rm tests php scripts/tests/run-tests.sh",
     "lint-staged": "lint-staged"
   },
   "config": {
@@ -22,31 +24,27 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
-    "@vitejs/plugin-vue": "^4.0.0",
-    "@vue/eslint-config-typescript": "^11.0.0",
     "commitizen": "^4.3.1",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.0.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-vue": "^9.0.0",
-    "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "husky": "^8.0.3",
     "lint-staged": "^15.5.1",
     "prettier": "^3.0.0",
     "sass": "^1.62.0",
-    "stylelint": "^14.16.1",
-    "stylelint-config-standard-scss": "^5.0.0",
-    "stylelint-scss": "^4.0.0",
-    "typescript": "^5.0.0",
-    "vite": "^5.0.0",
-    "vite-plugin-compression": "^0.5.1"
+    "serve": "^14.0.0"
   },
-  "dependencies": {
-    "pinia": "^2.1.0",
-    "vue": "^3.3.0",
-    "vue-router": "^4.2.0"
-  },
-  "keywords": []
+  "dependencies": {},
+  "keywords": [],
+  "lint-staged": {
+    "frontend/assets/js/**/*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "frontend/assets/scss/**/*.scss": [
+      "prettier --write"
+    ],
+    "frontend/**/*.html": [
+      "prettier --write"
+    ]
+  }
 }

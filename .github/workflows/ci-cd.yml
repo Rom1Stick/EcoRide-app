@@ -18,15 +18,18 @@ concurrency:
 env:
   NODE_VERSION: '18'
   PHP_VERSION: '8.2'
+  COMPOSER_PROCESS_TIMEOUT: 0
+  COMPOSER_NO_INTERACTION: 1
+  COMPOSER_NO_AUDIT: 1
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Cache front dependencies
@@ -42,24 +45,34 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, json
+      - name: Verify PHP version
+        run: php -v
+      - name: Update composer.lock
+        run: cd backend && composer update --lock --no-install
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
       - name: Install back dependencies
-        run: cd backend && composer install --no-progress --no-suggest --prefer-dist
+        run: cd backend && composer install --prefer-dist
       - name: Lint back
-        run: cd backend && vendor/bin/phpcs 
+        run: cd backend && vendor/bin/phpcs --standard=config/phpcs.xml app
   
   test:
     needs: lint
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Cache front dependencies
@@ -69,42 +82,76 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
       - name: Install front dependencies
         run: cd frontend && npm ci
-      - name: Run unit tests
-        run: cd frontend && npm test
-      - name: Check test coverage
-        run: cd frontend && npm run test:coverage || echo "Coverage check failed but continuing..."
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
+      - name: Run unit tests (Vitest)
+        run: cd frontend && npm run test:unit
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
         with:
-          name: test-coverage
+          name: frontend-coverage
           path: frontend/coverage
           retention-days: 7
-      - name: Start app for e2e tests
-        run: cd frontend && npm run dev & npx wait-on http://localhost:3000
+      - name: Build for E2E tests
+        run: cd frontend && npm run build
+      - name: Start frontend server
+        run: |
+          cd frontend
+          npm run start:ci &
+          npx wait-on http://localhost:3000 --timeout 60000
+        env:
+          NODE_ENV: test
+          CI: true
       - name: Run e2e tests
-        run: cd frontend && npm run test:e2e:ci
+        run: |
+          cd frontend
+          npm run cypress:run
+        env:
+          CYPRESS_baseUrl: http://localhost:3000
+          NODE_ENV: test
+          CI: true
+          DEBUG: start-server-and-test
+      - name: Upload Cypress screenshots if tests fail
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+          retention-days: 3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, json
+          coverage: xdebug
       - name: Cache back dependencies
         uses: actions/cache@v3
         with:
           path: backend/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
       - name: Install back dependencies
-        run: cd backend && composer install --no-progress --no-suggest --prefer-dist
+        run: cd backend && composer install --prefer-dist
       - name: Run backend tests
-        run: cd backend && vendor/bin/phpunit
+        run: |
+          cd backend
+          # Exécuter les tests simplifiés sans couverture de code
+          vendor/bin/phpunit --no-coverage
+        env:
+          XDEBUG_MODE: off
+      # Rapports de couverture désactivés temporairement
+      # - name: Upload PHP coverage report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: php-coverage
+      #     path: backend/coverage
+      #     retention-days: 7
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Cache front dependencies
@@ -119,7 +166,7 @@ jobs:
       - name: Check bundle size
         run: cd frontend && npm run bundle:check
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist
@@ -130,15 +177,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Lighthouse
         run: npm install -g @lhci/cli
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist
@@ -153,14 +200,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID || '' }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY || '' }}

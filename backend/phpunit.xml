@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         executionOrder="random"
+         failOnWarning="false"
+         failOnRisky="false"
+         failOnEmptyTestSuite="false"
+         beStrictAboutOutputDuringTests="false"
+         stopOnFailure="false"
+         cacheDirectory=".phpunit.cache">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+    <coverage>
+        <include>
+            <directory suffix=".php">app</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">app/Core/helpers.php</directory>
+        </exclude>
+    </coverage>
+    <logging>
+        <junit outputFile="tests/junit.xml"/>
+        <testdoxHtml outputFile="tests/coverage/testdox.html"/>
+        <testdoxText outputFile="tests/coverage/testdox.txt"/>
+    </logging>
+    <source restrictDeprecations="false" restrictNotices="false" restrictWarnings="false">
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <!-- Configuration générale -->
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_DEBUG" value="true"/>
+        
+        <!-- Configuration MySQL -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_HOST" value="mysql"/>
+        <env name="DB_PORT" value="3306"/>
+        <env name="DB_DATABASE" value="ecoride_test"/>
+        <env name="DB_USERNAME" value="ecorider"/>
+        <env name="DB_PASSWORD" value="securepass"/>
+        
+        <!-- Configuration MongoDB -->
+        <env name="MONGO_HOST" value="mongodb"/>
+        <env name="MONGO_PORT" value="27017"/>
+        <env name="MONGO_USERNAME" value="mongo"/>
+        <env name="MONGO_PASSWORD" value="changeme"/>
+        <env name="MONGO_DATABASE" value="ecoride_test"/>
+        
+        <!-- Configuration PHP -->
+        <ini name="error_reporting" value="E_ALL & ~E_DEPRECATED & ~E_STRICT"/>
+        <ini name="display_errors" value="On"/>
+    </php>
+</phpunit> 

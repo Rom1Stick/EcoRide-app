@@ -205,3 +205,131 @@ Nous évaluons régulièrement notre conformité aux principes d'éco-conception
 - **Sécurité et robustesse** : Protection des données et fiabilité
 - **Maintenabilité et évolutivité** : Architecture facilitant les évolutions futures
 - **Transparence** : Information claire sur l'impact environnemental de l'application
+
+# Base de données EcoRide
+
+Ce projet contient la structure de base de données relationnelle pour l'application EcoRide, une plateforme de covoiturage éco-responsable.
+
+## Structure du projet
+
+- `schema.sql` : Script SQL complet de création du schéma en 3FN
+- `docs/data-dictionary.md` : Documentation détaillée des tables et colonnes
+- `docs/architecture/mcd.md` : Description du modèle conceptuel de données
+
+## Principes d'écoconception appliqués
+
+Cette base de données a été conçue avec des principes d'écoconception :
+
+1. **Normalisation complète (3FN)** pour éviter la redondance de données
+2. **Optimisation du stockage** (types de données appropriés, liens vers fichiers externes)
+3. **Indexation sélective** pour limiter l'empreinte de stockage tout en garantissant les performances
+4. **Gestion intelligente des cascades** pour maintenir l'intégrité des données
+
+## Installation
+
+### Prérequis
+
+- MySQL 5.7+ ou MariaDB 10.3+
+- Droits suffisants pour créer des bases de données et des tables
+
+### Étapes d'installation
+
+1. Créer une base de données vide :
+
+```sql
+CREATE DATABASE ecoride CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE ecoride;
+```
+
+2. Exécuter le script de création :
+
+```bash
+mysql -u username -p ecoride < schema.sql
+```
+
+## Structure principale
+
+Le schéma est composé des entités principales suivantes :
+
+- **Utilisateur** : Gestion des comptes avec système de rôles
+- **Covoiturage** : Trajets proposés par les chauffeurs
+- **Participation** : Réservations des passagers
+- **Voiture** : Véhicules utilisés pour les trajets
+- **Avis** : Évaluations des trajets
+- **Crédit** : Système de gestion de crédits (solde et transactions)
+
+## Considérations de performance
+
+Pour les requêtes fréquentes, des index ont été définis sur :
+- Les clés étrangères utilisées pour les jointures
+- Les colonnes de filtrage courantes (dates, lieux, statuts)
+- Les colonnes de tri fréquentes (notes, dates)
+
+## Évolution et maintenance
+
+Pour étendre le schéma :
+
+1. Respecter la normalisation existante
+2. Ajouter les index seulement sur les colonnes essentielles
+3. Maintenir la documentation à jour
+4. Préserver les contraintes d'intégrité référentielle
+5. Tester les scripts de migration sur un environnement de test avant production
+
+## Licence
+
+Voir le fichier LICENSE pour les détails.
+
+## Configuration sécurisée pour MySQL
+
+Pour exécuter des commandes MySQL de manière sécurisée (sans exposer les mots de passe en ligne de commande), utilisez le script `mysql-secure.sh` :
+
+### Exemples d'utilisation:
+
+1. Tester la fonction de calcul de distance:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh distance
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh distance
+   ```
+
+2. Exécuter une requête SQL:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh query "SELECT * FROM Utilisateur LIMIT 5;"
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh query "SELECT * FROM Utilisateur LIMIT 5;"
+   ```
+
+3. Exécuter un benchmark sur une fonction:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh benchmark calculer_distance_km "48.8566, 2.3522, 43.2965, 5.3698" 50000 distance
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh benchmark calculer_distance_km "48.8566, 2.3522, 43.2965, 5.3698" 50000 distance
+   ```
+
+4. Exécuter un fichier SQL:
+   ```bash
+   # Windows PowerShell
+   ./scripts/mysql-secure.sh file test_distance.sql
+   
+   # Linux/Mac
+   bash scripts/mysql-secure.sh file test_distance.sql
+   ```
+
+## Avantages de cette approche
+
+- Évite l'avertissement "Using a password on the command line interface can be insecure"
+- Protège les identifiants en les stockant dans un fichier de configuration protégé
+- Améliore la sécurité en évitant que les mots de passe apparaissent dans l'historique des commandes ou les journaux système
+- Simplifie la maintenance en centralisant les identifiants
+
+## Documentation des fonctions SQL
+
+Les fonctions et procédures stockées sont documentées directement dans les fichiers SQL avec des commentaires détaillés expliquant leur usage, paramètres et exemples d'utilisation.
+
+Consultez le fichier `backend/database/scripts/06_create_triggers_and_funcs.sql` pour la documentation complète.

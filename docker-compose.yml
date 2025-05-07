@@ -4,21 +4,16 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: docker/node/Dockerfile
-    volumes:
-      - .:/app:delegated
-      - /app/node_modules
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "8090:80"
     depends_on:
       - backend
     networks:
       - ecoride-net
-    environment:
-      - VITE_API_URL=http://localhost:8080/api
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5173"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8090"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -46,6 +41,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-securepass}
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker/mysql/init-scripts:/docker-entrypoint-initdb.d
     networks:
       - ecoride-net
 
@@ -71,7 +67,6 @@ services:
       - "80:80"
     volumes:
       - ./backend:/var/www/html
-      - ./frontend/dist:/usr/share/nginx/html
     depends_on:
       - frontend
       - backend
@@ -85,6 +80,7 @@ services:
       dockerfile: docker/php/Dockerfile.tests
     volumes:
       - ./backend:/var/www/html
+      - composer_cache:/root/.composer/cache
     depends_on:
       - mysql
     networks:
@@ -133,6 +129,10 @@ services:
 volumes:
   db_data:
   mongo_data:
+<<<<<<< HEAD
+=======
+  composer_cache:
+>>>>>>> develop
 
 networks:
   ecoride-net:

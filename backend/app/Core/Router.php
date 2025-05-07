@@ -193,6 +193,9 @@ class Router
      */
     private function findRoute(string $method, string $uri, array &$params = []): ?Route
     {
+        // Initialiser le tableau de paramètres
+        $params = [];
+        
         foreach ($this->routes as $route) {
             // Vérifier si la méthode HTTP correspond
             if ($route->getMethod() !== $method) {
@@ -205,7 +208,6 @@ class Router
             // Vérifier si l'URI correspond au pattern
             if (preg_match($pattern, $uri, $matches)) {
                 // Extraire les paramètres
-                $params = [];
                 for ($i = 1; $i < count($matches); $i++) {
                     $params[$paramNames[$i - 1]] = $matches[$i];
                 }
@@ -225,8 +227,9 @@ class Router
      *                             extraits
      * @return string
      */
-    private function convertRouteToRegex(string $path, array &$paramNames = []): string
+    private function convertRouteToRegex(string $path, array &$paramNames = null): string
     {
+        // Initialiser le tableau de paramètres
         $paramNames = [];
 
         // Remplacer les paramètres {param} par des groupes de capture

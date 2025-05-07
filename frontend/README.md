@@ -2,14 +2,18 @@
 
 Interface utilisateur légère et éco-conçue pour l'application EcoRide de covoiturage écologique.
 
+<<<<<<< HEAD
 ## Test réussi
 
 Test de validation des hooks Git et de la configuration de qualité de code.
 
+=======
+>>>>>>> develop
 ## Approche d'éco-conception
 
 Notre frontend est conçu selon les principes d'éco-conception suivants :
 
+<<<<<<< HEAD
 - **Architecture légère** : Utilisation du framework Vue.js avec une approche minimaliste
 - **Bundle optimisé** : Code-splitting, tree-shaking et compression pour réduire la taille
 - **Performances optimales** : Respect des Web Vitals et optimisation des rendus
@@ -42,11 +46,28 @@ L'architecture du frontend est basée sur Vue.js avec une organisation modulaire
 - Pinia pour la gestion de l'état
 - Sass pour les styles CSS avec une approche modulaire
 - Vite comme outil de build pour des performances optimales
+=======
+- **Architecture ultra-légère** : HTML sémantique + SCSS + JavaScript vanilla sans aucun framework
+- **Performance optimale** : Réduction des traitements côté client et de la charge du navigateur
+- **Accessibilité** : Conception accessible répondant aux normes WCAG 2.1 AA
+- **Réduction des requêtes** : Minimisation des appels HTTP et optimisation des chargements
+- **Optimisation des médias** : Images au format optimisé, dimensionnement adapté, lazy loading
+
+## Stack technique
+
+L'application frontend utilise une stack minimaliste pour maximiser les performances et l'écoconception :
+
+- **HTML sémantique** : Structure claire, accessible et SEO-friendly
+- **SCSS (avec méthode BEM)** : Préprocesseur CSS pour styles modulaires et maintenables
+- **JavaScript Vanilla** : Code JS natif moderne sans dépendances externes
+- **Fetch API** : Communication avec le back-end via requêtes HTTP
+>>>>>>> develop
 
 ## Structure du projet
 
 ```
 frontend/
+<<<<<<< HEAD
 ├── src/
 │   ├── assets/          # Ressources statiques (images, fonts, etc.)
 │   ├── components/      # Composants Vue réutilisables
@@ -68,24 +89,64 @@ frontend/
 ├── __tests__/           # Tests unitaires
 ├── package.json         # Dépendances et scripts
 └── README.md            # Documentation
+=======
+├── pages/
+│   ├── public/                   # Pages accessibles aux visiteurs et utilisateurs
+│   │   ├── index.html
+│   │   ├── register.html
+│   │   ├── login.html
+│   │   └── ...
+│   └── admin/                    # Pages d'administration uniquement
+│       ├── dashboard.html
+│       ├── manage-users.html
+│       └── ...
+├── assets/
+│   ├── js/
+│   │   ├── public/               # Scripts liés aux pages publiques
+│   │   ├── admin/                # Scripts liés à l'admin
+│   │   └── common/               # Modules partagés (API, validations, etc.)
+│   ├── scss/
+│   │   ├── public/               # SCSS pour le front public
+│   │   ├── admin/                # SCSS pour l'admin
+│   │   ├── components/           # Boutons, formulaires, alertes, etc.
+│   │   ├── abstracts/            # Variables, mixins, fonctions...
+│   │   └── main.scss             # Point d'entrée SCSS
+│   ├── css/                      # CSS généré (compilé depuis SCSS)
+│   ├── images/                   # Images optimisées
+│   └── fonts/                    # Polices web
+├── README.md                     # Documentation
+├── Dockerfile                    # Configuration Docker
+└── package.json                  # Dépendances minimales (sass uniquement)
+>>>>>>> develop
 ```
 
 ## Performance et optimisations
 
 Plusieurs stratégies d'optimisation ont été mises en place :
 
+<<<<<<< HEAD
 - **Lazy loading** des composants pour réduire le bundle initial
 - **Prefetching** intelligent des routes pour améliorer la navigation
 - **Compression** des assets pour réduire la bande passante
 - **Cache** optimisé pour les ressources statiques
 - Utilisation d'un **CDN** pour la distribution des assets
 - **Code-splitting** pour charger uniquement le nécessaire
+=======
+- **Zéro framework JavaScript** pour réduire drastiquement la taille de bundle
+- **SCSS compilé en CSS optimisé** pour minimiser les styles inutiles
+- **Cache optimisé** pour les ressources statiques
+- **Fetch API native** pour des appels HTTP sans dépendances
+>>>>>>> develop
 
 ## Installation et développement
 
 ### Prérequis
 
+<<<<<<< HEAD
 - Node.js 16+
+=======
+- Node.js 16+ (uniquement pour compilation SCSS)
+>>>>>>> develop
 - npm ou yarn
 
 ### Installation locale
@@ -95,12 +156,21 @@ Plusieurs stratégies d'optimisation ont été mises en place :
 cd frontend
 npm install
 
+<<<<<<< HEAD
 # Lancer le serveur de développement
 npm run dev
+=======
+# Compiler le SCSS en CSS
+npm run build:scss
+
+# Lancer en mode watch (SCSS → CSS automatique)
+npm run watch:scss
+>>>>>>> develop
 ```
 
 ### Scripts disponibles
 
+<<<<<<< HEAD
 - `npm run dev` : Démarre le serveur de développement
 - `npm run build` : Compile l'application pour la production
 - `npm run preview` : Prévisualise la version de production localement
@@ -129,11 +199,25 @@ Pour contribuer au frontend, veuillez consulter le fichier CONTRIBUTING.md à la
 3. Écrivez des tests pour toute nouvelle fonctionnalité
 4. Suivez la convention de nommage des composants et des fichiers
 5. Utilisez les composants existants plutôt que d'en créer de nouveaux si possible
+=======
+- `npm run build:scss` : Compile le SCSS en CSS minifié
+- `npm run watch:scss` : Surveille les changements SCSS et compile en continu
+- `npm run lint` : Vérifie le code avec ESLint
+
+## Docker
+
+L'application est conçue pour fonctionner dans un environnement Docker :
+
+- Nginx sert les fichiers statiques de manière optimisée
+- Le proxy API est configuré pour communiquer avec le backend
+- La compilation SCSS peut être intégrée dans le pipeline de build
+>>>>>>> develop
 
 ## Mesures d'éco-conception
 
 Nous surveillons activement les métriques suivantes :
 
+<<<<<<< HEAD
 - Taille de bundle < 150KB
 - Score Lighthouse Performance > 90
 - First Contentful Paint < 1.5s
@@ -141,6 +225,16 @@ Nous surveillons activement les métriques suivantes :
 - Temps d'interaction total < 200ms
 
 Ces mesures sont vérifiées à chaque déploiement pour garantir notre engagement écologique.
+=======
+- Taille du bundle CSS < 10KB
+- Taille du bundle JS < 15KB
+- Score Lighthouse Performance > 95
+- First Contentful Paint < 1s
+- Largest Contentful Paint < 1.5s
+- Temps d'interaction total < 100ms
+
+Ces mesures reflètent notre engagement écologique et notre approche sobre du développement web.
+>>>>>>> develop
 
 ## Licence
 
