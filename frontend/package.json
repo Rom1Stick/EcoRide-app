@@ -15,11 +15,11 @@
     "test:coverage": "vitest run --coverage src/__tests__/counter.spec.ts src/__tests__/placeholder.spec.ts",
     "test:e2e": "cypress run --config-file config/cypress.config.js --reporter mocha-junit-reporter",
     "test:e2e:ci": "start-server-and-test preview:ci http://localhost:3000 cypress:run",
-    "preview:ci": "vite preview --host --port 3000 --config config/vite.config.js",
+    "preview:ci": "vite preview --host 0.0.0.0 --port 3000 --config config/vite.config.js --debug",
     "cypress:run": "cypress run --config-file config/cypress.config.js --reporter mocha-junit-reporter",
     "test:e2e:ci:timeout": "node scripts/cypress-timeout.js 180 & npm run test:e2e:ci",
     "test:e2e:ci:mock": "node scripts/mock-e2e-tests.js",
-    "serve": "vite preview --config config/vite.config.js",
+    "serve": "vite preview --host --port 3000 --config config/vite.config.js",
     "type-check": "vue-tsc --build",
     "format": "prettier --config config/.prettierrc --write src",
     "size": "size-limit",
@@ -54,7 +54,7 @@
     "npm-run-all2": "^7.0.2",
     "size-limit": "^11.2.0",
     "start-server-and-test": "^2.0.0",
-    "typescript": "~5.1.6",
+    "typescript": "^5.8.3",
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2",
     "vitest": "^3.1.1",
@@ -63,6 +63,9 @@
   "overrides": {
     "@typescript-eslint/typescript-estree": {
       "typescript": ">=5.8.3"
+    },
+    "tsutils": {
+      "typescript": "^5.8.3"
     }
   },
   "size-limit": [
