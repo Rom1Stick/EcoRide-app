@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       # Désactivation temporaire des services de base de données pour CI/CD
-      # Mais nous gardons un service fictif pour maintenir la structure YAML valide
+      # Mais nous gardons un service fictif pour maintenir la structure YAML valide ! 
       dummy-service:
         image: alpine:latest
         ports:
