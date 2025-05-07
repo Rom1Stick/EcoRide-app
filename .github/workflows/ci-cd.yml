@@ -311,35 +311,7 @@ jobs:
           name: frontend-build
           path: frontend/dist
       - name: Run Lighthouse CI
-        run: |
-          echo "Exécution de Lighthouse CI (mode tolérant pour CI)"
-          mkdir -p .lighthouseci || true
-          lhci autorun --config=./config/lighthouse.config.js || true
-        continue-on-error: true
-      - name: Ensure Lighthouse report exists
-        if: success() || failure()
-        run: |
-          if [ ! -d ".lighthouseci" ] || [ -z "$(ls -A .lighthouseci)" ]; then
-            echo "Création d'un rapport Lighthouse simulé pour assurer la progression du pipeline"
-            mkdir -p .lighthouseci
-            cat > .lighthouseci/dummy-report.json << 'EOL'
-            {
-              "categories": {
-                "performance": { "score": 0.95 },
-                "accessibility": { "score": 0.98 },
-                "best-practices": { "score": 0.93 },
-                "seo": { "score": 0.9 }
-              },
-              "audits": {
-                "first-contentful-paint": { "score": 0.9 },
-                "speed-index": { "score": 0.95 }
-              }
-            }
-            EOL
-            echo "✅ Rapport Lighthouse simulé créé avec succès"
-          else
-            echo "✅ Rapport Lighthouse existant détecté"
-          fi
+        run: lhci autorun --config=./config/lighthouse.config.js
       - name: Run security audit
         run: cd frontend && npm audit --production
 

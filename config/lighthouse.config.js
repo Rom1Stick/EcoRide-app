@@ -1,70 +1,52 @@
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: 'cd frontend && npm run build && npm run preview:ci',
-      startServerReadyPattern: 'server started at|ready in',
-      url: ['http://localhost:3000'],
-      numberOfRuns: 1,
+      startServerCommand: 'cd frontend && npm ci && npm run serve',
+      startServerReadyPattern: 'http://localhost:3000',
+      url: ['http://localhost:3000', 'http://localhost:3000/about'],
+      numberOfRuns: 2,
       settings: {
-        // Options spéciales pour environnement CI
-        chromeFlags: '--no-sandbox --disable-dev-shm-usage --disable-gpu --headless=new',
-        formFactor: 'desktop', // Moins de problèmes qu'en mode mobile
-        // Désactiver l'émulation mobile pour réduire les problèmes
-        screenEmulation: {
-          mobile: false,
-          width: 1350,
-          height: 940,
-          deviceScaleFactor: 1,
-          disabled: true
-        },
-        skipAudits: [
-          'uses-http2',
-          'uses-long-cache-ttl',
-          'is-on-https',
-          'redirects-http',
-          'efficient-animated-content',
-          'interactive',
-          'first-contentful-paint',
-          'largest-contentful-paint'
-        ],
-        // Désactiver la limitation de CPU/réseau dans CI
         throttling: {
-          cpuSlowdownMultiplier: 1,
-          downloadThroughputKbps: 10000,
-          uploadThroughputKbps: 10000,
-          rttMs: 0
+          // Simuler une connexion lente pour évaluer les performances dans des conditions défavorables
+          cpuSlowdownMultiplier: 4,
+          downloadThroughputKbps: 1500,
+          uploadThroughputKbps: 750,
+          rttMs: 40
         },
-        onlyCategories: ['accessibility', 'best-practices'],
-        // Augmenter le timeout pour les environnements CI
-        maxWaitForLoad: 120000,
-        // Éviter les problèmes avec le headless browser
-        disableStorageReset: true,
+        formFactor: 'mobile',
+        screenEmulation: {
+          mobile: true,
+          width: 375,
+          height: 667,
+          deviceScaleFactor: 2,
+          disabled: false
+        }
       }
     },
     assert: {
       assertions: {
-        // Assouplir les critères pour CI
-        'categories:performance': ['off'],
-        'categories:accessibility': ['warn', { minScore: 0.7 }],
-        'categories:best-practices': ['warn', { minScore: 0.7 }],
-        'categories:seo': ['off'],
+        // Critères de performance
+        'categories:performance': ['error', { minScore: 0.90 }],
+        'categories:accessibility': ['error', { minScore: 0.95 }],
+        'categories:best-practices': ['error', { minScore: 0.95 }],
+        'categories:seo': ['error', { minScore: 0.90 }],
 
-        // Désactiver les critères d'éco-conception stricts pour CI
-        'uses-optimized-images': ['off'],
-        'uses-webp-images': ['off'],
-        'uses-responsive-images': ['off'],
-        'offscreen-images': ['off'],
-        'total-byte-weight': ['off'],
-        'unused-javascript': ['off'],
-        'uses-rel-preconnect': ['off'],
-        'efficient-animated-content': ['off'],
+        // Critères d'éco-conception
+        'uses-optimized-images': ['error', { maxLength: 0 }],
+        'uses-webp-images': ['warn', { maxLength: 0 }],
+        'uses-responsive-images': ['error', { maxLength: 0 }],
+        'offscreen-images': ['error', { maxLength: 0 }],
+        'total-byte-weight': ['error', { maxNumericValue: 1000000 }], // 1MB max
+        'unused-javascript': ['error', { maxLength: 0 }],
+        'uses-rel-preconnect': ['warn', { maxLength: 0 }],
+        'efficient-animated-content': ['warn', { maxLength: 0 }],
         
-        // Désactiver les critères de performance qui posent problème
-        'first-contentful-paint': ['off'],
-        'largest-contentful-paint': ['off'],
-        'cumulative-layout-shift': ['off'],
-        'total-blocking-time': ['off'],
-        'server-response-time': ['off']
+        // Performance et ressources
+        'first-contentful-paint': ['error', { maxNumericValue: 2000 }],
+        'largest-contentful-paint': ['error', { maxNumericValue: 2500 }],
+        'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
+        'total-blocking-time': ['error', { maxNumericValue: 300 }],
+        'server-response-time': ['error', { maxNumericValue: 600 }]
       }
     },
     upload: {
@@ -72,4 +54,4 @@ module.exports = {
     },
     outputPath: '.lighthouseci'
   }
-}; 
+};
