@@ -129,10 +129,7 @@ services:
 volumes:
   db_data:
   mongo_data:
-<<<<<<< HEAD
-=======
   composer_cache:
->>>>>>> develop
 
 networks:
   ecoride-net:
