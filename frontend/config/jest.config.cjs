@@ -1,5 +1,5 @@
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/js-with-ts-esm',
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.vue$': [
@@ -8,14 +8,17 @@ module.exports = {
         tsConfig: '<rootDir>/tsconfig.test.json',
       },
     ],
-    '^.+\\.(ts|js)$': [
+    '^.+\\.(ts|js|tsx|jsx)$': [
       'ts-jest',
       {
         tsconfig: '<rootDir>/tsconfig.test.json',
+        useESM: true,
+        isolatedModules: true,
       },
     ],
   },
-  moduleFileExtensions: ['ts', 'js', 'json', 'vue'],
+  transformIgnorePatterns: ['node_modules/(?!(vue|@vue/test-utils|@vue/vue3-jest)/)'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'vue'],
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.{ts,vue}', '!src/main.ts'],
   coverageReporters: ['text', 'lcov'],
@@ -24,13 +27,24 @@ module.exports = {
   verbose: true,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/config/__mocks__/fileMock.js',
   },
+  setupFilesAfterEnv: ['<rootDir>/config/jest.setup.js'],
+  extensionsToTreatAsEsm: ['.ts', '.tsx', '.vue'],
   globals: {
     'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.test.json',
+      useESM: true,
+      isolatedModules: true,
+      diagnostics: {
+        warnOnly: true,
+      },
     },
     'vue-jest': {
-      tsConfig: '<rootDir>/tsconfig.test.json',
+      babelConfig: false,
+      experimentalCSSCompile: true,
     },
   },
+  testPathIgnorePatterns: ['/node_modules/'],
+  bail: 0,
 }

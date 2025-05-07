@@ -3,8 +3,7 @@
     "description": "API backend pour l'application EcoRide",
     "type": "project",
     "require": {
-        "php": "^8.2",
-        "ext-json": "*",
+        "php": "^8.1",
         "ext-pdo": "*",
         "mongodb/mongodb": "^2.0"
     },
@@ -26,11 +25,11 @@
         }
     },
     "scripts": {
-        "test": "phpunit -c config/phpunit.xml",
-        "test:unit": "phpunit -c config/phpunit.xml --testsuite Unit",
-        "test:feature": "phpunit -c config/phpunit.xml --testsuite Feature",
-        "test:coverage": "phpunit -c config/phpunit.xml --coverage-html tests/coverage",
-        "test:ci": "phpunit -c config/phpunit.xml --coverage-clover=coverage.xml",
+        "test": "phpunit --no-coverage",
+        "test:unit": "phpunit --testsuite Unit --no-coverage",
+        "test:feature": "phpunit --testsuite Feature --no-coverage",
+        "test:coverage": "phpunit --coverage-html tests/coverage",
+        "test:ci": "phpunit --no-coverage",
         "docker:test": "./run-tests.sh",
         "docker:test:unit": "./run-tests.sh --unit",
         "docker:test:feature": "./run-tests.sh --feature",
