@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validatePassword(password)) {
       displayError(
         passwordInput,
-        'Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial'
+        'Le mot de passe doit contenir entre 8 et 15 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial'
       );
       hasError = true;
     }

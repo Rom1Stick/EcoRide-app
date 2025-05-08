@@ -26,7 +26,7 @@ class AuthController extends Controller
             $data,
             [
                 'email' => 'required|email|max:255',
-                'password' => 'required|min:8|max:255',
+                'password' => 'required|min:8|max:15',
                 'name' => 'required|min:3|max:15'
             ]
         );
@@ -92,6 +92,24 @@ class AuthController extends Controller
             $stmt->execute([$userId, $confirmationToken, $expiresAt]);
 
             $db->commit();
+
+            // Journalisation MongoDB de l'inscription
+            try {
+                $mongoConn = new \App\DataAccess\NoSql\MongoConnection();
+                $activityService = new \App\DataAccess\NoSql\Service\ActivityLogService($mongoConn);
+                $activityLog = new \App\DataAccess\NoSql\Model\ActivityLog();
+                $activityLog
+                    ->setUserId((int)$userId)
+                    ->setEventType('register')
+                    ->setLevel('info')
+                    ->setDescription('Nouvel utilisateur inscrit')
+                    ->setData(['email' => $data['email']])
+                    ->setSource('api')
+                    ->setIpAddress($_SERVER['REMOTE_ADDR'] ?? null);
+                $activityService->create($activityLog);
+            } catch (\Exception $e) {
+                // Ignorer les erreurs de journalisation MongoDB
+            }
         } catch (\Exception $e) {
             $db->rollBack();
             // En mode debug, renvoyer le message d'exception pour faciliter le diagnostic

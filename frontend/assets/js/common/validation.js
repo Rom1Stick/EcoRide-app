@@ -4,12 +4,12 @@ export function validateEmail(email) {
 }
 
 export function validatePassword(password) {
-  const length = password.length >= 8;
+  const lengthValid = password.length >= 8 && password.length <= 15;
   const upper = /[A-Z]/.test(password);
   const lower = /[a-z]/.test(password);
   const digit = /\d/.test(password);
   const special = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  return length && upper && lower && digit && special;
+  return lengthValid && upper && lower && digit && special;
 }
 
 export function validateConfirmPassword(password, confirmPassword) {
