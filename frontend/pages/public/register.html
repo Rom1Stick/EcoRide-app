@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/src/assets/styles/main.min.css" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
   </head>
   <body>
     <div class="register-page">
@@ -16,13 +16,14 @@
         <button class="register-modal__close" aria-label="Fermer">✕</button>
 
         <div class="register-modal__logo">
-          <img src="/src/assets/images/LogoText_Ecoride.svg" alt="EcoRide Logo" />
+          <img src="/assets/images/LogoText_Ecoride.svg" alt="EcoRide Logo" />
         </div>
 
         <h1 id="register-title" class="register-modal__title">Créer un compte</h1>
-        <p class="register-modal__subtitle">Rejoignez-nous dès aujourd’hui</p>
+        <p class="register-modal__subtitle">Rejoignez-nous dès aujourd'hui</p>
 
-        <form class="register-form">
+        <form class="register-form" novalidate>
+          <div class="register-form__global-message" role="alert" aria-live="assertive"></div>
           <!-- Nom -->
           <div class="register-form__group">
             <label for="fullname">Nom complet</label>
@@ -59,14 +60,19 @@
           <div class="register-form__checkbox">
             <input type="checkbox" id="terms" required />
             <label for="terms">
-              J’accepte les
-              <a href="/terms">conditions d’utilisation</a>
+              J'accepte les
+              <a href="/terms">conditions d'utilisation</a>
               et la
               <a href="/privacy">politique de confidentialité</a>
             </label>
           </div>
           <!-- Submit -->
-          <button type="submit" class="register-form__submit">S’inscrire</button>
+          <button type="submit" class="register-form__submit">S'inscrire</button>
+          <div class="register-form__overlay hidden" aria-hidden="true">
+            <div class="register-form__spinner" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+          </div>
         </form>
 
         <p class="register-modal__login">
@@ -77,6 +83,7 @@
 
       <!-- Ici, sous la modal, et centré -->
     </div>
+    <script type="module" src="/assets/js/register.js"></script>
     <a href="/" class="register-modal__back">Retour à l'accueil</a>
   </body>
 </html>

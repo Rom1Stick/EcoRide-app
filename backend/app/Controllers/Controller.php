@@ -37,6 +37,7 @@ abstract class Controller
      */
     protected function json($data, int $statusCode = 200): array
     {
+        header('Content-Type: application/json; charset=UTF-8');
         http_response_code($statusCode);
         return $data;
     }

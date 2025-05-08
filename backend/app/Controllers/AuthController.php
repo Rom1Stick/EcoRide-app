@@ -21,15 +21,20 @@ class AuthController extends Controller
         // Récupérer et nettoyer les données de la requête
         $data = sanitize($this->getJsonData());
 
-        // Valider les données
+        // Validation des données (email, mot de passe, nom)
         $errors = validate(
             $data,
             [
                 'email' => 'required|email|max:255',
                 'password' => 'required|min:8|max:255',
-                'name' => 'required|max:255'
+                'name' => 'required|min:3|max:15'
             ]
         );
+
+        // Vérifier l'absence de caractères spéciaux dans le nom
+        if (isset($data['name']) && !preg_match('/^[\p{L} ]{3,15}$/u', $data['name'])) {
+            $errors['name'][] = 'Le nom doit contenir entre 3 et 15 lettres, sans caractères spéciaux';
+        }
 
         if (!empty($errors)) {
             return $this->error(
@@ -69,8 +74,8 @@ class AuthController extends Controller
             // Récupérer l'ID utilisateur
             $userId = $db->lastInsertId();
 
-            // Attribution du crédit de bienvenue
-            $stmt = $db->prepare('INSERT INTO CreditBalance (utilisateur_id, solde) VALUES (?, ?)');
+            // Attribution du crédit de bienvenue (insert ou update si déjà existant)
+            $stmt = $db->prepare('INSERT INTO CreditBalance (utilisateur_id, solde) VALUES (?, ?) ON DUPLICATE KEY UPDATE solde = VALUES(solde)');
             $stmt->execute([$userId, 20]);
 
             // Enregistrer la transaction initiale
@@ -89,6 +94,14 @@ class AuthController extends Controller
             $db->commit();
         } catch (\Exception $e) {
             $db->rollBack();
+            // En mode debug, renvoyer le message d'exception pour faciliter le diagnostic
+            if (env('APP_DEBUG', false) === true) {
+                return $this->error([
+                    'message' => 'Erreur interne lors de l\'inscription',
+                    'exception' => $e->getMessage()
+                ], 500);
+            }
+            // En production, message générique
             return $this->error('Erreur interne lors de l\'inscription', 500);
         }
 

@@ -2,6 +2,8 @@
 @import 'abstracts/reset';
 @import 'public/styleRegister';
 @import 'error';
+@import 'components/form-error';
+@import 'components/overlay-spinner';
 
 // Styles globaux
 body {
