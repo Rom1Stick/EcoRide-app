@@ -17,6 +17,9 @@ $router->post('/api/auth/login', 'AuthController@login');
 $router->post('/api/auth/refresh', 'AuthController@refresh');
 $router->post('/api/auth/logout', 'AuthController@logout')->middleware('auth');
 
+// Endpoint de confirmation de compte via jeton
+$router->get('/api/auth/confirm', 'AuthController@confirm');
+
 // Routes des trajets
 $router->get('/api/rides', 'RideController@index');
 $router->get('/api/rides/{id}', 'RideController@show');

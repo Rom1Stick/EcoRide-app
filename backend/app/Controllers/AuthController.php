@@ -41,36 +41,64 @@ class AuthController extends Controller
             );
         }
 
-        // Vérifier si l'email existe déjà
+        // Récupérer la connexion à la base de données
         $db = $this->app->getDatabase()->getMysqlConnection();
-        $stmt = $db->prepare('SELECT id FROM users WHERE email = ?');
-        $stmt->execute([$data['email']]);
 
-        if ($stmt->fetchColumn()) {
-            return $this->error('Cette adresse email est déjà utilisée', 400);
+        // Démarrer la transaction
+        try {
+            $db->beginTransaction();
+
+            // Vérifier si l'email existe déjà dans la table Utilisateur
+            $stmt = $db->prepare('SELECT utilisateur_id FROM Utilisateur WHERE email = ?');
+            $stmt->execute([$data['email']]);
+            if ($stmt->fetchColumn()) {
+                return $this->error('Cette adresse email est déjà utilisée', 400);
+            }
+
+            // Hasher le mot de passe
+            $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
+
+            // Insérer l'utilisateur dans la table Utilisateur
+            // On stocke le nom complet dans le champ nom et on laisse prenom vide
+            $stmt = $db->prepare(
+                'INSERT INTO Utilisateur (nom, prenom, email, mot_passe, date_creation)
+                 VALUES (?, ?, ?, ?, NOW())'
+            );
+            $stmt->execute([$data['name'], '', $data['email'], $hashedPassword]);
+
+            // Récupérer l'ID utilisateur
+            $userId = $db->lastInsertId();
+
+            // Attribution du crédit de bienvenue
+            $stmt = $db->prepare('INSERT INTO CreditBalance (utilisateur_id, solde) VALUES (?, ?)');
+            $stmt->execute([$userId, 20]);
+
+            // Enregistrer la transaction initiale
+            $stmt = $db->prepare('SELECT type_id FROM TypeTransaction WHERE libelle = ?');
+            $stmt->execute(['initial']);
+            $typeId = $stmt->fetchColumn();
+            $stmt = $db->prepare('INSERT INTO CreditTransaction (utilisateur_id, montant, type_id, description) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$userId, 20, $typeId, 'Crédit de bienvenue']);
+
+            // Génération du token de confirmation
+            $confirmationToken = bin2hex(random_bytes(32));
+            $expiresAt = date('Y-m-d H:i:s', time() + 24 * 3600);
+            $stmt = $db->prepare('INSERT INTO user_confirmations (utilisateur_id, token, expires_at) VALUES (?, ?, ?)');
+            $stmt->execute([$userId, $confirmationToken, $expiresAt]);
+
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            return $this->error('Erreur interne lors de l\'inscription', 500);
         }
 
-        // Hasher le mot de passe avec un coût plus élevé pour une meilleure sécurité
-        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
-
-        // Insérer l'utilisateur en base de données
-        $stmt = $db->prepare('INSERT INTO users (name, email, password, created_at) VALUES (?, ?, ?, NOW())');
-        $stmt->execute(
-            [
-                $data['name'],
-                $data['email'],
-                $hashedPassword
-            ]
-        );
-
         // Génération d'un token JWT
-        $userId = $db->lastInsertId();
         $token = $this->generateJwtToken($userId);
 
-        // Enregistrement de l'IP et de l'agent utilisateur pour suivi de sécurité
+        // Journalisation de l'inscription réussie
         $this->logAuthActivity($userId, 'register', true);
 
-        // Retourner les données de l'utilisateur et le token
+        // Retour des données, y compris le token de confirmation
         return $this->success(
             [
                 'user' => [
@@ -78,9 +106,10 @@ class AuthController extends Controller
                     'name' => $data['name'],
                     'email' => $data['email']
                 ],
-                'token' => $token
+                'token' => $token,
+                'confirmation_token' => $confirmationToken
             ],
-            'Inscription réussie'
+            'Inscription réussie, veuillez confirmer votre compte'
         );
     }
 
@@ -131,6 +160,23 @@ class AuthController extends Controller
             // Enregistrer la tentative échouée
             $this->logAuthActivity(0, 'login', false, $data['email']);
             return $this->error('Email ou mot de passe incorrect', 401);
+        }
+
+        // Vérifier le statut de confirmation du compte
+        $confirmStmt = $db->prepare(
+            'SELECT is_used, expires_at
+             FROM user_confirmations
+             WHERE utilisateur_id = ?
+             ORDER BY created_at DESC
+             LIMIT 1'
+        );
+        $confirmStmt->execute([$user['id']]);
+        $confirmation = $confirmStmt->fetch();
+        if ($confirmation && !$confirmation['is_used']) {
+            if ($confirmation['expires_at'] < date('Y-m-d H:i:s')) {
+                return $this->error('Le token de confirmation a expiré', 403);
+            }
+            return $this->error('Compte non confirmé', 403);
         }
 
         // Vérifier le mot de passe
@@ -289,5 +335,41 @@ class AuthController extends Controller
                 $_SERVER['HTTP_USER_AGENT'] ?? null
             ]
         );
+    }
+
+    /**
+     * Confirme un compte utilisateur via un jeton
+     *
+     * @return array
+     */
+    public function confirm(): array
+    {
+        // Récupérer le jeton depuis les paramètres GET
+        $token = $_GET['token'] ?? null;
+        if (!$token) {
+            return $this->error('Jeton manquant', 400);
+        }
+
+        $db = $this->app->getDatabase()->getMysqlConnection();
+        // Rechercher le jeton de confirmation
+        $stmt = $db->prepare('SELECT id, utilisateur_id, expires_at, is_used FROM user_confirmations WHERE token = ?');
+        $stmt->execute([$token]);
+        $confirmation = $stmt->fetch();
+
+        if (!$confirmation) {
+            return $this->error('Jeton invalide', 404);
+        }
+        if ($confirmation['is_used']) {
+            return $this->error('Jeton déjà utilisé', 400);
+        }
+        if ($confirmation['expires_at'] < date('Y-m-d H:i:s')) {
+            return $this->error('Jeton expiré', 410);
+        }
+
+        // Marquer le jeton comme utilisé
+        $update = $db->prepare('UPDATE user_confirmations SET is_used = 1 WHERE id = ?');
+        $update->execute([$confirmation['id']]);
+
+        return $this->success(null, 'Compte confirmé');
     }
 }

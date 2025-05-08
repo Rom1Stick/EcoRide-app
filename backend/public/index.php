@@ -17,6 +17,13 @@ require BASE_PATH . '/vendor/autoload.php';
 $dotenv = new \App\Core\DotEnv(BASE_PATH . '/.env');
 $dotenv->load();
 
+// En-têtes HTTP de sécurité
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: no-referrer-when-downgrade');
+header('Permissions-Policy: geolocation=(), microphone=()');
+header("Content-Security-Policy: default-src 'self';");
+
 // Configurer les erreurs en fonction de l'environnement
 if (env('APP_DEBUG', false) === true) {
     ini_set('display_errors', 1);

@@ -187,4 +187,17 @@ CREATE TABLE IF NOT EXISTS CreditTransaction (
     description VARCHAR(255),
     FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(utilisateur_id) ON DELETE CASCADE,
     FOREIGN KEY (type_id) REFERENCES TypeTransaction(type_id)
-); 
+);
+
+-- Table user_confirmations pour la gestion des tokens de confirmation d'inscription
+CREATE TABLE IF NOT EXISTS user_confirmations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    is_used TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(utilisateur_id) ON DELETE CASCADE,
+    INDEX idx_user_confirmations_token (token),
+    INDEX idx_user_confirmations_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 

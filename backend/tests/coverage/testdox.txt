@@ -1,0 +1,101 @@
+Api Routes (Tests\Feature\ApiRoutes)
+ [ ] Health check route
+ [ ] Route with parameters
+ [x] Http methods are respected
+ [ ] Unknown routes are not found
+ [ ] Route to regex conversion
+
+Booking Stats Service (Tests\Unit\DataAccess\NoSql\Service\BookingStatsService)
+ [ ] FindOrCreateByUserId Existing
+ [ ] FindOrCreateByUserId New
+ [ ] Update for new booking
+ [ ] Update for status change
+ [ ] Get top global destinations
+ [ ] Get global stats
+ [ ] Get monthly booking trend
+ [ ] Delete by user id
+ [ ] DeleteByUserId NonExistent
+
+Configuration Service (Tests\Unit\DataAccess\NoSql\Service\ConfigurationService)
+ [x] Save
+ [x] Find by id
+ [x] Find by code
+ [x] Update value
+ [x] Delete
+ [x] Connection error
+ [x] FindOrCreate ExistingConfig
+ [x] FindOrCreate NewConfig
+
+Example (Tests\Unit\Example)
+ [x] Environment works
+ [x] Array operations
+ [x] Application is functional
+
+Geo Data Service (Tests\Unit\DataAccess\NoSql\Service\GeoDataService)
+ [ ] Save New
+ [ ] Save Update
+ [ ] Find by id
+ [ ] Find by covoiturage id
+ [ ] Find itineraire by covoiturage id
+ [ ] Find points interet near
+ [ ] Save itineraire
+ [ ] Delete by covoiturage id
+ [ ] Calculate distance
+
+Integration (Tests\Feature\DataAccess\Integration)
+ [ ] User crud cycle
+ [ ] Vehicle crud cycle
+ [ ] Review crud cycle
+ [ ] My sql transaction
+
+Performance (Tests\Unit\DataAccess\Performance)
+ [ ] User find by id performance
+ [ ] Vehicle complex query performance
+ [ ] Vehicle count performance
+ [ ] Review find by id performance
+ [ ] Review complex query performance
+ [ ] Review aggregation performance
+ [ ] Load performance
+
+Review Service (Tests\Unit\DataAccess\NoSql\Service\ReviewService)
+ [x] Insert
+ [x] Find by id
+ [x] Update
+ [x] Delete
+ [x] Find by driver id
+ [x] Connection error
+
+Router (Tests\Unit\Router)
+ [x] Can create get route
+ [x] Can create post route
+ [x] Can create put route
+ [x] Can create delete route
+ [x] Can add middleware to route
+ [x] Can match simple route
+ [ ] Can match route with parameters
+ [ ] Can match route with multiple parameters
+ [x] Non matching route returns null
+ [x] Non matching method returns null
+
+Security (Tests\Unit\Security)
+ [x] Sanitize string
+ [x] Sanitize html
+ [ ] Sanitize array
+ [x] Csrf token generation
+ [x] Validation
+
+Trip Stats Service (Tests\Unit\DataAccess\NoSql\Service\TripStatsService)
+ [ ] FindOrCreateByDriverId Existing
+ [ ] FindOrCreateByDriverId New
+ [ ] Update for new trip
+ [ ] Get top global destinations
+ [ ] Analyze by time and distance
+
+User Repository (Tests\Unit\DataAccess\Sql\Repository\UserRepository)
+ [ ] Find by id
+ [ ] Create
+ [ ] Update
+ [ ] Delete
+ [ ] Find by email
+ [ ] Database exception
+
