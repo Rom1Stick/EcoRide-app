@@ -3,57 +3,89 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Connexion - EcoRide" />
-    <link rel="icon" href="../../assets/images/favicon.ico" />
-    <title>Connexion - EcoRide</title>
-    <link rel="stylesheet" href="../../assets/css/main.css" />
+    <title>Connexion – EcoRide</title>
+    <link rel="stylesheet" href="/src/assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body class="page-login">
-    <header class="header">
-      <div class="header__logo">
-        <img src="../../assets/images/logo.svg" alt="Logo EcoRide" />
+  <body>
+    <div class="login-page">
+      <div class="login-modal" role="dialog" aria-labelledby="login-title">
+        <button class="login-modal__close" aria-label="Fermer">✕</button>
+
+        <div class="login-modal__logo">
+          <img src="/src/assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+        </div>
+
+        <form class="login-form" novalidate>
+          <div class="login-form__group">
+            <label for="email">Adresse e-mail</label>
+            <input type="email" id="email" name="email" placeholder="nom@exemple.com" required />
+
+            <label for="password">Mot de passe</label>
+            <div class="input-wrapper">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-visibility"
+                aria-label="Afficher/masquer le mot de passe"
+              >
+                👁
+              </button>
+            </div>
+          </div>
+
+          <div class="login-form__options">
+            <label>
+              <input type="checkbox" name="remember" />
+              Se souvenir de moi
+            </label>
+            <a href="#">Mot de passe oublié ?</a>
+          </div>
+
+          <button type="submit" class="login-form__submit">Se connecter</button>
+        </form>
+
+        <div class="login-form__alt">
+          <p>Pas encore de compte ?</p>
+          <a href="#" class="alt-btn">S'inscrire</a>
+        </div>
       </div>
-      <nav class="header__nav">
-        <ul class="header__list">
-          <li class="header__item"><a href="index.html" class="header__link">Accueil</a></li>
-          <li class="header__item"><a href="register.html" class="header__link">Inscription</a></li>
-          <li class="header__item">
-            <a href="login.html" class="header__link header__link--active">Connexion</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
-    <main class="main">
-      <h1 class="main__title">Connexion</h1>
-      <form class="form-login" novalidate>
-        <div class="form-login__group">
-          <label for="email" class="form-login__label">Email</label>
-          <input type="email" id="email" name="email" class="form-login__input" required />
-          <span class="form-login__error-text" data-error="email"></span>
-        </div>
-        <div class="form-login__group">
-          <label for="password" class="form-login__label">Mot de passe</label>
-          <input type="password" id="password" name="password" class="form-login__input" required />
-          <span class="form-login__error-text" data-error="password"></span>
-        </div>
-        <div class="form-login__remember">
-          <input type="checkbox" id="remember" name="remember" class="form-login__checkbox" />
-          <label for="remember" class="form-login__checkbox-label">Se souvenir de moi</label>
-        </div>
-        <div class="form-login__error"></div>
-        <button type="submit" class="form-login__button button button--primary">
-          Se connecter
-        </button>
-        <p class="form-login__register-link">
-          Pas encore de compte ?
-          <a href="register.html">Inscrivez-vous</a>
-        </p>
-      </form>
-    </main>
-    <footer class="footer">
-      <p class="footer__text">&copy; 2025 EcoRide</p>
-    </footer>
-    <script type="module" src="../../assets/js/common/api.js"></script>
-    <script type="module" src="../../assets/js/public/login.js"></script>
+      <a href="/" class="login-modal__back">Retour à l'accueil</a>
+    </div>
+    <script>
+      document.querySelector('.login-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const identifier = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ email: identifier, password }),
+          });
+          const data = await response.json();
+          if (response.ok) {
+            // Redirection selon le rôle
+            window.location.href = data.redirect_url;
+          } else {
+            // Afficher le message d'erreur
+            alert(data.message || 'Erreur lors de la connexion');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Erreur réseau, veuillez réessayer');
+        }
+      });
+    </script>
   </body>
 </html>

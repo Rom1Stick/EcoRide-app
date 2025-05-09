@@ -16,18 +16,21 @@ class AuthMiddleware
      */
     public function handle()
     {
-        // Vérifier la présence du header Authorization
+        // Récupérer le token JWT depuis l'en-tête Authorization ou le cookie
+        $token = null;
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
-
-        if (!$authHeader || !preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+        if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+            $token = $matches[1];
+        } elseif (!empty($_COOKIE['auth_token'])) {
+            $token = $_COOKIE['auth_token'];
+        }
+        if (!$token) {
             http_response_code(401);
             return [
                 'error' => true,
                 'message' => 'Accès non autorisé. Token manquant.'
             ];
         }
-
-        $token = $matches[1];
 
         // Limiter les tentatives d'authentification pour prévenir les attaques par force brute
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
@@ -52,6 +55,10 @@ class AuthMiddleware
 
         // Stocker l'ID de l'utilisateur pour y accéder dans les contrôleurs
         $_SERVER['AUTH_USER_ID'] = $payload['sub'];
+        // Stocker le rôle de l'utilisateur si présent dans le payload
+        if (isset($payload['role'])) {
+            $_SERVER['AUTH_USER_ROLE'] = $payload['role'];
+        }
 
         return true;
     }

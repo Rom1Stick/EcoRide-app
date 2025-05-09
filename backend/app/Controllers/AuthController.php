@@ -151,6 +151,9 @@ class AuthController extends Controller
      */
     public function login(): array
     {
+        // Initialisation des variables pour le linter
+        $identifier = '';
+        $password = '';
         // Limiter les tentatives de connexion pour prévenir les attaques par force brute
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
         if (!Security::rateLimit("login_$ip", 5, 300)) {
@@ -160,20 +163,32 @@ class AuthController extends Controller
         // Récupérer les données de la requête et les nettoyer
         $data = sanitize($this->getJsonData());
 
-        // Valider les données
-        $errors = validate(
-            $data,
-            [
-                'email' => 'required|email',
-                'password' => 'required'
-            ]
-        );
+        // Validation de l'identifiant (email ou pseudo) et du mot de passe
+        $identifier = $data['email'] ?? '';
+        $password   = $data['password'] ?? '';
+        $errors     = [];
+
+        // Vérifier l'identifiant
+        if (trim($identifier) === '') {
+            $errors['email'][] = 'Le champ identifiant est obligatoire';
+        } else {
+            if (filter_var($identifier, FILTER_VALIDATE_EMAIL) === false) {
+                if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_-]{2,15}$/', $identifier)) {
+                    $errors['email'][] = 'Le champ identifiant doit être un email valide ou un pseudo (3-16 caractères, commence par une lettre)';
+                }
+            }
+        }
+
+        // Vérifier le mot de passe
+        if (trim($password) === '') {
+            $errors['password'][] = 'Le champ mot de passe est obligatoire';
+        }
 
         if (!empty($errors)) {
             return $this->error(
                 [
                     'message' => 'Données invalides',
-                    'errors' => $errors
+                    'errors'  => $errors
                 ],
                 422
             );
@@ -181,25 +196,27 @@ class AuthController extends Controller
 
         // Récupérer l'utilisateur
         $db = $this->app->getDatabase()->getMysqlConnection();
-        $stmt = $db->prepare('SELECT id, name, email, password FROM users WHERE email = ?');
-        $stmt->execute([$data['email']]);
-
+        // Déterminer le type d'identifiant et récupérer l'utilisateur
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $stmt = $db->prepare('SELECT utilisateur_id AS id, CONCAT(nom, " ", prenom) AS name, email, mot_passe AS password FROM Utilisateur WHERE email = ?');
+        } else {
+            $stmt = $db->prepare('SELECT utilisateur_id AS id, CONCAT(nom, " ", prenom) AS name, email, mot_passe AS password FROM Utilisateur WHERE pseudo = ?');
+        }
+        $stmt->execute([$identifier]);
         $user = $stmt->fetch();
 
         // Vérifier si l'utilisateur existe
         if (!$user) {
             // Enregistrer la tentative échouée
-            $this->logAuthActivity(0, 'login', false, $data['email']);
+            $this->logAuthActivity(0, 'login', false, $identifier);
             return $this->error('Email ou mot de passe incorrect', 401);
         }
 
-        // Vérifier le statut de confirmation du compte
+        // Vérifier le statut de confirmation du compte par user_id
         $confirmStmt = $db->prepare(
             'SELECT is_used, expires_at
              FROM user_confirmations
-             WHERE utilisateur_id = ?
-             ORDER BY created_at DESC
-             LIMIT 1'
+             WHERE utilisateur_id = ?'
         );
         $confirmStmt->execute([$user['id']]);
         $confirmation = $confirmStmt->fetch();
@@ -211,7 +228,7 @@ class AuthController extends Controller
         }
 
         // Vérifier le mot de passe
-        if (!password_verify($data['password'], $user['password'])) {
+        if (!password_verify($password, $user['password'])) {
             // Enregistrer la tentative échouée
             $this->logAuthActivity($user['id'], 'login', false);
             return $this->error('Email ou mot de passe incorrect', 401);
@@ -219,8 +236,8 @@ class AuthController extends Controller
 
         // Vérifier si le hash du mot de passe doit être mis à jour (changement des paramètres de hachage)
         if (password_needs_rehash($user['password'], PASSWORD_BCRYPT, ['cost' => 12])) {
-            $newHash = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
-            $stmt = $db->prepare('UPDATE users SET password = ? WHERE id = ?');
+            $newHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+            $stmt = $db->prepare('UPDATE Utilisateur SET mot_passe = ? WHERE utilisateur_id = ?');
             $stmt->execute([$newHash, $user['id']]);
         }
 
@@ -230,7 +247,31 @@ class AuthController extends Controller
         // Enregistrer la tentative réussie
         $this->logAuthActivity($user['id'], 'login', true);
 
-        // Retourner les données de l'utilisateur et le token
+        // Envoyer le JWT dans un cookie sécurisé (30 minutes)
+        header(sprintf(
+            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=%d',
+            $token,
+            (int) env('JWT_EXPIRATION', 1800)
+        ));
+
+        // Récupérer le rôle de l'utilisateur pour la réponse
+        $stmtRole = $db->prepare('SELECT r.libelle FROM Role r JOIN Possede p ON r.role_id = p.role_id WHERE p.utilisateur_id = ? LIMIT 1');
+        $stmtRole->execute([$user['id']]);
+        $role = $stmtRole->fetchColumn() ?: 'visiteur';
+        // Déterminer l'URL de redirection selon le rôle
+        switch ($role) {
+            case 'passager':
+                $redirectUrl = '/rides/search';
+                break;
+            case 'chauffeur':
+                $redirectUrl = '/driver/dashboard';
+                break;
+            case 'admin':
+                $redirectUrl = '/admin/panel';
+                break;
+            default:
+                $redirectUrl = '/';
+        }
         return $this->success(
             [
                 'user' => [
@@ -238,7 +279,9 @@ class AuthController extends Controller
                     'name' => $user['name'],
                     'email' => $user['email']
                 ],
-                'token' => $token
+                'role' => $role,
+                'token' => $token,
+                'redirect_url' => $redirectUrl
             ],
             'Connexion réussie'
         );
@@ -257,6 +300,8 @@ class AuthController extends Controller
             // Enregistrer la déconnexion
             $this->logAuthActivity($userId, 'logout', true);
         }
+        // Supprimer le cookie d'authentification
+        header('Set-Cookie: auth_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
 
         return $this->success(null, 'Déconnexion réussie');
     }
@@ -277,6 +322,13 @@ class AuthController extends Controller
 
         // Générer un nouveau token
         $token = $this->generateJwtToken($userId);
+
+        // Envoyer le JWT dans un cookie sécurisé (30 minutes)
+        header(sprintf(
+            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=%d',
+            $token,
+            (int) env('JWT_EXPIRATION', 1800)
+        ));
 
         return $this->success(
             [
@@ -302,11 +354,18 @@ class AuthController extends Controller
         $issuedAt = time();
         $expiresAt = $issuedAt + (int) env('JWT_EXPIRATION', 3600);
 
+        // Récupérer le rôle de l'utilisateur
+        $db = $this->app->getDatabase()->getMysqlConnection();
+        $stmt = $db->prepare('SELECT r.libelle FROM Role r JOIN Possede p ON r.role_id = p.role_id WHERE p.utilisateur_id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $role = $stmt->fetchColumn() ?: 'visiteur';
+
         $payload = [
-            'sub' => $userId,
-            'iat' => $issuedAt,
-            'exp' => $expiresAt,
-            'jti' => bin2hex(random_bytes(16)) // ID unique pour le token
+            'sub'  => $userId,
+            'role' => $role,
+            'iat'  => $issuedAt,
+            'exp'  => $expiresAt,
+            'jti'  => bin2hex(random_bytes(16)) // ID unique pour le token
         ];
 
         $base64Header = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($header)));
