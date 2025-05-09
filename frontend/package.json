@@ -5,8 +5,8 @@
   "description": "Frontend éco-conçu pour l'application EcoRide",
   "type": "module",
   "scripts": {
-    "build:scss": "sass assets/scss/main.scss:assets/css/main.css --style=compressed --no-source-map",
-    "watch:scss": "sass assets/scss/main.scss:assets/css/main.css --watch --style=compressed",
+    "build:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --style=compressed --no-source-map",
+    "watch:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --watch --style=compressed --no-source-map",
     "lint": "eslint assets/js/**/*.js",
     "format": "prettier --write 'assets/js/**/*.js' 'assets/scss/**/*.scss' '**/*.html'"
   },

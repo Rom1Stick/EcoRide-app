@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/var/www/html/config/phpunit.xml" tests="77" assertions="82" errors="42" failures="5" skipped="0" time="0.314561">
+    <testsuite name="Unit" tests="68" assertions="77" errors="36" failures="3" skipped="0" time="0.304286">
+      <testsuite name="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" tests="9" assertions="0" errors="9" failures="0" skipped="0" time="0.000000">
+        <testcase name="testGetMonthlyBookingTrend" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="274" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testGetMonthlyBookingTrend
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testUpdateForNewBooking" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="92" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testUpdateForNewBooking
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testGetTopGlobalDestinations" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="189" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testGetTopGlobalDestinations
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testDeleteByUserId_NonExistent" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="327" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testDeleteByUserId_NonExistent
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testGetGlobalStats" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="218" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testGetGlobalStats
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testUpdateForStatusChange" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="152" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testUpdateForStatusChange
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testFindOrCreateByUserId_Existing" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="32" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testFindOrCreateByUserId_Existing
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testFindOrCreateByUserId_New" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="66" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testFindOrCreateByUserId_New
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testDeleteByUserId" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php" line="309" class="Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.BookingStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\BookingStatsServiceTest::testDeleteByUserId
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoConnection" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/BookingStatsServiceTest.php:26</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Unit\ExampleTest" file="/var/www/html/tests/Unit/ExampleTest.php" tests="3" assertions="7" errors="0" failures="0" skipped="0" time="0.044884">
+        <testcase name="testEnvironmentWorks" file="/var/www/html/tests/Unit/ExampleTest.php" line="24" class="Tests\Unit\ExampleTest" classname="Tests.Unit.ExampleTest" assertions="3" time="0.034168"/>
+        <testcase name="testArrayOperations" file="/var/www/html/tests/Unit/ExampleTest.php" line="34" class="Tests\Unit\ExampleTest" classname="Tests.Unit.ExampleTest" assertions="3" time="0.010523"/>
+        <testcase name="test_application_is_functional" file="/var/www/html/tests/Unit/ExampleTest.php" line="60" class="Tests\Unit\ExampleTest" classname="Tests.Unit.ExampleTest" assertions="1" time="0.000193"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" tests="9" assertions="0" errors="9" failures="0" skipped="0" time="0.000000">
+        <testcase name="testSave_Update" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="73" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testSave_Update
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testDeleteByCovoiturageId" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="333" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testDeleteByCovoiturageId
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testFindItineraireByCovoiturageId" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="201" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testFindItineraireByCovoiturageId
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testSave_New" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="40" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testSave_New
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testFindPointsInteretNear" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="237" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testFindPointsInteretNear
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testFindByCovoiturageId" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="141" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testFindByCovoiturageId
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testCalculateDistance" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="351" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testCalculateDistance
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testSaveItineraire" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="301" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testSaveItineraire
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+        <testcase name="testFindById" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php" line="104" class="Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.GeoDataServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\GeoDataServiceTest::testFindById
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/GeoDataServiceTest.php:24</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Unit\SecurityTest" file="/var/www/html/tests/Unit/SecurityTest.php" tests="5" assertions="9" errors="0" failures="1" skipped="0" time="0.057833">
+        <testcase name="testSanitizeString" file="/var/www/html/tests/Unit/SecurityTest.php" line="16" class="Tests\Unit\SecurityTest" classname="Tests.Unit.SecurityTest" assertions="1" time="0.002625"/>
+        <testcase name="testCsrfTokenGeneration" file="/var/www/html/tests/Unit/SecurityTest.php" line="64" class="Tests\Unit\SecurityTest" classname="Tests.Unit.SecurityTest" assertions="3" time="0.023482"/>
+        <testcase name="testValidation" file="/var/www/html/tests/Unit/SecurityTest.php" line="87" class="Tests\Unit\SecurityTest" classname="Tests.Unit.SecurityTest" assertions="3" time="0.000678"/>
+        <testcase name="testSanitizeArray" file="/var/www/html/tests/Unit/SecurityTest.php" line="38" class="Tests\Unit\SecurityTest" classname="Tests.Unit.SecurityTest" assertions="1" time="0.030757">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\SecurityTest::testSanitizeArray
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+     'name' =&gt; 'John'
+     'email' =&gt; 'john@example.com'
+     'nested' =&gt; Array (
+-        'key' =&gt; 'document.cookie'
++        'key' =&gt; ''
+         'value' =&gt; 'Test'
+     )
+ )
+
+/var/www/html/tests/Unit/SecurityTest.php:58</failure>
+        </testcase>
+        <testcase name="testSanitizeHtml" file="/var/www/html/tests/Unit/SecurityTest.php" line="27" class="Tests\Unit\SecurityTest" classname="Tests.Unit.SecurityTest" assertions="1" time="0.000291"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\DataAccess\PerformanceTest" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" tests="7" assertions="0" errors="7" failures="0" skipped="0" time="0.000000">
+        <testcase name="testReviewAggregationPerformance" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" line="170" class="Tests\Unit\DataAccess\PerformanceTest" classname="Tests.Unit.DataAccess.PerformanceTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\PerformanceTest::testReviewAggregationPerformance
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Unit/DataAccess/PerformanceTest.php:38</error>
+        </testcase>
+        <testcase name="testVehicleCountPerformance" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" line="112" class="Tests\Unit\DataAccess\PerformanceTest" classname="Tests.Unit.DataAccess.PerformanceTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\PerformanceTest::testVehicleCountPerformance
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Unit/DataAccess/PerformanceTest.php:38</error>
+        </testcase>
+        <testcase name="testReviewFindByIdPerformance" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" line="130" class="Tests\Unit\DataAccess\PerformanceTest" classname="Tests.Unit.DataAccess.PerformanceTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\PerformanceTest::testReviewFindByIdPerformance
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Unit/DataAccess/PerformanceTest.php:38</error>
+        </testcase>
+        <testcase name="testReviewComplexQueryPerformance" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" line="151" class="Tests\Unit\DataAccess\PerformanceTest" classname="Tests.Unit.DataAccess.PerformanceTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\PerformanceTest::testReviewComplexQueryPerformance
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Unit/DataAccess/PerformanceTest.php:38</error>
+        </testcase>
+        <testcase name="testLoadPerformance" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" line="232" class="Tests\Unit\DataAccess\PerformanceTest" classname="Tests.Unit.DataAccess.PerformanceTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\PerformanceTest::testLoadPerformance
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Unit/DataAccess/PerformanceTest.php:38</error>
+        </testcase>
+        <testcase name="testVehicleComplexQueryPerformance" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" line="93" class="Tests\Unit\DataAccess\PerformanceTest" classname="Tests.Unit.DataAccess.PerformanceTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\PerformanceTest::testVehicleComplexQueryPerformance
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Unit/DataAccess/PerformanceTest.php:38</error>
+        </testcase>
+        <testcase name="testUserFindByIdPerformance" file="/var/www/html/tests/Unit/DataAccess/PerformanceTest.php" line="72" class="Tests\Unit\DataAccess\PerformanceTest" classname="Tests.Unit.DataAccess.PerformanceTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\PerformanceTest::testUserFindByIdPerformance
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Unit/DataAccess/PerformanceTest.php:38</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest" file="/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php" tests="6" assertions="0" errors="6" failures="0" skipped="0" time="0.000000">
+        <testcase name="testUpdate" file="/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php" line="81" class="Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest" classname="Tests.Unit.DataAccess.Sql.Repository.UserRepositoryTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest::testUpdate
+Error: Class "App\DataAccess\Sql\Repository\UserRepository" not found
+
+/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php:27</error>
+        </testcase>
+        <testcase name="testCreate" file="/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php" line="58" class="Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest" classname="Tests.Unit.DataAccess.Sql.Repository.UserRepositoryTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest::testCreate
+Error: Class "App\DataAccess\Sql\Repository\UserRepository" not found
+
+/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php:27</error>
+        </testcase>
+        <testcase name="testDatabaseException" file="/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php" line="146" class="Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest" classname="Tests.Unit.DataAccess.Sql.Repository.UserRepositoryTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest::testDatabaseException
+Error: Class "App\DataAccess\Sql\Repository\UserRepository" not found
+
+/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php:27</error>
+        </testcase>
+        <testcase name="testFindById" file="/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php" line="30" class="Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest" classname="Tests.Unit.DataAccess.Sql.Repository.UserRepositoryTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest::testFindById
+Error: Class "App\DataAccess\Sql\Repository\UserRepository" not found
+
+/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php:27</error>
+        </testcase>
+        <testcase name="testFindByEmail" file="/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php" line="119" class="Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest" classname="Tests.Unit.DataAccess.Sql.Repository.UserRepositoryTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest::testFindByEmail
+Error: Class "App\DataAccess\Sql\Repository\UserRepository" not found
+
+/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php:27</error>
+        </testcase>
+        <testcase name="testDelete" file="/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php" line="105" class="Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest" classname="Tests.Unit.DataAccess.Sql.Repository.UserRepositoryTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Unit\DataAccess\Sql\Repository\UserRepositoryTest::testDelete
+Error: Class "App\DataAccess\Sql\Repository\UserRepository" not found
+
+/var/www/html/tests/Unit/DataAccess/Sql/Repository/UserRepositoryTest.php:27</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Unit\RouterTest" file="/var/www/html/tests/Unit/RouterTest.php" tests="10" assertions="24" errors="0" failures="2" skipped="0" time="0.137746">
+        <testcase name="testCanMatchRouteWithMultipleParameters" file="/var/www/html/tests/Unit/RouterTest.php" line="122" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="1" time="0.123615">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\RouterTest::testCanMatchRouteWithMultipleParameters
+Failed asserting that null is an instance of class App\Core\Route.
+
+/var/www/html/tests/Unit/RouterTest.php:128</failure>
+        </testcase>
+        <testcase name="testCanCreatePostRoute" file="/var/www/html/tests/Unit/RouterTest.php" line="44" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="4" time="0.000328"/>
+        <testcase name="testCanCreateGetRoute" file="/var/www/html/tests/Unit/RouterTest.php" line="31" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="4" time="0.000297"/>
+        <testcase name="testNonMatchingRouteReturnsNull" file="/var/www/html/tests/Unit/RouterTest.php" line="136" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="1" time="0.003972"/>
+        <testcase name="testCanMatchRouteWithParameters" file="/var/www/html/tests/Unit/RouterTest.php" line="108" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="1" time="0.001472">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\RouterTest::testCanMatchRouteWithParameters
+Failed asserting that null is an instance of class App\Core\Route.
+
+/var/www/html/tests/Unit/RouterTest.php:114</failure>
+        </testcase>
+        <testcase name="testCanMatchSimpleRoute" file="/var/www/html/tests/Unit/RouterTest.php" line="94" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="3" time="0.000266"/>
+        <testcase name="testCanAddMiddlewareToRoute" file="/var/www/html/tests/Unit/RouterTest.php" line="83" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="1" time="0.006983"/>
+        <testcase name="testCanCreateDeleteRoute" file="/var/www/html/tests/Unit/RouterTest.php" line="70" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="4" time="0.000334"/>
+        <testcase name="testNonMatchingMethodReturnsNull" file="/var/www/html/tests/Unit/RouterTest.php" line="148" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="1" time="0.000207"/>
+        <testcase name="testCanCreatePutRoute" file="/var/www/html/tests/Unit/RouterTest.php" line="57" class="Tests\Unit\RouterTest" classname="Tests.Unit.RouterTest" assertions="4" time="0.000272"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php" tests="5" assertions="0" errors="5" failures="0" skipped="0" time="0.000000">
+        <testcase name="testUpdateForNewTrip" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php" line="96" class="Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.TripStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest::testUpdateForNewTrip
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testFindOrCreateByDriverId_New" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php" line="72" class="Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.TripStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest::testFindOrCreateByDriverId_New
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testAnalyzeByTimeAndDistance" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php" line="164" class="Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.TripStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest::testAnalyzeByTimeAndDistance
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testFindOrCreateByDriverId_Existing" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php" line="42" class="Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.TripStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest::testFindOrCreateByDriverId_Existing
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php:26</error>
+        </testcase>
+        <testcase name="testGetTopGlobalDestinations" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php" line="135" class="Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.TripStatsServiceTest" assertions="0" time="0.000000">
+          <error type="PHPUnit\Framework\MockObject\Generator\UnknownTypeException">Tests\Unit\DataAccess\NoSql\Service\TripStatsServiceTest::testGetTopGlobalDestinations
+PHPUnit\Framework\MockObject\Generator\UnknownTypeException: Class or interface "App\DataAccess\NoSql\Service\MongoServiceInterface" does not exist
+
+/var/www/html/tests/Unit/DataAccess/NoSql/Service/TripStatsServiceTest.php:26</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" tests="8" assertions="24" errors="0" failures="0" skipped="0" time="0.047046">
+        <testcase name="testConnectionError" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="402" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="1" time="0.026516"/>
+        <testcase name="testFindOrCreate_ExistingConfig" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="418" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="3" time="0.010157"/>
+        <testcase name="testFindByCode" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="322" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="4" time="0.000704"/>
+        <testcase name="testUpdateValue" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="350" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="3" time="0.003501"/>
+        <testcase name="testSave" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="267" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="4" time="0.002695"/>
+        <testcase name="testFindById" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="295" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="3" time="0.000370"/>
+        <testcase name="testDelete" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="385" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="1" time="0.002597"/>
+        <testcase name="testFindOrCreate_NewConfig" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ConfigurationServiceTest.php" line="446" class="Tests\Unit\DataAccess\NoSql\Service\ConfigurationServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ConfigurationServiceTest" assertions="5" time="0.000506"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\DataAccess\NoSql\Service\ReviewServiceTest" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ReviewServiceTest.php" tests="6" assertions="13" errors="0" failures="0" skipped="0" time="0.016777">
+        <testcase name="testFindById" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ReviewServiceTest.php" line="93" class="Tests\Unit\DataAccess\NoSql\Service\ReviewServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ReviewServiceTest" assertions="3" time="0.003881"/>
+        <testcase name="testFindByDriverId" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ReviewServiceTest.php" line="157" class="Tests\Unit\DataAccess\NoSql\Service\ReviewServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ReviewServiceTest" assertions="5" time="0.011460"/>
+        <testcase name="testInsert" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ReviewServiceTest.php" line="66" class="Tests\Unit\DataAccess\NoSql\Service\ReviewServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ReviewServiceTest" assertions="2" time="0.000482"/>
+        <testcase name="testDelete" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ReviewServiceTest.php" line="140" class="Tests\Unit\DataAccess\NoSql\Service\ReviewServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ReviewServiceTest" assertions="1" time="0.000345"/>
+        <testcase name="testConnectionError" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ReviewServiceTest.php" line="203" class="Tests\Unit\DataAccess\NoSql\Service\ReviewServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ReviewServiceTest" assertions="1" time="0.000255"/>
+        <testcase name="testUpdate" file="/var/www/html/tests/Unit/DataAccess/NoSql/Service/ReviewServiceTest.php" line="119" class="Tests\Unit\DataAccess\NoSql\Service\ReviewServiceTest" classname="Tests.Unit.DataAccess.NoSql.Service.ReviewServiceTest" assertions="1" time="0.000353"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="9" assertions="5" errors="6" failures="2" skipped="0" time="0.010275">
+      <testsuite name="Tests\Feature\DataAccess\IntegrationTest" file="/var/www/html/tests/Feature/DataAccess/IntegrationTest.php" tests="4" assertions="0" errors="4" failures="0" skipped="0" time="0.000000">
+        <testcase name="testReviewCrudCycle" file="/var/www/html/tests/Feature/DataAccess/IntegrationTest.php" line="214" class="Tests\Feature\DataAccess\IntegrationTest" classname="Tests.Feature.DataAccess.IntegrationTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Feature\DataAccess\IntegrationTest::testReviewCrudCycle
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Feature/DataAccess/IntegrationTest.php:44</error>
+        </testcase>
+        <testcase name="testUserCrudCycle" file="/var/www/html/tests/Feature/DataAccess/IntegrationTest.php" line="102" class="Tests\Feature\DataAccess\IntegrationTest" classname="Tests.Feature.DataAccess.IntegrationTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Feature\DataAccess\IntegrationTest::testUserCrudCycle
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Feature/DataAccess/IntegrationTest.php:44</error>
+        </testcase>
+        <testcase name="testMySqlTransaction" file="/var/www/html/tests/Feature/DataAccess/IntegrationTest.php" line="269" class="Tests\Feature\DataAccess\IntegrationTest" classname="Tests.Feature.DataAccess.IntegrationTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Feature\DataAccess\IntegrationTest::testMySqlTransaction
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Feature/DataAccess/IntegrationTest.php:44</error>
+        </testcase>
+        <testcase name="testVehicleCrudCycle" file="/var/www/html/tests/Feature/DataAccess/IntegrationTest.php" line="147" class="Tests\Feature\DataAccess\IntegrationTest" classname="Tests.Feature.DataAccess.IntegrationTest" assertions="0" time="0.000000">
+          <error type="Error">Tests\Feature\DataAccess\IntegrationTest::testVehicleCrudCycle
+Error: Class "App\DataAccess\NoSql\MongoConnection" not found
+
+/var/www/html/tests/Feature/DataAccess/IntegrationTest.php:44</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\ApiRoutesTest" file="/var/www/html/tests/Feature/ApiRoutesTest.php" tests="5" assertions="5" errors="2" failures="2" skipped="0" time="0.010275">
+        <testcase name="testRouteWithParameters" file="/var/www/html/tests/Feature/ApiRoutesTest.php" line="69" class="Tests\Feature\ApiRoutesTest" classname="Tests.Feature.ApiRoutesTest" assertions="1" time="0.002934">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ApiRoutesTest::testRouteWithParameters
+Failed asserting that null is not null.
+
+/var/www/html/tests/Feature/ApiRoutesTest.php:83</failure>
+        </testcase>
+        <testcase name="testHealthCheckRoute" file="/var/www/html/tests/Feature/ApiRoutesTest.php" line="44" class="Tests\Feature\ApiRoutesTest" classname="Tests.Feature.ApiRoutesTest" assertions="0" time="0.002637">
+          <error type="TypeError">Tests\Feature\ApiRoutesTest::testHealthCheckRoute
+TypeError: App\Core\Router::findRoute(): Argument #3 ($params) must be of type array, null given, called in /var/www/html/app/Core/Router.php on line 122
+
+/var/www/html/app/Core/Router.php:194
+/var/www/html/app/Core/Router.php:122
+/var/www/html/app/Core/Application.php:73
+/var/www/html/tests/Feature/ApiRoutesTest.php:51</error>
+        </testcase>
+        <testcase name="testRouteToRegexConversion" file="/var/www/html/tests/Feature/ApiRoutesTest.php" line="142" class="Tests\Feature\ApiRoutesTest" classname="Tests.Feature.ApiRoutesTest" assertions="1" time="0.000926">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ApiRoutesTest::testRouteToRegexConversion
+Failed asserting that false is true.
+
+/var/www/html/tests/Feature/ApiRoutesTest.php:155</failure>
+        </testcase>
+        <testcase name="testUnknownRoutesAreNotFound" file="/var/www/html/tests/Feature/ApiRoutesTest.php" line="117" class="Tests\Feature\ApiRoutesTest" classname="Tests.Feature.ApiRoutesTest" assertions="0" time="0.003396">
+          <error type="TypeError">Tests\Feature\ApiRoutesTest::testUnknownRoutesAreNotFound
+TypeError: App\Core\Router::findRoute(): Argument #3 ($params) must be of type array, null given, called in /var/www/html/app/Core/Router.php on line 122
+
+/var/www/html/app/Core/Router.php:194
+/var/www/html/app/Core/Router.php:122
+/var/www/html/app/Core/Application.php:73
+/var/www/html/tests/Feature/ApiRoutesTest.php:124</error>
+        </testcase>
+        <testcase name="testHttpMethodsAreRespected" file="/var/www/html/tests/Feature/ApiRoutesTest.php" line="92" class="Tests\Feature\ApiRoutesTest" classname="Tests.Feature.ApiRoutesTest" assertions="3" time="0.000382"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
