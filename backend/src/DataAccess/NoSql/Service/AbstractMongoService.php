@@ -44,8 +44,8 @@ abstract class AbstractMongoService implements MongoServiceInterface
     public function __construct(MongoConnection $connection)
     {
         $this->connection = $connection;
-        $this->initService();
         $this->collection = $this->connection->getCollection($this->collectionName);
+        $this->initService();
     }
 
     /**

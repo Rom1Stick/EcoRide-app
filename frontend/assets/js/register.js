@@ -114,7 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
           displayError(input, msg);
         });
       } else if (err.message) {
-        displayError(form, err.message);
+        // Si l'email est déjà utilisé, afficher l'erreur sous le champ email
+        if (err.message.toLowerCase().includes('email')) {
+          displayError(emailInput, err.message);
+        } else {
+          displayError(form, err.message);
+        }
       } else {
         displayError(form, 'Une erreur est survenue. Veuillez réessayer.');
       }
