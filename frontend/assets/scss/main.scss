@@ -1,9 +1,10 @@
-@import 'abstracts/variables';
-@import 'abstracts/reset';
-@import 'public/styleRegister';
-@import 'error';
-@import 'components/form-error';
-@import 'components/overlay-spinner';
+@use 'sass:color';
+@use 'abstracts/variables' as *;
+@use 'abstracts/reset';
+@use 'pages/register';
+@use 'error';
+@use 'components/form-error';
+@use 'components/overlay-spinner';
 
 // Styles globaux
 body {
@@ -47,7 +48,7 @@ body {
 
   // Variante admin
   &--admin {
-    background-color: $color-secondary;
+    background-color: color.adjust($color-secondary, $lightness: -10%);
   }
 }
 
@@ -118,6 +119,6 @@ body {
 
   // Variante admin
   &--admin {
-    background-color: darken($color-secondary, 10%);
+    background-color: color.adjust($color-secondary, $lightness: -10%);
   }
 }

@@ -1,3 +1,5 @@
+@use '../abstracts/variables' as *;
+
 .register-form__error-message {
   color: $color-secondary;
   font-size: 0.875rem;

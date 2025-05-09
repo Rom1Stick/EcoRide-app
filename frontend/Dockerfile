@@ -27,7 +27,7 @@ FROM nginx:alpine
 COPY docker/nginx-frontend.conf /etc/nginx/conf.d/default.conf
 
 # Copier les fichiers statiques depuis la première étape
-COPY --from=builder /app/assets/css /usr/share/nginx/html/assets/css
+COPY --from=builder /app/assets/styles /usr/share/nginx/html/assets/styles
 COPY --from=builder /app/assets/js/dist /usr/share/nginx/html/assets/js
 
 # Copier les fichiers statiques directement
