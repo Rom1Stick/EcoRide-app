@@ -1,13 +1,25 @@
 @use '../abstracts/variables' as *;
 
+// Message d'erreur
 .register-form__error-message {
-  color: $color-secondary;
+  display: block;
+  background-color: rgba($color-accent, 0.1);
+  border: 1px solid $color-accent;
+  color: $color-accent;
+  padding: $spacing/2 $spacing;
+  border-radius: $radius-md;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: $spacing;
 }
 
+// Message de succès
 .register-form__success-message {
-  color: $color-primary;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  display: block;
+  background-color: rgba($color-secondary, 0.1);
+  border: 1px solid $color-secondary;
+  color: $color-secondary;
+  padding: $spacing/2 $spacing;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  margin-top: $spacing;
 }
