@@ -14,7 +14,7 @@ $router->get('/api/health', 'HomeController@health');
 // Routes d'authentification
 $router->post('/api/auth/register', 'AuthController@register');
 $router->post('/api/auth/login', 'AuthController@login');
-$router->post('/api/auth/refresh', 'AuthController@refresh');
+$router->post('/api/auth/refresh', 'AuthController@refresh')->middleware('auth');
 $router->post('/api/auth/logout', 'AuthController@logout')->middleware('auth');
 
 // Endpoint de confirmation de compte via jeton
@@ -31,7 +31,7 @@ $router->delete('/api/rides/{id}', 'RideController@destroy')->middleware('auth')
 $router->get('/api/rides/search', 'SearchController@search');
 
 // Routes des utilisateurs
-$router->get('/api/users/me', 'UserController@me')->middleware('auth');
+$router->get('/api/users/me', 'UserController@me');
 $router->put('/api/users/me', 'UserController@update')->middleware('auth');
 
 // Routes des réservations

@@ -13,7 +13,9 @@
   <body>
     <div class="register-page">
       <div class="register-modal" role="dialog" aria-labelledby="register-title">
-        <button class="register-modal__close" aria-label="Fermer">✕</button>
+        <button class="register-modal__close" aria-label="Fermer" onclick="window.history.back();">
+          ✕
+        </button>
 
         <div class="register-modal__logo">
           <img src="/assets/images/LogoText_Ecoride.svg" alt="EcoRide Logo" />
@@ -77,7 +79,7 @@
 
         <p class="register-modal__login">
           Déjà inscrit ?
-          <a href="/login">Se connecter</a>
+          <a href="/frontend/pages/public/login.html">Se connecter</a>
         </p>
       </div>
     </div>
