@@ -14,7 +14,7 @@ $router->get('/api/health', 'HomeController@health');
 // Routes d'authentification
 $router->post('/api/auth/register', 'AuthController@register');
 $router->post('/api/auth/login', 'AuthController@login');
-$router->post('/api/auth/refresh', 'AuthController@refresh');
+$router->post('/api/auth/refresh', 'AuthController@refresh')->middleware('auth');
 $router->post('/api/auth/logout', 'AuthController@logout')->middleware('auth');
 
 // Endpoint de confirmation de compte via jeton

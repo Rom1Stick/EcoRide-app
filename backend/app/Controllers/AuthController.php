@@ -88,8 +88,15 @@ class AuthController extends Controller
             // Génération du token de confirmation
             $confirmationToken = bin2hex(random_bytes(32));
             $expiresAt = date('Y-m-d H:i:s', time() + 24 * 3600);
-            $stmt = $db->prepare('INSERT INTO user_confirmations (utilisateur_id, token, expires_at) VALUES (?, ?, ?)');
+            $stmt = $db->prepare('INSERT INTO user_confirmations (user_id, token, expires_at) VALUES (?, ?, ?)');
             $stmt->execute([$userId, $confirmationToken, $expiresAt]);
+
+            // Assigner le rôle par défaut 'visiteur'
+            $stmtRole = $db->prepare('SELECT role_id FROM Role WHERE libelle = ?');
+            $stmtRole->execute(['visiteur']);
+            $roleId = $stmtRole->fetchColumn();
+            $stmt = $db->prepare('INSERT INTO Possede (utilisateur_id, role_id) VALUES (?, ?)');
+            $stmt->execute([$userId, $roleId]);
 
             $db->commit();
 
@@ -249,7 +256,7 @@ class AuthController extends Controller
         $confirmStmt = $db->prepare(
             'SELECT is_used, expires_at
              FROM user_confirmations
-             WHERE utilisateur_id = ?'
+             WHERE user_id = ?'
         );
         $confirmStmt->execute([$user['id']]);
         $confirmation = $confirmStmt->fetch();
@@ -282,9 +289,9 @@ class AuthController extends Controller
 
         // Envoyer le JWT dans un cookie sécurisé (30 minutes)
         header(sprintf(
-            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=%d',
+            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=%d',
             $token,
-            (int) env('JWT_EXPIRATION', 1800)
+            (int) env('JWT_EXPIRATION', 3600)
         ));
 
         // Récupérer le rôle de l'utilisateur pour la réponse
@@ -358,9 +365,9 @@ class AuthController extends Controller
 
         // Envoyer le JWT dans un cookie sécurisé (30 minutes)
         header(sprintf(
-            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=%d',
+            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=%d',
             $token,
-            (int) env('JWT_EXPIRATION', 1800)
+            (int) env('JWT_EXPIRATION', 3600)
         ));
 
         return $this->success(
@@ -483,7 +490,7 @@ class AuthController extends Controller
 
         $db = $this->app->getDatabase()->getMysqlConnection();
         // Rechercher le jeton de confirmation
-        $stmt = $db->prepare('SELECT id, utilisateur_id, expires_at, is_used FROM user_confirmations WHERE token = ?');
+        $stmt = $db->prepare('SELECT id, user_id, expires_at, is_used FROM user_confirmations WHERE token = ?');
         $stmt->execute([$token]);
         $confirmation = $stmt->fetch();
 
