@@ -7,6 +7,9 @@
  * configure l'environnement et gère les requêtes entrantes.
  */
 
+// Démarrer la session pour CSRF
+session_start();
+
 // Définir le chemin de base
 define('BASE_PATH', dirname(__DIR__));
 
@@ -42,6 +45,11 @@ $app = new \App\Core\Application();
 
 // Charger les routes de l'API
 require BASE_PATH . '/routes/api.php';
+
+// Générer et exposer le token CSRF via cookie lisible par JS
+$csrfToken = \App\Core\Security::generateCsrfToken();
+// En dev, on n'impose pas Secure pour le cookie CSRF
+setcookie('XSRF-TOKEN', $csrfToken, 0, '/', '', false, false);
 
 // Gérer la requête entrante
 $app->run(); 

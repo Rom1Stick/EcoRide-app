@@ -162,6 +162,11 @@ class AuthController extends Controller
 
         // Récupérer les données de la requête et les nettoyer
         $data = sanitize($this->getJsonData());
+        // Vérifier le token CSRF
+        $csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+        if (! $csrfToken || ! Security::verifyCsrfToken($csrfToken)) {
+            return $this->error('Requête invalide (CSRF)', 403);
+        }
 
         // Validation de l'identifiant (email ou pseudo) et du mot de passe
         $identifier = $data['email'] ?? '';
@@ -192,6 +197,34 @@ class AuthController extends Controller
                 ],
                 422
             );
+        }
+
+        // Anti-bruteforce : blocage IP et utilisateur (seuil 5 tentatives / 15 minutes)
+        $db = $this->app->getDatabase()->getMysqlConnection();
+        $threshold = 5;
+        $blockWindow = 15; // minutes
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        // Blocage par IP
+        $ipStmt = $db->prepare("SELECT COUNT(*) FROM auth_logs WHERE action = 'login' AND success = 0 AND ip_address = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? MINUTE)");
+        $ipStmt->execute([$ip, $blockWindow]);
+        if ((int)$ipStmt->fetchColumn() >= $threshold) {
+            return $this->error("Trop de tentatives échouées depuis votre IP. Veuillez réessayer dans {$blockWindow} minutes.", 429);
+        }
+        // Blocage par utilisateur
+        $userIdCheck = null;
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $stmtCheck = $db->prepare("SELECT utilisateur_id FROM Utilisateur WHERE email = ?");
+        } else {
+            $stmtCheck = $db->prepare("SELECT utilisateur_id FROM Utilisateur WHERE pseudo = ?");
+        }
+        $stmtCheck->execute([$identifier]);
+        $userIdCheck = $stmtCheck->fetchColumn();
+        if ($userIdCheck) {
+            $userStmt = $db->prepare("SELECT COUNT(*) FROM auth_logs WHERE action = 'login' AND success = 0 AND user_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? MINUTE)");
+            $userStmt->execute([$userIdCheck, $blockWindow]);
+            if ((int)$userStmt->fetchColumn() >= $threshold) {
+                return $this->error("Trop de tentatives échouées pour ce compte. Veuillez réessayer dans {$blockWindow} minutes.", 429);
+            }
         }
 
         // Récupérer l'utilisateur
@@ -403,10 +436,18 @@ class AuthController extends Controller
                 user_agent TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 INDEX (user_id),
+                INDEX (ip_address),
                 INDEX (created_at)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         '
         );
+
+        // S'assurer que l'index sur ip_address existe
+        try {
+            $db->exec('ALTER TABLE auth_logs ADD INDEX idx_auth_logs_ip_address (ip_address)');
+        } catch (\Exception $e) {
+            // index existant ou autre erreur, on ignore
+        }
 
         $stmt = $db->prepare(
             '

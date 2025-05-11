@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connexion – EcoRide</title>
-    <link rel="stylesheet" href="/src/assets/styles/main.min.css" />
+    <link rel="stylesheet" href="/frontend/assets/styles/main.min.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
       rel="stylesheet"
@@ -62,14 +62,29 @@
       <a href="/" class="login-modal__back">Retour à l'accueil</a>
     </div>
     <script>
+      // Initialiser le token CSRF en appelant l'API health
+      (async () => {
+        try {
+          await fetch('/api/health', { credentials: 'include' });
+        } catch {}
+      })();
       document.querySelector('.login-form').addEventListener('submit', async function (e) {
         e.preventDefault();
         const identifier = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         try {
+          // Récupérer le token CSRF depuis le cookie
+          const csrfToken =
+            document.cookie
+              .split('; ')
+              .find((row) => row.startsWith('XSRF-TOKEN='))
+              ?.split('=')[1] || '';
           const response = await fetch('/api/auth/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': csrfToken,
+            },
             credentials: 'include',
             body: JSON.stringify({ email: identifier, password }),
           });

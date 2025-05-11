@@ -60,6 +60,15 @@ class AuthMiddleware
             $_SERVER['AUTH_USER_ROLE'] = $payload['role'];
         }
 
+        // Contrôle d'accès par rôle pour les routes /api/admin
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        if (strpos($uri, '/api/admin') === 0 && ($_SERVER['AUTH_USER_ROLE'] ?? '') !== 'admin') {
+            http_response_code(403);
+            return [
+                'error'   => true,
+                'message' => 'Accès réservé aux administrateurs.'
+            ];
+        }
         return true;
     }
 
