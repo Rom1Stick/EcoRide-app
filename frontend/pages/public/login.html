@@ -105,6 +105,22 @@
           alert('Erreur réseau, veuillez réessayer');
         }
       });
+      // Gestion du toggle de visibilité du mot de passe
+      document.querySelectorAll('.input-wrapper').forEach((wrapper) => {
+        const input = wrapper.querySelector('input');
+        const btn = wrapper.querySelector('.toggle-visibility');
+        if (input && btn) {
+          btn.addEventListener('click', () => {
+            if (input.type === 'password') {
+              input.type = 'text';
+              btn.textContent = '🙈';
+            } else {
+              input.type = 'password';
+              btn.textContent = '👁';
+            }
+          });
+        }
+      });
     </script>
   </body>
 </html>
