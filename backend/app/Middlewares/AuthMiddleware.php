@@ -16,13 +16,13 @@ class AuthMiddleware
      */
     public function handle()
     {
-        // Récupérer le token JWT depuis l'en-tête Authorization ou le cookie
-        $token = null;
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
-        if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-            $token = $matches[1];
-        } elseif (!empty($_COOKIE['auth_token'])) {
-            $token = $_COOKIE['auth_token'];
+        // Récupérer le token JWT depuis le cookie ou l'en-tête Authorization
+        $token = $_COOKIE['auth_token'] ?? null;
+        if (!$token) {
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+            if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+                $token = $matches[1];
+            }
         }
         if (!$token) {
             http_response_code(401);

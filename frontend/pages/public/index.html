@@ -18,8 +18,18 @@
           <li class="header__item">
             <a href="index.html" class="header__link header__link--active">Accueil</a>
           </li>
-          <li class="header__item"><a href="register.html" class="header__link">Inscription</a></li>
-          <li class="header__item"><a href="login.html" class="header__link">Connexion</a></li>
+          <li class="header__item" id="nav-register">
+            <a href="register.html" class="header__link">Inscription</a>
+          </li>
+          <li class="header__item" id="nav-login">
+            <a href="login.html" class="header__link">Connexion</a>
+          </li>
+          <li class="header__item" id="nav-user" style="display: none">
+            <span id="user-greeting" class="header__link"></span>
+          </li>
+          <li class="header__item" id="nav-logout" style="display: none">
+            <button id="logout-btn" class="header__link button button--link">Déconnexion</button>
+          </li>
         </ul>
       </nav>
     </header>
@@ -37,5 +47,6 @@
       <p class="footer__text">&copy; 2025 EcoRide</p>
     </footer>
     <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
   </body>
 </html>

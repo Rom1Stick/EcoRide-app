@@ -236,7 +236,8 @@ class Router
             '/{([^\/]+)}/',
             function ($matches) use (&$paramNames) {
                 $paramNames[] = $matches[1];
-                return '([^\/]+)';
+                // Capture un segment sans slash, l'échappement sera géré ensuite
+                return '([^/]+)';
             },
             $path
         );

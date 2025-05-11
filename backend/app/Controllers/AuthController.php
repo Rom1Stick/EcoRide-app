@@ -88,7 +88,7 @@ class AuthController extends Controller
             // Génération du token de confirmation
             $confirmationToken = bin2hex(random_bytes(32));
             $expiresAt = date('Y-m-d H:i:s', time() + 24 * 3600);
-            $stmt = $db->prepare('INSERT INTO user_confirmations (user_id, token, expires_at) VALUES (?, ?, ?)');
+            $stmt = $db->prepare('INSERT INTO user_confirmations (utilisateur_id, token, expires_at) VALUES (?, ?, ?)');
             $stmt->execute([$userId, $confirmationToken, $expiresAt]);
 
             // Assigner le rôle par défaut 'visiteur'
@@ -208,6 +208,22 @@ class AuthController extends Controller
 
         // Anti-bruteforce : blocage IP et utilisateur (seuil 5 tentatives / 15 minutes)
         $db = $this->app->getDatabase()->getMysqlConnection();
+        // Créer la table auth_logs si elle n'existe pas pour éviter les erreurs
+        $db->exec(
+            'CREATE TABLE IF NOT EXISTS auth_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                action VARCHAR(50) NOT NULL,
+                success TINYINT(1) NOT NULL,
+                email VARCHAR(255),
+                ip_address VARCHAR(45),
+                user_agent TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX (user_id),
+                INDEX (ip_address),
+                INDEX (created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+        );
         $threshold = 5;
         $blockWindow = 15; // minutes
         $ip = $_SERVER['REMOTE_ADDR'] ?? '';
@@ -256,7 +272,7 @@ class AuthController extends Controller
         $confirmStmt = $db->prepare(
             'SELECT is_used, expires_at
              FROM user_confirmations
-             WHERE user_id = ?'
+             WHERE utilisateur_id = ?'
         );
         $confirmStmt->execute([$user['id']]);
         $confirmation = $confirmStmt->fetch();
@@ -289,7 +305,7 @@ class AuthController extends Controller
 
         // Envoyer le JWT dans un cookie sécurisé (30 minutes)
         header(sprintf(
-            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=%d',
+            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; SameSite=Strict; Max-Age=%d',
             $token,
             (int) env('JWT_EXPIRATION', 3600)
         ));
@@ -341,7 +357,7 @@ class AuthController extends Controller
             $this->logAuthActivity($userId, 'logout', true);
         }
         // Supprimer le cookie d'authentification
-        header('Set-Cookie: auth_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
+        header('Set-Cookie: auth_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
 
         return $this->success(null, 'Déconnexion réussie');
     }
@@ -365,7 +381,7 @@ class AuthController extends Controller
 
         // Envoyer le JWT dans un cookie sécurisé (30 minutes)
         header(sprintf(
-            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=%d',
+            'Set-Cookie: auth_token=%s; Path=/; HttpOnly; SameSite=Strict; Max-Age=%d',
             $token,
             (int) env('JWT_EXPIRATION', 3600)
         ));
@@ -490,7 +506,7 @@ class AuthController extends Controller
 
         $db = $this->app->getDatabase()->getMysqlConnection();
         // Rechercher le jeton de confirmation
-        $stmt = $db->prepare('SELECT id, user_id, expires_at, is_used FROM user_confirmations WHERE token = ?');
+        $stmt = $db->prepare('SELECT id, utilisateur_id, expires_at, is_used FROM user_confirmations WHERE token = ?');
         $stmt->execute([$token]);
         $confirmation = $stmt->fetch();
 

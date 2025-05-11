@@ -31,7 +31,7 @@ $router->delete('/api/rides/{id}', 'RideController@destroy')->middleware('auth')
 $router->get('/api/rides/search', 'SearchController@search');
 
 // Routes des utilisateurs
-$router->get('/api/users/me', 'UserController@me')->middleware('auth');
+$router->get('/api/users/me', 'UserController@me');
 $router->put('/api/users/me', 'UserController@update')->middleware('auth');
 
 // Routes des réservations
