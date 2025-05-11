@@ -2,6 +2,7 @@
 @use 'abstracts/variables' as *;
 @use 'abstracts/reset';
 @use 'pages/register';
+@use 'pages/login';
 @use 'error';
 @use 'components/form-error';
 @use 'components/overlay-spinner';

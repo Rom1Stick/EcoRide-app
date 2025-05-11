@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connexion – EcoRide</title>
-    <link rel="stylesheet" href="/frontend/assets/styles/main.min.css" />
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
       rel="stylesheet"
@@ -13,10 +13,12 @@
   <body>
     <div class="login-page">
       <div class="login-modal" role="dialog" aria-labelledby="login-title">
-        <button class="login-modal__close" aria-label="Fermer">✕</button>
+        <button class="login-modal__close" aria-label="Fermer" onclick="window.history.back();">
+          ✕
+        </button>
 
         <div class="login-modal__logo">
-          <img src="/src/assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
         </div>
 
         <form class="login-form" novalidate>

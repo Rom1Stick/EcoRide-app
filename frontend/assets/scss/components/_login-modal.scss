@@ -1,0 +1,61 @@
+@use '../abstracts/variables' as *;
+
+// Composant Login Modal
+.login-modal {
+  background-color: $color-text-secondary;
+  border-radius: $radius-lg;
+  padding: 2rem 1rem;
+  width: 100%;
+  max-width: 24rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2);
+  position: relative;
+
+  &__close {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background-color: transparent;
+    border: 2px solid $color-primary-bg;
+    color: $color-primary-bg;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.25rem;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  &__logo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+
+    .icon {
+      height: 12rem;
+      vertical-align: middle;
+      object-fit: contain;
+      position: absolute;
+      top: -3rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  &__back {
+    margin-top: 2rem;
+    text-align: center;
+    color: $color-accent;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-secondary;
+    }
+  }
+}
