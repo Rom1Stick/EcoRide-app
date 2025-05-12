@@ -2,7 +2,7 @@ export async function initAuthUI() {
   // Ne pas interroger l'API si pas de token JWT en localStorage
   const storedToken = localStorage.getItem('auth_token');
   if (!storedToken) {
-    return;
+    return false;
   }
   try {
     // Préparer l'en-tête Authorization
@@ -12,26 +12,38 @@ export async function initAuthUI() {
       credentials: 'include',
       headers,
     });
+    // Redirection si pas authentifié
+    if (response.status === 401) {
+      localStorage.removeItem('auth_token');
+      window.location.href = '/pages/public/login.html';
+      return false;
+    }
     const result = await response.json();
-    if (response.ok && !result.error && result.data) {
-      const user = result.data;
-      // Masquer Inscription et Connexion
-      const navRegister = document.getElementById('nav-register');
-      const navLogin = document.getElementById('nav-login');
-      if (navRegister) navRegister.style.display = 'none';
-      if (navLogin) navLogin.style.display = 'none';
-      // Afficher greeting et bouton déconnexion
-      const navUser = document.getElementById('nav-user');
-      const navLogout = document.getElementById('nav-logout');
-      if (navUser && navLogout) {
-        const greeting = document.getElementById('user-greeting');
-        greeting.textContent = `Bonjour, ${user.email || ''}`;
-        navUser.style.display = '';
-        navLogout.style.display = '';
-      }
+    if (!response.ok || result.error || !result.data) {
+      localStorage.removeItem('auth_token');
+      window.location.href = '/pages/public/login.html';
+      return false;
+    }
+
+    // Afficher la navigation utilisateur
+    const navRegister = document.getElementById('nav-register');
+    const navLogin = document.getElementById('nav-login');
+    if (navRegister) navRegister.style.display = 'none';
+    if (navLogin) navLogin.style.display = 'none';
+    const navUser = document.getElementById('nav-user');
+    const navLogout = document.getElementById('nav-logout');
+    if (navUser && navLogout) {
+      const greeting = document.getElementById('user-greeting');
+      // Utiliser l'email retourné
+      greeting.textContent = `Bonjour, ${result.data.email || ''}`;
+      navUser.style.display = '';
+      navLogout.style.display = '';
     }
   } catch (err) {
     console.warn('User not authenticated', err);
+    localStorage.removeItem('auth_token');
+    window.location.href = '/pages/public/login.html';
+    return false;
   }
 
   // Gestion de la déconnexion
@@ -47,6 +59,7 @@ export async function initAuthUI() {
       window.location.reload();
     });
   }
+  return true;
 }
 
 // Initialisation au chargement de la page

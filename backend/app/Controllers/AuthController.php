@@ -94,9 +94,10 @@ class AuthController extends Controller
             // Assigner le rôle par défaut 'visiteur'
             $stmtRole = $db->prepare('SELECT role_id FROM Role WHERE libelle = ?');
             $stmtRole->execute(['visiteur']);
-            $roleId = $stmtRole->fetchColumn();
-            $stmt = $db->prepare('INSERT INTO Possede (utilisateur_id, role_id) VALUES (?, ?)');
-            $stmt->execute([$userId, $roleId]);
+            if ($visitorRid = $stmtRole->fetchColumn()) {
+                $db->prepare('INSERT IGNORE INTO Possede (utilisateur_id, role_id) VALUES (?, ?)')
+                   ->execute([$userId, $visitorRid]);
+            }
 
             $db->commit();
 
@@ -320,10 +321,10 @@ class AuthController extends Controller
                 $redirectUrl = '/rides/search';
                 break;
             case 'chauffeur':
-                $redirectUrl = '/driver/dashboard';
+                $redirectUrl = '/pages/public/index.html';
                 break;
             case 'admin':
-                $redirectUrl = '/admin/panel';
+                $redirectUrl = '/pages/admin/dashboard.html';
                 break;
             default:
                 $redirectUrl = '/';
@@ -524,6 +525,17 @@ class AuthController extends Controller
         $update = $db->prepare('UPDATE user_confirmations SET is_used = 1 WHERE id = ?');
         $update->execute([$confirmation['id']]);
 
+        // Assigner les rôles 'passager' et 'chauffeur' après confirmation
+        $userId = (int)$confirmation['utilisateur_id'];
+        $stmtRole = $db->prepare('SELECT role_id FROM Role WHERE libelle = ?');
+        $stmtInsert = $db->prepare('INSERT IGNORE INTO Possede (utilisateur_id, role_id) VALUES (?, ?)');
+        foreach (['passager', 'chauffeur'] as $libelle) {
+            $stmtRole->execute([$libelle]);
+            if ($rid = $stmtRole->fetchColumn()) {
+                $stmtInsert->execute([$userId, $rid]);
+            }
+        }
+        
         return $this->success(null, 'Compte confirmé');
     }
 }

@@ -6,23 +6,26 @@
     <meta name="description" content="Dashboard Administration - EcoRide" />
     <link rel="icon" href="../../assets/images/favicon.ico" />
     <title>Dashboard Administration - EcoRide</title>
-    <link rel="stylesheet" href="../../assets/css/main.css" />
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
   </head>
   <body class="page-admin">
     <header class="header header--admin">
       <div class="header__logo">
-        <img src="../../assets/images/logo.svg" alt="Logo EcoRide" />
+        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Logo EcoRide" />
       </div>
       <nav class="header__nav">
         <ul class="header__list">
           <li class="header__item">
-            <a href="dashboard.html" class="header__link header__link--active">Dashboard</a>
+            <a href="dashboard.html" class="header__link header__link--active">Tableau de bord</a>
           </li>
           <li class="header__item">
-            <a href="manage-users.html" class="header__link">Gestion Utilisateurs</a>
+            <a href="manage-users.html" class="header__link">Gestion des utilisateurs</a>
           </li>
           <li class="header__item">
-            <a href="../public/index.html" class="header__link">Retour au site</a>
+            <a href="/pages/public/index.html" class="header__link">Voir le site</a>
+          </li>
+          <li class="header__item">
+            <button id="logout-btn" class="header__link">Déconnexion</button>
           </li>
         </ul>
       </nav>
@@ -62,10 +65,11 @@
                 <th>Nom</th>
                 <th>Email</th>
                 <th>Date d'inscription</th>
+                <th>État</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="pending-users-tbody">
               <!-- Les données seront chargées dynamiquement via JavaScript -->
             </tbody>
           </table>
