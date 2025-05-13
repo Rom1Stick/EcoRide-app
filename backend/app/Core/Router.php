@@ -118,6 +118,8 @@ class Router
         // Nettoyer l'URI
         $uri = parse_url($uri, PHP_URL_PATH);
 
+        // Initialiser le tableau de paramètres
+        $params = [];
         // Trouver la route correspondante
         $route = $this->findRoute($method, $uri, $params);
 
@@ -193,9 +195,6 @@ class Router
      */
     private function findRoute(string $method, string $uri, array &$params = []): ?Route
     {
-        // Initialiser le tableau de paramètres
-        $params = [];
-        
         foreach ($this->routes as $route) {
             // Vérifier si la méthode HTTP correspond
             if ($route->getMethod() !== $method) {
@@ -237,7 +236,8 @@ class Router
             '/{([^\/]+)}/',
             function ($matches) use (&$paramNames) {
                 $paramNames[] = $matches[1];
-                return '([^\/]+)';
+                // Capture un segment sans slash, l'échappement sera géré ensuite
+                return '([^/]+)';
             },
             $path
         );

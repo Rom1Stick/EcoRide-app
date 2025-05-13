@@ -13,11 +13,12 @@ COPY assets/scss ./assets/scss
 # Compiler le SCSS en CSS
 RUN npm run build:scss
 
-# Optimisation des fichiers JavaScript
-RUN mkdir -p ./assets/js/dist
+# Copie et minification des fichiers JavaScript tout en conservant l'arborescence
 COPY assets/js ./assets/js/src
-RUN npx eslint assets/js/src --fix || true
-RUN npx terser assets/js/src/*.js --compress --mangle --output assets/js/dist
+RUN npx eslint "assets/js/src/**/*.js" --fix || true \
+ && mkdir -p assets/js/dist \
+ && cp -r assets/js/src/. assets/js/dist/ \
+ && find assets/js/dist -type f -name "*.js" -exec sh -c 'terser "$1" --compress --mangle --output "$1"' _ {} \;
 
 # Étape 2: Servir les fichiers statiques avec Nginx
 FROM nginx:alpine
@@ -26,7 +27,7 @@ FROM nginx:alpine
 COPY docker/nginx-frontend.conf /etc/nginx/conf.d/default.conf
 
 # Copier les fichiers statiques depuis la première étape
-COPY --from=builder /app/assets/css /usr/share/nginx/html/assets/css
+COPY --from=builder /app/assets/styles /usr/share/nginx/html/assets/styles
 COPY --from=builder /app/assets/js/dist /usr/share/nginx/html/assets/js
 
 # Copier les fichiers statiques directement

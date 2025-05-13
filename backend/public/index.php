@@ -7,6 +7,9 @@
  * configure l'environnement et gère les requêtes entrantes.
  */
 
+// Démarrer la session pour CSRF
+session_start();
+
 // Définir le chemin de base
 define('BASE_PATH', dirname(__DIR__));
 
@@ -16,6 +19,13 @@ require BASE_PATH . '/vendor/autoload.php';
 // Charger les variables d'environnement
 $dotenv = new \App\Core\DotEnv(BASE_PATH . '/.env');
 $dotenv->load();
+
+// En-têtes HTTP de sécurité
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: no-referrer-when-downgrade');
+header('Permissions-Policy: geolocation=(), microphone=()');
+header("Content-Security-Policy: default-src 'self';");
 
 // Configurer les erreurs en fonction de l'environnement
 if (env('APP_DEBUG', false) === true) {
@@ -35,6 +45,11 @@ $app = new \App\Core\Application();
 
 // Charger les routes de l'API
 require BASE_PATH . '/routes/api.php';
+
+// Générer et exposer le token CSRF via cookie lisible par JS
+$csrfToken = \App\Core\Security::generateCsrfToken();
+// En dev, on n'impose pas Secure pour le cookie CSRF
+setcookie('XSRF-TOKEN', $csrfToken, 0, '/', '', false, false);
 
 // Gérer la requête entrante
 $app->run(); 

@@ -1,19 +1,14 @@
-/**
- * Wrapper Fetch API pour EcoRide
- */
-const API_BASE_URL = '/api';
-
-async function apiRequest(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+export async function registerUser({ name, email, password }) {
+  const response = await fetch('/api/auth/register', {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    ...options,
+    body: JSON.stringify({ name, email, password }),
   });
-  return response.json();
+  const result = await response.json();
+  if (!response.ok || result.error) {
+    throw result;
+  }
+  return result;
 }
-
-export const api = {
-  get: (path) => apiRequest(path),
-  post: (path, data) => apiRequest(path, { method: 'POST', body: JSON.stringify(data) }),
-};

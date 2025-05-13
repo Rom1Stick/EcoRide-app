@@ -1,3 +1,6 @@
+// Import des variables SCSS
+@use 'abstracts/variables' as *;
+
 /*
  * Styles pour la page d'erreur
  */
@@ -13,41 +16,41 @@
 
 .error {
   text-align: center;
-  padding: 2rem;
+  padding: $spacing * 2;
   max-width: 600px;
   margin: 0 auto;
 
   &__title {
     font-size: 2rem;
-    margin-bottom: 1rem;
-    color: var(--color-primary);
+    margin-bottom: $spacing;
+    color: $color-primary;
   }
 
   &__text {
     font-size: 1.2rem;
-    margin-bottom: 2rem;
-    color: var(--color-text);
+    margin-bottom: $spacing * 2;
+    color: $text-color;
   }
 
   &__code {
     font-size: 6rem;
     font-weight: bold;
-    color: var(--color-secondary);
-    margin: 2rem 0;
+    color: $color-secondary;
+    margin: $spacing * 2 0;
     opacity: 0.4;
   }
 
   &__cta {
-    margin-top: 2rem;
+    margin-top: $spacing * 2;
 
     .button {
       font-size: 1.2rem;
-      padding: 0.75rem 1.5rem;
+      padding: $spacing $spacing * 2;
     }
   }
 
   @media (max-width: 768px) {
-    padding: 1rem;
+    padding: $spacing;
 
     &__title {
       font-size: 1.5rem;

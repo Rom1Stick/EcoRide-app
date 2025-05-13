@@ -202,28 +202,14 @@ class ReviewServiceTest extends TestCase
 
     public function testConnectionError()
     {
-        // Utiliser notre classe TestReviewService avec une méthode findById surchargée
-        $exceptionMessage = 'Impossible de se connecter à MongoDB';
-        
-        // Créer un mock de collection qui génère une exception
+        // Préparer un mock de collection qui lancera une exception MongoDB
         $mockCollection = $this->createMock(Collection::class);
         $mockCollection->method('findOne')
-            ->willThrowException(new ConnectionException($exceptionMessage));
-        
-        // Créer une sous-classe anonyme qui convertit l'exception MongoDB en DataAccessException
-        $reviewService = new class($mockCollection) extends TestReviewService {
-            public function findById($id)
-            {
-                try {
-                    $result = $this->collection->findOne(['_id' => new ObjectId($id)]);
-                    return $result;
-                } catch (\Exception $e) {
-                    // Convertir en DataAccessException
-                    throw new DataAccessException("Erreur lors de la recherche : " . $e->getMessage());
-                }
-            }
-        };
-        
+            ->willThrowException(new ConnectionException('Impossible de se connecter à MongoDB'));
+
+        // Utiliser la version de test du service, qui héritera de la gestion DataAccessException
+        $reviewService = new TestReviewService($mockCollection);
+
         // Test avec assertion d'exception
         $this->expectException(DataAccessException::class);
         $reviewService->findById('507f1f77bcf86cd799439011');

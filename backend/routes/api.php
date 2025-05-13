@@ -14,8 +14,11 @@ $router->get('/api/health', 'HomeController@health');
 // Routes d'authentification
 $router->post('/api/auth/register', 'AuthController@register');
 $router->post('/api/auth/login', 'AuthController@login');
-$router->post('/api/auth/refresh', 'AuthController@refresh');
+$router->post('/api/auth/refresh', 'AuthController@refresh')->middleware('auth');
 $router->post('/api/auth/logout', 'AuthController@logout')->middleware('auth');
+
+// Endpoint de confirmation de compte via jeton
+$router->get('/api/auth/confirm', 'AuthController@confirm');
 
 // Routes des trajets
 $router->get('/api/rides', 'RideController@index');
@@ -28,10 +31,27 @@ $router->delete('/api/rides/{id}', 'RideController@destroy')->middleware('auth')
 $router->get('/api/rides/search', 'SearchController@search');
 
 // Routes des utilisateurs
-$router->get('/api/users/me', 'UserController@me')->middleware('auth');
+$router->get('/api/users/me', 'UserController@me');
+$router->post('/api/users/me/role-requests', 'UserController@requestRole')->middleware('auth');
 $router->put('/api/users/me', 'UserController@update')->middleware('auth');
 
 // Routes des réservations
 $router->get('/api/bookings', 'BookingController@index')->middleware('auth');
 $router->post('/api/rides/{id}/book', 'BookingController@store')->middleware('auth');
-$router->delete('/api/bookings/{id}', 'BookingController@destroy')->middleware('auth'); 
+$router->delete('/api/bookings/{id}', 'BookingController@destroy')->middleware('auth');
+
+// Routes d'administration (gestion des rôles et utilisateurs)
+$router->get('/api/admin/users', 'AdminController@listUsers')->middleware('auth');
+$router->post('/api/admin/users/{userId}/roles', 'AdminController@addUserRole')->middleware('auth');
+$router->delete('/api/admin/users/{userId}/roles/{roleId}', 'AdminController@removeUserRole')->middleware('auth');
+$router->get('/api/admin/roles', 'AdminController@listRoles')->middleware('auth');
+$router->get('/api/admin/permissions', 'AdminController@listPermissions')->middleware('auth');
+
+// Gestion des demandes de rôle
+$router->get('/api/admin/role-requests', 'AdminController@listRoleRequests')->middleware('auth');
+$router->post('/api/admin/role-requests/{requestId}/approve', 'AdminController@approveRoleRequest')->middleware('auth');
+$router->post('/api/admin/role-requests/{requestId}/reject', 'AdminController@rejectRoleRequest')->middleware('auth');
+
+// Routes supplémentaires
+$router->get('/api/admin/users/pending', 'AdminController@listPendingUsers')->middleware('auth');
+$router->post('/api/admin/users/{userId}/confirm', 'AdminController@confirmUser')->middleware('auth'); 

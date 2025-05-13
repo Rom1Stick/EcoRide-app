@@ -1,6 +1,21 @@
 /* Variables SCSS */
+// Couleurs principales
+$color-primary-bg: #1b5e20; // Vert Forêt Foncé – Fond principal
+$color-secondary: #388e3c; // Vert Mousse – Éléments interactifs secondaires
+$color-accent: #ffc107; // Jaune Ocre – Accents importants / CTA
+
+// Couleurs neutres
+$color-text-primary: #f1f1f1; // Gris très clair – Texte principal
+$color-text-secondary: #a8b0a5; // Gris doux – Texte secondaire, bordures
+$color-surface-alt: #4e342e; // Brun Sableux – Fond alternatif / cartes
+
+$radius-lg: 1rem;
+$radius-md: 0.75rem;
+$spacing: 1rem;
+$font-base: 'Inter', sans-serif;
+
+/* Variables globales existantes */
 $font-primary: 'Helvetica Neue', Arial, sans-serif;
 $color-primary: #2a9d8f;
-$color-secondary: #264653;
 $background-color: #f4f4f4;
 $text-color: #333;

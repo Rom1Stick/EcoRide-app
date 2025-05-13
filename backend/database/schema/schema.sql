@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS Possede;
 DROP TABLE IF EXISTS Utilisateur;
 DROP TABLE IF EXISTS Role;
 DROP TABLE IF EXISTS Adresse;
+DROP TABLE IF EXISTS user_confirmations;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Adresses (extraction des données d'adresse)
@@ -252,4 +253,17 @@ INSERT INTO StatutAvis (libelle) VALUES
 
 -- Types de transaction
 INSERT INTO TypeTransaction (libelle) VALUES 
-('initial'), ('achat_trajet'), ('bonus'), ('annulation'), ('autre'); 
+('initial'), ('achat_trajet'), ('bonus'), ('annulation'), ('autre');
+
+-- Table user_confirmations pour la gestion des tokens de confirmation d'inscription
+CREATE TABLE user_confirmations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    is_used TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Utilisateur(utilisateur_id) ON DELETE CASCADE,
+    INDEX idx_user_confirmations_token (token),
+    INDEX idx_user_confirmations_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 

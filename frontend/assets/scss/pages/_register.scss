@@ -1,0 +1,17 @@
+@use '../abstracts/variables' as *;
+@use '../components/register-modal';
+@use '../components/register-form';
+
+// Styles pour la page d'inscription
+body {
+  background-color: $color-primary-bg;
+}
+
+// Conteneur principal de la page
+.register-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  background-color: $color-primary-bg;
+}

@@ -18,12 +18,19 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ public/index.php [L]
+
+    # Forcer HTTPS
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </IfModule>
 
 # Configuration de sécurité
 <IfModule mod_headers.c>
     # Désactiver la signature du serveur
     Header unset Server
+    
+    # Forcer la suppression de X-Powered-By
+    Header unset X-Powered-By
     
     # Protection XSS
     Header set X-XSS-Protection "1; mode=block"
@@ -34,8 +41,17 @@
     # Protection contre le MIME-sniffing
     Header set X-Content-Type-Options "nosniff"
     
-    # Sécurité des cookies
-    Header always edit Set-Cookie (.*) "$1; HttpOnly; Secure; SameSite=Strict"
+    # HSTS : forcer HTTPS côté client
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    
+    # Politique de referrer
+    Header set Referrer-Policy "no-referrer-when-downgrade"
+    
+    # Content Security Policy
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'"
+    
+    # Sécurité des cookies (SameSite=Lax)
+    Header always edit Set-Cookie (.*) "$1; HttpOnly; Secure; SameSite=Lax"
 </IfModule>
 
 # Limiter les méthodes HTTP autorisées

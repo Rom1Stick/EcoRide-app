@@ -1,69 +1,91 @@
-import { api } from '../common/api.js';
+import { initAuthUI } from '../common/auth.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Récupérer et charger les derniers utilisateurs inscrits
-  async function loadLatestUsers() {
-    const tableBody = document.querySelector('.admin-table tbody');
+(async () => {
+  const authOK = await initAuthUI();
+  if (!authOK) return;
 
-    if (!tableBody) return;
+  console.log('Admin dashboard chargé.');
 
-    try {
-      // Simuler les données en attendant l'API réelle
-      const users = await api.get('/admin/users/latest');
+  // Préparer les en-têtes
+  const token = localStorage.getItem('auth_token');
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
 
-      if (users.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="4">Aucun utilisateur enregistré</td></tr>';
-        return;
-      }
-
-      // Remplir le tableau
-      tableBody.innerHTML = users
-        .map(
-          (user) => `
-        <tr>
-          <td>${user.name}</td>
-          <td>${user.email}</td>
-          <td>${new Date(user.created_at).toLocaleDateString()}</td>
-          <td>
-            <button class="button button--small" data-action="view" data-id="${user.id}">Voir</button>
-            <button class="button button--small button--danger" data-action="delete" data-id="${user.id}">Supprimer</button>
-          </td>
-        </tr>
-      `
-        )
-        .join('');
-
-      // Ajouter les écouteurs d'événements pour les actions
-      tableBody.querySelectorAll('[data-action]').forEach((button) => {
-        button.addEventListener('click', handleUserAction);
-      });
-    } catch (error) {
-      console.error('Erreur de chargement des utilisateurs:', error);
-      tableBody.innerHTML = '<tr><td colspan="4">Erreur de chargement des données</td></tr>';
+  // Charger les utilisateurs en attente
+  try {
+    const resp = await fetch('/api/admin/users/pending', {
+      method: 'GET',
+      credentials: 'include',
+      headers,
+    });
+    if (!resp.ok) {
+      throw new Error(`Erreur ${resp.status}`);
     }
+    const result = await resp.json();
+    if (result.error) throw new Error(result.message);
+    renderPendingUsers(result.data, headers);
+  } catch (err) {
+    console.error(err);
   }
+})();
 
-  // Gérer les actions sur les utilisateurs
-  async function handleUserAction(e) {
-    const action = e.target.dataset.action;
-    const userId = e.target.dataset.id;
+function renderPendingUsers(users, headers) {
+  const tbody = document.getElementById('pending-users-tbody');
+  tbody.innerHTML = '';
 
-    if (action === 'view') {
-      // Rediriger vers la page de détails de l'utilisateur
-      window.location.href = `user-details.html?id=${userId}`;
-    } else if (action === 'delete') {
-      if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+  users.forEach((user) => {
+    const tr = document.createElement('tr');
+
+    // Nom
+    const tdName = document.createElement('td');
+    tdName.textContent = user.name;
+    // Email
+    const tdEmail = document.createElement('td');
+    tdEmail.textContent = user.email;
+    // Date d'inscription
+    const tdDate = document.createElement('td');
+    tdDate.textContent = new Date(user.registered_at).toLocaleString();
+    // État de confirmation
+    const tdStatus = document.createElement('td');
+    tdStatus.textContent = user.confirmed ? 'Confirmé' : 'Non confirmé';
+
+    // Actions
+    const tdAction = document.createElement('td');
+    if (!user.confirmed) {
+      const btn = document.createElement('button');
+      btn.textContent = 'Valider';
+      btn.className = 'button button--primary';
+      btn.addEventListener('click', async () => {
+        if (!confirm('Valider ce compte utilisateur ?')) return;
         try {
-          await api.post(`/admin/users/${userId}/delete`);
-          // Recharger la liste après suppression
-          loadLatestUsers();
-        } catch (error) {
-          alert("Erreur lors de la suppression de l'utilisateur");
+          const r = await fetch(`/api/admin/users/${user.id}/confirm`, {
+            method: 'POST',
+            credentials: 'include',
+            headers,
+          });
+          if (!r.ok) {
+            const text = await r.text();
+            throw new Error(text);
+          }
+          const res2 = await r.json();
+          if (res2.error) throw new Error(res2.message);
+          tr.remove();
+        } catch (e) {
+          alert(e.message || 'Erreur lors de la validation');
         }
-      }
+      });
+      tdAction.appendChild(btn);
+    } else {
+      tdAction.textContent = '-';
     }
-  }
 
-  // Charger les données au chargement de la page
-  loadLatestUsers();
-});
+    tr.appendChild(tdName);
+    tr.appendChild(tdEmail);
+    tr.appendChild(tdDate);
+    tr.appendChild(tdStatus);
+    tr.appendChild(tdAction);
+    tbody.appendChild(tr);
+  });
+}
