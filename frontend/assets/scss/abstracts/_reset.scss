@@ -6,3 +6,14 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+.index-page {
+  background-color: var(--color-primary-bg, #1b5e20);
+  color: var(--color-text-primary, #f1f1f1);
+  font-family: var(--font-base, 'Inter', sans-serif);
+  overflow-x: hidden;
+
+  &.menu-open {
+    overflow: hidden;
+  }
+}

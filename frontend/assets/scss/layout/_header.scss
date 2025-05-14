@@ -1,0 +1,182 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// HEADER
+.header {
+  background-color: $color-primary-bg;
+  border-bottom: 0.1rem solid $color-secondary;
+  padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  width: 100%;
+
+  @include tablet {
+    padding: 1.2rem 0;
+  }
+
+  @include desktop {
+    padding: 1.4rem 0;
+  }
+
+  &__logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 2.5vh;
+
+    @include tablet {
+      height: 3vh;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -0.6rem;
+      left: 0;
+      height: 0.08rem;
+      width: 100vw;
+      background-color: $color-accent;
+
+      @include desktop {
+        display: none;
+      }
+    }
+
+    .icon {
+      display: flex;
+      max-height: 8rem;
+      object-fit: contain;
+      position: relative;
+
+      @include tablet {
+        max-height: 9rem;
+      }
+
+      @include desktop {
+        max-height: 10rem;
+
+        &::after {
+          display: none;
+        }
+      }
+    }
+
+    i {
+      color: $color-text-primary;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__menu {
+    background: none;
+    border: none;
+    color: $color-text-primary;
+    font-size: 1.2rem;
+    padding-right: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    z-index: 101;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      color: $color-accent;
+    }
+
+    @include tablet {
+      font-size: 1.3rem;
+    }
+
+    @include desktop {
+      display: none; // Masquer le bouton de menu sur desktop
+    }
+
+    i {
+      margin-right: 0.5rem;
+    }
+  }
+
+  // Navigation mobile
+  &__nav {
+    display: none; // Masqué par défaut sur mobile
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: $color-primary-bg;
+    padding: 5rem 2rem 2rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    height: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    transform: translateY(-100%);
+    border-bottom-left-radius: $radius-lg;
+    border-bottom-right-radius: $radius-lg;
+
+    &.active {
+      display: flex;
+      transform: translateY(0);
+    }
+
+    a {
+      color: $color-text-primary;
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 0.5rem 0;
+      width: 100%;
+      text-align: center;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $color-accent;
+      }
+    }
+
+    .login-btn {
+      background-color: $color-accent;
+      color: black;
+      padding: 0.5rem 1.5rem;
+      border-radius: $radius-md;
+      margin: 1rem 2rem 0 0;
+      font-weight: 700;
+      width: auto;
+
+      &:hover {
+        background-color: $color-secondary;
+        color: $color-text-primary;
+      }
+    }
+
+    @include desktop {
+      display: flex;
+      flex-direction: row;
+      position: static;
+      padding: 0;
+      transform: translateY(0);
+      box-shadow: none;
+      height: auto;
+      background-color: transparent;
+      max-height: none;
+      overflow-y: visible;
+      border-radius: 0;
+
+      a {
+        width: auto;
+        font-size: 1rem;
+        padding: 0;
+      }
+
+      .login-btn {
+        margin-top: 0;
+      }
+    }
+  }
+}

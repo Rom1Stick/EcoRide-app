@@ -1,9 +1,28 @@
 @use 'sass:color';
 @use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
 @use 'abstracts/reset';
+
+// Base
+@use 'base/base';
+@use 'base/container';
+
+// Layout
+@use 'layout/header';
+@use 'layout/footer';
+
+// Pages
+@use 'pages/index';
 @use 'pages/register';
 @use 'pages/login';
-@use 'error';
+
+// Components
+@use 'components/sections';
 @use 'components/form-error';
 @use 'components/overlay-spinner';
+
+// Error
+@use 'error';
+
+// Admin
 @use 'admin/admin';

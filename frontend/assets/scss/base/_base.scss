@@ -1,0 +1,13 @@
+@use '../abstracts/variables' as *;
+
+// Styles de base pour la page d'index
+.index-page {
+  background-color: $color-primary-bg;
+  color: $color-text-primary;
+  font-family: $font-base;
+  overflow-x: hidden;
+
+  &.menu-open {
+    overflow: hidden;
+  }
+}
