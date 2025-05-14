@@ -30,7 +30,21 @@
         <a href="/">Accueil</a>
         <a href="./covoiturages.html">Covoiturages</a>
         <a href="/contact">Contact</a>
-        <a href="./login.html" class="login-btn">Connexion / Inscription</a>
+        <div class="auth-container">
+          <!-- Contenu remplacé dynamiquement par JavaScript -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <!-- Bouton de profil (caché par défaut) -->
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/default-avatar.png"
+              alt="Avatar"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+        </div>
       </nav>
       <!-- Bouton de menu mobile -->
       <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
@@ -226,5 +240,6 @@
     <script type="module" src="../../assets/js/common/api.js"></script>
     <script type="module" src="../../assets/js/common/auth.js"></script>
     <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
   </body>
 </html>

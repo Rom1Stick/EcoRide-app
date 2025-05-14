@@ -96,7 +96,7 @@
 
         &:hover {
           transform: translateY(-5px);
-          color: lighten($color-accent, 10%);
+          color: $color-text-primary;
         }
       }
 

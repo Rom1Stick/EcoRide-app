@@ -282,7 +282,7 @@
 
   @include desktop {
     padding: 5rem 3rem;
-    background: linear-gradient(135deg, $color-secondary, darken($color-secondary, 15%));
+    background: linear-gradient(135deg, $color-secondary, $color-primary-bg);
   }
 
   h2 {
@@ -345,7 +345,7 @@
         background-color 0.3s ease;
 
       &:hover {
-        background-color: lighten($color-accent, 10%);
+        background-color: $color-text-primary;
         transform: translateY(-5px);
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       }
