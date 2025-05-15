@@ -1,22 +1,6 @@
 @use 'sass:math';
 @import '../abstracts/variables';
 
-/* Placeholders */
-%card-base {
-  background-color: $background-color;
-  padding: math.div($spacing * 5, 4); // équivalent à $spacing * 1.25
-  border-radius: $radius-md;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-%table-container {
-  background-color: $background-color;
-  border-radius: $radius-md;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
-}
-
 /* Mixins */
 @mixin button-base($bg, $col) {
   background-color: $bg;
@@ -26,60 +10,133 @@
   border-radius: $radius-md;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
 
   &:hover {
-    background-color: darken($bg, 10%);
+    background-color: $color-secondary;
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 }
 
-/* Base du layout admin */
+/* Base du layout admin - Mobile first */
 .page-admin {
-  background-color: $background-color;
+  background-color: $color-text-primary;
   min-height: 100vh;
   font-family: $font-base;
-  color: $text-color;
+  color: $color-surface-alt;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header Admin */
 .header--admin {
   background-color: $color-primary-bg;
   color: $color-text-primary;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $spacing * 1 $spacing;
+  flex-wrap: wrap;
+  z-index: 100;
 
   .header__logo {
     flex-shrink: 0;
+    margin-right: auto;
     img {
-      height: 6rem;
+      height: 2.5rem;
       width: auto;
       display: block;
     }
   }
 
+  /* Bouton menu mobile */
+  .mobile-menu-toggle {
+    display: block;
+    margin: 0 2rem 0.8rem 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: $color-secondary;
+    color: $color-text-primary;
+    border: none;
+    border-radius: $radius-md;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 101;
+    transition: all 0.2s ease;
+
+    &[aria-expanded='true'] {
+      background-color: $color-accent;
+      color: $color-primary-bg;
+    }
+  }
+
   /* Navigation Admin */
   .header__nav {
+    display: none; /* Masqué par défaut sur mobile */
+    position: fixed;
+    top: 4rem; /* Hauteur approximative du header */
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: $color-primary-bg;
+    padding: $spacing;
+    z-index: 99;
+    border: 1px solid $color-secondary;
+    border-top: none;
+    border-bottom-left-radius: $radius-lg;
+    border-bottom-right-radius: $radius-lg;
+
+    &.open {
+      display: block;
+    }
+
     .header__list {
-      display: flex;
-      align-items: center;
+      list-style: none;
       margin: 0;
       padding: 0;
-      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing * 0.5;
 
       .header__item {
-        & + .header__item {
-          margin-left: $spacing;
-        }
+        width: 100%;
       }
 
       .header__link {
-        @include button-base(transparent, $color-text-primary);
+        display: flex;
+        align-items: center;
+        padding: $spacing * 0.75;
+        background-color: transparent;
+        color: $color-text-primary;
         text-decoration: none;
+        border: none;
+        border-radius: $radius-md;
+        font-size: 0.95rem;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid $color-secondary;
+
+        i {
+          margin-right: $spacing * 0.75;
+          font-size: 1.1rem;
+          min-width: 1.5rem;
+          text-align: center;
+        }
+
         &:hover,
         &--active {
-          background-color: rgba($color-secondary, 0.2);
+          background-color: $color-secondary;
+          color: $color-accent;
+        }
+
+        &:last-child {
+          border-bottom: none;
         }
       }
     }
@@ -88,75 +145,263 @@
 
 /* Contenu principal */
 .main--admin {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: $spacing * 2;
+  padding: $spacing;
+  flex: 1;
+}
+
+/* En-tête des sections admin */
+.admin-header {
+  margin-bottom: $spacing * 1.5;
+
+  &__title {
+    font-size: 1.5rem;
+    margin: 0 0 $spacing * 0.5;
+    color: $color-primary-bg;
+  }
+
+  &__user {
+    font-size: 0.9rem;
+    color: $color-text-secondary;
+  }
+}
+
+.admin-section {
+  margin-bottom: $spacing * 2;
+
+  &__title {
+    font-size: 1.2rem;
+    margin-bottom: $spacing;
+    color: $color-primary-bg;
+    padding-bottom: math.div($spacing, 2);
+    border-bottom: 1px solid $color-text-secondary;
+  }
 }
 
 /* Dashboard cartes */
 .dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: math.div($spacing * 3, 2);
-  margin-bottom: $spacing * 2;
+  grid-template-columns: 1fr;
+  gap: $spacing;
+  margin-bottom: $spacing * 1.5;
 
   &__card {
-    @extend %card-base;
+    background-color: $color-text-primary;
+    padding: $spacing;
+    border-radius: $radius-md;
+    border: 1px solid $color-text-secondary;
+    text-align: center;
+    border-left: 4px solid $color-primary-bg;
   }
 
   &__card-title {
-    font-size: 1.125rem;
+    font-size: 0.95rem;
     margin-bottom: math.div($spacing, 2);
+    color: $color-text-secondary;
   }
 
   &__card-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     margin: math.div($spacing, 4) 0;
+    color: $color-primary-bg;
   }
 
   &__card-change {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: $color-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::before {
+      content: '↑';
+      margin-right: 3px;
+    }
   }
 }
 
-/* Tableau de gestion */
+/* Tableau de gestion - format mobile optimisé */
 .admin-table {
-  @extend %table-container;
+  background-color: $color-text-primary;
+  border-radius: $radius-md;
+  border: 1px solid $color-text-secondary;
+  margin-bottom: $spacing;
+  position: relative;
+  overflow: hidden;
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
+  /* Indicateur de défilement pour mobile */
+  .table-scroll-indicator {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: $color-primary-bg;
+    color: $color-text-primary;
+    padding: 0.3rem 0.5rem;
+    border-radius: $radius-md;
+    font-size: 0.7rem;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.5s;
 
+    i {
+      margin-left: 0.3rem;
+      animation: scroll-right 1.5s infinite;
+    }
+
+    &.fade-out {
+      opacity: 0;
+    }
+  }
+
+  /* Vue mobile: affichage en cartes plutôt qu'en tableau */
+  @media (max-width: 767px) {
+    table,
+    thead,
+    tbody,
     th,
-    td {
-      padding: math.div($spacing * 3, 4) $spacing;
-      text-align: left;
-      border-bottom: 1px solid $color-text-secondary;
+    td,
+    tr {
+      display: block;
     }
 
-    th {
-      background-color: $background-color;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-    }
+    table {
+      border: 0;
 
-    tr:nth-child(even) {
-      background-color: lighten($background-color, 5%);
-    }
+      thead {
+        position: absolute;
+        height: 1px;
+        width: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        border: 0;
+        padding: 0;
+      }
 
-    button {
-      @include button-base($color-secondary, $color-text-primary);
-    }
+      tr {
+        margin-bottom: $spacing;
+        border-bottom: 2px solid $color-text-secondary;
+        padding: $spacing * 0.5;
+        position: relative;
 
-    select {
-      padding: math.div($spacing, 2) math.div($spacing, 3);
-      border: 1px solid $color-text-secondary;
-      border-radius: $radius-md;
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &:nth-child(even) {
+          background-color: $color-text-primary;
+        }
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid $color-text-secondary;
+        padding: $spacing * 0.5 0;
+        font-size: 0.9rem;
+
+        &:before {
+          content: attr(data-label);
+          font-weight: bold;
+          margin-right: $spacing;
+          min-width: 33%;
+          color: $color-primary-bg;
+        }
+
+        &:last-child {
+          border-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        &:first-child {
+          padding-top: 0;
+        }
+      }
+
+      button {
+        @include button-base($color-secondary, $color-text-primary);
+        font-size: 0.75rem;
+        padding: math.div($spacing, 3) math.div($spacing, 1.5);
+        margin: 0;
+      }
+
+      select {
+        padding: math.div($spacing, 3) math.div($spacing, 2);
+        border: 1px solid $color-text-secondary;
+        border-radius: $radius-md;
+        font-size: 0.8rem;
+        background-color: $color-text-primary;
+        max-width: 60%;
+      }
+    }
+  }
+
+  /* Vue tablette et desktop: tableau standard */
+  @media (min-width: $breakpoint-tablet) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 0.9rem;
+
+      th,
+      td {
+        padding: math.div($spacing, 2) math.div($spacing, 1.5);
+        text-align: left;
+        border-bottom: 1px solid $color-text-secondary;
+      }
+
+      th {
+        background-color: $color-text-primary;
+        font-weight: 600;
+        color: $color-primary-bg;
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+
+      tr:nth-child(even) {
+        background-color: $color-text-primary;
+      }
+
+      button {
+        @include button-base($color-secondary, $color-text-primary);
+        font-size: 0.75rem;
+        padding: math.div($spacing, 3) math.div($spacing, 1.5);
+      }
+
+      select {
+        padding: math.div($spacing, 3) math.div($spacing, 2);
+        border: 1px solid $color-text-secondary;
+        border-radius: $radius-md;
+        font-size: 0.8rem;
+        background-color: $color-text-primary;
+      }
     }
+  }
+
+  /* Message d'état vide */
+  .table-empty-state {
+    padding: $spacing;
+    text-align: center;
+    color: $color-text-secondary;
+    font-style: italic;
+  }
+}
+
+/* Animation pour l'indicateur de défilement */
+@keyframes scroll-right {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(3px);
   }
 }
 
@@ -164,17 +409,120 @@
 .footer--admin {
   text-align: center;
   padding: $spacing;
-  background-color: $background-color;
+  background-color: $color-text-primary;
   color: $color-text-secondary;
+  font-size: 0.8rem;
+  border-top: 1px solid $color-text-secondary;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
+/* Media Query pour tablette et desktop */
+@media (min-width: $breakpoint-tablet) {
+  .header--admin {
+    flex-wrap: nowrap;
+    padding: $spacing $spacing * 1.5;
+
+    .mobile-menu-toggle {
+      display: none; /* Masqué sur desktop */
+    }
+
+    .header__nav {
+      display: block; /* Toujours visible sur desktop */
+      position: static;
+      width: auto;
+      margin-top: 0;
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      border-radius: 0;
+
+      .header__list {
+        flex-direction: row;
+
+        .header__item {
+          width: auto;
+        }
+
+        .header__link {
+          padding: $spacing * 0.5 $spacing;
+          white-space: nowrap;
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  .main--admin {
+    padding: $spacing * 1.5;
+  }
+
   .dashboard {
-    display: block;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing * 1.2;
 
     &__card {
-      margin-bottom: $spacing;
+      padding: $spacing * 1.2;
     }
+  }
+
+  .admin-table {
+    .table-scroll-indicator {
+      display: none;
+    }
+  }
+}
+
+/* Desktop large */
+@media (min-width: $breakpoint-desktop) {
+  .header--admin {
+    padding: $spacing * 1.2 $spacing * 2;
+
+    .header__logo img {
+      height: 3.5rem;
+    }
+
+    .header__nav .header__list {
+      gap: $spacing * 1.5;
+
+      .header__link {
+        padding: $spacing * 0.5 $spacing * 1.25;
+      }
+    }
+  }
+
+  .main--admin {
+    max-width: 1200px;
+    padding: $spacing * 2;
+  }
+
+  .dashboard {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing * 1.5;
+
+    &__card-value {
+      font-size: 2rem;
+    }
+  }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &__title {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+  }
+}
+
+/* Page admin avec menu mobile ouvert */
+.page-admin.menu-is-open {
+  .header--admin {
+    z-index: 1000;
+  }
+
+  .header__nav {
+    max-height: 80vh; /* Hauteur maximale du viewport */
+    overflow-y: auto;
   }
 }

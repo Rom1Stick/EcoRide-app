@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="Politique de confidentialité EcoRide - Protection des données personnelles"
+    />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>Politique de Confidentialité – EcoRide</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+      </div>
+      <!-- Menu de navigation desktop -->
+      <nav class="header__nav">
+        <a href="/">Accueil</a>
+        <a href="./covoiturages.html">Covoiturages</a>
+        <a href="/contact">Contact</a>
+        <div class="auth-container">
+          <!-- Contenu remplacé dynamiquement par JavaScript -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <!-- Bouton de profil (caché par défaut) -->
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/Logo_EcoRide.svg"
+              alt="Avatar"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+        </div>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell"></i>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container legal-page">
+        <h1>Politique de Confidentialité</h1>
+
+        <div class="legal-toc">
+          <h3>Sommaire</h3>
+          <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#donnees">Données collectées</a></li>
+            <li><a href="#utilisation">Utilisation des données</a></li>
+            <li><a href="#partage">Partage des données</a></li>
+            <li><a href="#conservation">Conservation des données</a></li>
+            <li><a href="#droits">Vos droits</a></li>
+            <li><a href="#cookies">Politique de gestion des cookies</a></li>
+            <li><a href="#securite">Sécurité des données</a></li>
+            <li><a href="#modifications">Modifications de la politique</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <section id="introduction">
+          <h2>1. Introduction</h2>
+          <p>
+            EcoRide SAS (ci-après "EcoRide", "nous", "notre" ou "nos") s'engage à protéger la vie
+            privée des utilisateurs de sa plateforme de covoiturage (ci-après la "Plateforme"). La
+            présente Politique de Confidentialité a pour objectif de vous informer sur la manière
+            dont nous collectons, utilisons, partageons et protégeons vos données personnelles
+            lorsque vous utilisez notre Plateforme.
+          </p>
+          <p>
+            Cette Politique de Confidentialité s'applique à tous les services proposés par EcoRide,
+            y compris le site web et l'application mobile. En utilisant notre Plateforme, vous
+            acceptez les pratiques décrites dans la présente Politique de Confidentialité.
+          </p>
+          <p>
+            Nous traitons vos données personnelles conformément au Règlement Général sur la
+            Protection des Données (RGPD) et à la loi Informatique et Libertés du 6 janvier 1978
+            modifiée.
+          </p>
+        </section>
+
+        <section id="donnees">
+          <h2>2. Données collectées</h2>
+          <p>Nous collectons différents types de données vous concernant :</p>
+
+          <h3>2.1 Données que vous nous fournissez directement</h3>
+          <ul>
+            <li>
+              <strong>Données d'inscription</strong>
+              : nom, prénom, adresse email, numéro de téléphone, date de naissance, photo de profil
+              (facultative).
+            </li>
+            <li>
+              <strong>Informations de paiement</strong>
+              : nous ne stockons pas vos coordonnées bancaires complètes. Ces informations sont
+              traitées directement par nos prestataires de paiement sécurisés.
+            </li>
+            <li>
+              <strong>Informations relatives aux trajets</strong>
+              : lieux de départ et d'arrivée, dates et heures, nombre de places disponibles, prix,
+              préférences de trajet (musique, animaux, etc.).
+            </li>
+            <li>
+              <strong>Contenu généré</strong>
+              : avis, commentaires, messages échangés avec d'autres utilisateurs.
+            </li>
+            <li>
+              <strong>Informations sur votre véhicule</strong>
+              (pour les conducteurs) : marque, modèle, couleur, immatriculation, consommation
+              estimée.
+            </li>
+          </ul>
+
+          <h3>2.2 Données collectées automatiquement</h3>
+          <ul>
+            <li>
+              <strong>Données de connexion</strong>
+              : adresse IP, type et version du navigateur, système d'exploitation, date et heure de
+              connexion.
+            </li>
+            <li>
+              <strong>Données de géolocalisation</strong>
+              : avec votre consentement, nous pouvons collecter des données de géolocalisation pour
+              faciliter la recherche de trajets.
+            </li>
+            <li>
+              <strong>Données d'utilisation</strong>
+              : pages visitées, actions effectuées sur la Plateforme, préférences de recherche.
+            </li>
+            <li>
+              <strong>Cookies et technologies similaires</strong>
+              : nous utilisons des cookies et autres technologies pour améliorer votre expérience
+              sur notre Plateforme (voir notre
+              <a href="./cookies.html">Politique de gestion des cookies</a>
+              ).
+            </li>
+          </ul>
+
+          <h3>2.3 Données provenant de tiers</h3>
+          <ul>
+            <li>
+              <strong>Réseaux sociaux</strong>
+              : si vous choisissez de vous connecter via un réseau social, nous pouvons recevoir
+              certaines informations de votre profil public.
+            </li>
+            <li>
+              <strong>Partenaires</strong>
+              : nous pouvons recevoir des informations de nos partenaires commerciaux pour améliorer
+              nos services.
+            </li>
+          </ul>
+        </section>
+
+        <section id="utilisation">
+          <h2>3. Utilisation des données</h2>
+          <p>Nous utilisons vos données personnelles pour les finalités suivantes :</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Finalité</th>
+                <th>Base légale</th>
+                <th>Données concernées</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Gestion de votre compte utilisateur</td>
+                <td>Exécution d'un contrat</td>
+                <td>Données d'inscription, préférences</td>
+              </tr>
+              <tr>
+                <td>Mise en relation entre conducteurs et passagers</td>
+                <td>Exécution d'un contrat</td>
+                <td>Données de profil, informations sur les trajets</td>
+              </tr>
+              <tr>
+                <td>Traitement des paiements</td>
+                <td>Exécution d'un contrat</td>
+                <td>Informations de paiement</td>
+              </tr>
+              <tr>
+                <td>Communication avec vous</td>
+                <td>Intérêt légitime, consentement pour les communications commerciales</td>
+                <td>Coordonnées, préférences de communication</td>
+              </tr>
+              <tr>
+                <td>Amélioration de nos services</td>
+                <td>Intérêt légitime</td>
+                <td>Données d'utilisation, feedback</td>
+              </tr>
+              <tr>
+                <td>Détection et prévention des fraudes</td>
+                <td>Intérêt légitime, obligation légale</td>
+                <td>Données d'utilisation, informations de paiement</td>
+              </tr>
+              <tr>
+                <td>Personnalisation de l'expérience utilisateur</td>
+                <td>Consentement, intérêt légitime</td>
+                <td>Préférences, historique d'utilisation</td>
+              </tr>
+              <tr>
+                <td>Études statistiques et analytiques</td>
+                <td>Intérêt légitime</td>
+                <td>Données d'utilisation anonymisées</td>
+              </tr>
+              <tr>
+                <td>Respect des obligations légales</td>
+                <td>Obligation légale</td>
+                <td>Diverses selon les obligations</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="partage">
+          <h2>4. Partage des données</h2>
+          <p>
+            Nous pouvons partager vos données personnelles avec les catégories de destinataires
+            suivantes :
+          </p>
+
+          <h3>4.1 Autres utilisateurs de la Plateforme</h3>
+          <p>
+            Certaines de vos informations (prénom, photo de profil, évaluations) sont visibles par
+            les autres utilisateurs de la Plateforme pour faciliter la mise en relation. Lors d'une
+            réservation de trajet, le conducteur et les passagers concernés ont accès à davantage
+            d'informations (nom complet, numéro de téléphone) nécessaires à l'organisation du
+            covoiturage.
+          </p>
+
+          <h3>4.2 Prestataires de services</h3>
+          <p>
+            Nous faisons appel à des prestataires de services tiers qui nous aident à fournir et
+            améliorer nos services :
+          </p>
+          <ul>
+            <li>Prestataires de paiement sécurisés</li>
+            <li>Fournisseurs d'hébergement et de services cloud</li>
+            <li>Services d'analyse et de statistiques</li>
+            <li>Services de communication (email, SMS)</li>
+            <li>Services de cartographie et de géolocalisation</li>
+          </ul>
+          <p>
+            Ces prestataires sont tenus de respecter la confidentialité de vos données et de ne les
+            utiliser que pour les finalités pour lesquelles nous les leur communiquons.
+          </p>
+
+          <h3>4.3 Transferts légaux</h3>
+          <p>
+            Nous pouvons être amenés à divulguer vos données personnelles si la loi nous y oblige ou
+            en réponse à des demandes légitimes des autorités publiques (y compris pour des raisons
+            de sécurité nationale ou d'application de la loi).
+          </p>
+
+          <h3>4.4 Transferts commerciaux</h3>
+          <p>
+            Dans le cadre d'une fusion, acquisition, vente d'actifs ou procédure de faillite, vos
+            données personnelles pourraient être transférées comme faisant partie des actifs
+            commerciaux. Dans un tel cas, vous en seriez informé par email et/ou par un avis bien
+            visible sur notre Plateforme.
+          </p>
+
+          <h3>4.5 Transferts internationaux</h3>
+          <p>
+            Certains de nos prestataires de services peuvent être situés en dehors de l'Espace
+            Économique Européen (EEE). Dans ce cas, nous veillons à ce que des garanties appropriées
+            soient mises en place pour assurer un niveau de protection adéquat de vos données,
+            conformément à la réglementation applicable.
+          </p>
+        </section>
+
+        <section id="conservation">
+          <h2>5. Conservation des données</h2>
+          <p>
+            Nous conservons vos données personnelles uniquement pendant la durée nécessaire à la
+            réalisation des finalités pour lesquelles elles ont été collectées, conformément à nos
+            obligations légales et réglementaires.
+          </p>
+
+          <h3>5.1 Durées de conservation</h3>
+          <ul>
+            <li>
+              <strong>Données de compte</strong>
+              : conservées tant que votre compte est actif. Après la suppression de votre compte,
+              certaines données peuvent être conservées pendant une période supplémentaire pour des
+              raisons légales ou de sécurité.
+            </li>
+            <li>
+              <strong>Données de transaction</strong>
+              : conservées pendant 10 ans à des fins fiscales et comptables.
+            </li>
+            <li>
+              <strong>Données de communication</strong>
+              : les messages échangés entre utilisateurs sont conservés pendant 2 ans après la fin
+              du trajet.
+            </li>
+            <li>
+              <strong>Données de navigation</strong>
+              : conservées pendant 13 mois maximum.
+            </li>
+          </ul>
+
+          <h3>5.2 Suppression des données</h3>
+          <p>
+            À l'expiration des périodes de conservation, vos données sont soit supprimées, soit
+            anonymisées de manière irréversible pour des finalités statistiques.
+          </p>
+        </section>
+
+        <section id="droits">
+          <h2>6. Vos droits</h2>
+          <p>
+            Conformément à la réglementation applicable en matière de protection des données
+            personnelles, vous disposez des droits suivants :
+          </p>
+
+          <h3>6.1 Droits d'accès et de rectification</h3>
+          <p>
+            Vous avez le droit d'accéder à vos données personnelles et de demander leur
+            rectification si elles sont inexactes ou incomplètes. Vous pouvez exercer ce droit
+            directement dans les paramètres de votre compte ou en nous contactant.
+          </p>
+
+          <h3>6.2 Droit à l'effacement</h3>
+          <p>
+            Vous pouvez demander l'effacement de vos données personnelles dans certaines
+            circonstances, notamment lorsque les données ne sont plus nécessaires au regard des
+            finalités pour lesquelles elles ont été collectées.
+          </p>
+
+          <h3>6.3 Droit à la limitation du traitement</h3>
+          <p>
+            Vous pouvez demander la limitation du traitement de vos données personnelles dans
+            certaines circonstances, par exemple lorsque vous contestez l'exactitude des données.
+          </p>
+
+          <h3>6.4 Droit à la portabilité des données</h3>
+          <p>
+            Vous avez le droit de recevoir vos données personnelles dans un format structuré,
+            couramment utilisé et lisible par machine, et de les transmettre à un autre responsable
+            du traitement.
+          </p>
+
+          <h3>6.5 Droit d'opposition</h3>
+          <p>
+            Vous avez le droit de vous opposer à tout moment, pour des raisons tenant à votre
+            situation particulière, au traitement de vos données personnelles fondé sur notre
+            intérêt légitime. Vous pouvez également vous opposer à tout moment au traitement de vos
+            données à des fins de prospection.
+          </p>
+
+          <h3>6.6 Droit de retirer votre consentement</h3>
+          <p>
+            Lorsque le traitement est fondé sur votre consentement, vous avez le droit de retirer ce
+            consentement à tout moment, sans que cela n'affecte la licéité du traitement fondé sur
+            le consentement effectué avant le retrait.
+          </p>
+
+          <h3>6.7 Exercice de vos droits</h3>
+          <p>Pour exercer vos droits, vous pouvez :</p>
+          <ul>
+            <li>Accéder aux paramètres de votre compte sur la Plateforme</li>
+            <li>Nous contacter par email à l'adresse : rgpd@ecoride.com</li>
+            <li>
+              Nous écrire à l'adresse postale : EcoRide SAS, Service Protection des Données, 123
+              Avenue de la Mobilité Durable, 75001 Paris, France
+            </li>
+          </ul>
+          <p>
+            Nous répondrons à votre demande dans un délai d'un mois, qui pourra être prolongé de
+            deux mois compte tenu de la complexité et du nombre de demandes.
+          </p>
+
+          <h3>6.8 Réclamation auprès d'une autorité de contrôle</h3>
+          <p>
+            Si vous estimez que le traitement de vos données personnelles n'est pas conforme à la
+            réglementation, vous avez le droit d'introduire une réclamation auprès de la Commission
+            Nationale de l'Informatique et des Libertés (CNIL) ou de toute autre autorité de
+            contrôle compétente.
+          </p>
+        </section>
+
+        <section id="cookies">
+          <h2>7. Politique de gestion des cookies</h2>
+          <p>
+            Notre Plateforme utilise des cookies et technologies similaires pour améliorer votre
+            expérience d'utilisation. Pour plus d'informations sur les cookies que nous utilisons et
+            sur la façon de les gérer, veuillez consulter notre
+            <a href="./cookies.html">Politique de gestion des cookies</a>
+            .
+          </p>
+        </section>
+
+        <section id="securite">
+          <h2>8. Sécurité des données</h2>
+          <p>
+            Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour
+            protéger vos données personnelles contre la destruction accidentelle ou illicite, la
+            perte accidentelle, l'altération, la diffusion ou l'accès non autorisé.
+          </p>
+          <p>Ces mesures incluent notamment :</p>
+          <ul>
+            <li>Le chiffrement des données sensibles</li>
+            <li>La mise en œuvre de contrôles d'accès stricts</li>
+            <li>La sauvegarde régulière des données</li>
+            <li>La formation et la sensibilisation de notre personnel à la sécurité des données</li>
+            <li>Des audits de sécurité réguliers</li>
+          </ul>
+          <p>
+            Malgré ces précautions, aucun système de sécurité n'est infaillible. Si vous avez des
+            raisons de croire que votre interaction avec nous n'est plus sécurisée, veuillez nous en
+            informer immédiatement.
+          </p>
+        </section>
+
+        <section id="modifications">
+          <h2>9. Modifications de la politique</h2>
+          <p>
+            Nous nous réservons le droit de modifier la présente Politique de Confidentialité à tout
+            moment. En cas de modification substantielle, nous vous en informerons par email et/ou
+            par une notification visible sur notre Plateforme au moins 30 jours avant l'entrée en
+            vigueur des nouvelles dispositions.
+          </p>
+          <p>
+            Nous vous encourageons à consulter régulièrement cette page pour prendre connaissance
+            des éventuelles modifications. La date de dernière mise à jour figure en haut de cette
+            page.
+          </p>
+        </section>
+
+        <section id="contact">
+          <h2>10. Contact</h2>
+          <p>
+            Si vous avez des questions concernant la présente Politique de Confidentialité ou si
+            vous souhaitez exercer vos droits, vous pouvez nous contacter :
+          </p>
+          <ul>
+            <li>Par email : rgpd@ecoride.com</li>
+            <li>
+              Par courrier postal : EcoRide SAS, Service Protection des Données, 123 Avenue de la
+              Mobilité Durable, 75001 Paris, France
+            </li>
+          </ul>
+          <p>Délégué à la Protection des Données : Mme Sophie Martin, dpo@ecoride.com</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__top">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope"></i>
+            contact@ecoride.com
+          </p>
+          <p>
+            <i class="fa-solid fa-phone"></i>
+            01 23 45 67 89
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><a href="./index.html">Accueil</a></li>
+              <li><a href="./index.html#about">À propos</a></li>
+              <li><a href="./covoiturages.html">Services</a></li>
+              <li><a href="/contact">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><a href="./conditions.html">Conditions</a></li>
+              <li><a href="./confidentialite.html">Confidentialité</a></li>
+              <li><a href="./cookies.html">Cookies</a></li>
+              <li><a href="./mentions-legales.html">Mentions légales</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,570 @@
+// Import des variables
+@use '../abstracts/variables' as *;
+@use 'sass:math';
+@use 'sass:color';
+
+// ==========================================================================
+// Pages légales - Styles communs
+// ==========================================================================
+
+.legal-page {
+  padding: $spacing * 3 0;
+  padding-left: $spacing * 2;
+  padding-right: $spacing * 2;
+  max-width: 1000px;
+  margin: 0 auto;
+  line-height: 1.6;
+  background-color: $color-surface-alt;
+  color: $color-text-primary;
+
+  // Animation d'entrée pour les sections
+  &__animate {
+    animation: fadeIn 0.5s ease-in-out;
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // Titres
+  h1 {
+    color: $color-text-primary;
+    margin: 4rem 0 2.5rem 0;
+    text-align: center;
+    font-size: 2.2rem;
+    position: relative;
+    padding-bottom: $spacing;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background-color: $color-accent;
+      border-radius: $radius-md;
+    }
+  }
+
+  h2 {
+    color: $color-accent;
+    margin-top: $spacing * 2.5;
+    margin-bottom: $spacing * 1.2;
+    padding-bottom: calc($spacing / 2);
+    font-size: 1.8rem;
+    border-bottom: 1px solid $color-text-secondary;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-text-primary;
+    }
+  }
+
+  h3 {
+    color: $color-secondary;
+    margin-top: $spacing * 1.8;
+    margin-bottom: $spacing;
+    font-size: 1.4rem;
+
+    &::before {
+      content: '•';
+      color: $color-accent;
+      margin-right: calc($spacing / 2);
+      font-weight: 700;
+    }
+  }
+
+  // Paragraphes et listes
+  p {
+    margin-bottom: $spacing * 1.2;
+    color: $color-text-primary;
+    transition: color 0.2s ease;
+  }
+
+  ul,
+  ol {
+    margin-bottom: $spacing * 1.2;
+    padding-left: $spacing * 2;
+    color: $color-text-primary;
+  }
+
+  li {
+    margin-bottom: $spacing * 0.8;
+    position: relative;
+
+    &::marker {
+      color: $color-accent;
+    }
+
+    a {
+      color: $color-accent;
+      text-decoration: none;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        bottom: -2px;
+        left: 0;
+        background-color: $color-accent;
+        transform: scaleX(0);
+        transform-origin: bottom right;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover::after {
+        transform: scaleX(1);
+        transform-origin: bottom left;
+      }
+    }
+  }
+
+  // Liens standards
+  a:not(.legal-toc a) {
+    color: $color-accent;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $color-text-primary;
+      text-decoration: underline;
+    }
+  }
+
+  // Mise en évidence
+  strong {
+    color: $color-accent;
+    font-weight: 700;
+  }
+}
+
+// ==========================================================================
+// Table des matières
+// ==========================================================================
+
+.legal-toc {
+  background-color: $color-primary-bg;
+  padding: $spacing * 1.8;
+  border-radius: $radius-md;
+  margin-bottom: $spacing * 3;
+  border-left: 4px solid $color-accent;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: $spacing * 1.2;
+    color: $color-text-primary;
+    font-size: 1.5rem;
+    border-bottom: 1px solid $color-text-secondary;
+    padding-bottom: calc($spacing / 2);
+
+    &::before {
+      display: none;
+    }
+  }
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+    columns: 2;
+    column-gap: $spacing * 2;
+
+    @media (max-width: $breakpoint-tablet) {
+      columns: 1;
+    }
+  }
+
+  li {
+    margin-bottom: calc($spacing / 2);
+    break-inside: avoid;
+  }
+
+  a {
+    color: $color-accent;
+    text-decoration: none;
+    display: block;
+    padding: $spacing * 0.6 $spacing;
+    border-radius: $radius-md;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $color-text-primary;
+      background-color: $color-secondary;
+      transform: translateX(5px);
+    }
+  }
+}
+
+// ==========================================================================
+// Tableaux
+// ==========================================================================
+
+.legal-page table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: $spacing * 2;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  th,
+  td {
+    border: 1px solid $color-text-secondary;
+    padding: $spacing;
+    text-align: left;
+  }
+
+  th {
+    background-color: $color-primary-bg;
+    color: $color-text-primary;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+  }
+
+  tr {
+    transition: background-color 0.2s ease;
+
+    &:nth-child(even) {
+      background-color: $color-secondary;
+
+      td {
+        color: $color-text-primary;
+      }
+    }
+
+    &:nth-child(odd) {
+      background-color: $color-surface-alt;
+
+      td {
+        color: $color-text-primary;
+      }
+    }
+
+    &:hover {
+      background-color: $color-primary-bg;
+
+      td {
+        color: $color-text-primary;
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Paramètres cookies
+// ==========================================================================
+
+.cookie-settings {
+  background-color: $color-primary-bg;
+  padding: $spacing * 2;
+  border-radius: $radius-md;
+  margin: $spacing * 3 0;
+  border-left: 4px solid $color-accent;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: $spacing * 1.5;
+    color: $color-text-primary;
+    font-size: 1.5rem;
+    text-align: center;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .switch-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: $spacing * 1.2;
+    padding: $spacing;
+    border-radius: $radius-md;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: $color-secondary;
+    }
+  }
+
+  .switch-label {
+    flex-grow: 1;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+
+      &:checked + .slider {
+        background-color: $color-accent;
+      }
+
+      &:focus + .slider {
+        border: 1px solid $color-accent;
+      }
+
+      &:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      &:disabled + .slider {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $color-text-secondary;
+    transition: 0.4s;
+    border-radius: 34px;
+
+    &:before {
+      position: absolute;
+      content: '';
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: $color-text-primary;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+  }
+
+  .cookie-buttons {
+    display: flex;
+    justify-content: center;
+    gap: $spacing * 1.2;
+    margin-top: $spacing * 2;
+    flex-wrap: wrap;
+
+    button {
+      padding: $spacing * 0.8 $spacing * 1.8;
+      border: none;
+      border-radius: $radius-md;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 120px;
+
+      &:focus {
+        outline: none;
+        border: 1px solid $color-accent;
+      }
+    }
+  }
+
+  .save-btn {
+    background-color: $color-accent;
+    color: $color-surface-alt;
+
+    &:hover {
+      background-color: $color-text-primary;
+      color: $color-surface-alt;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .reject-btn {
+    background-color: $color-text-primary;
+    color: $color-surface-alt;
+    border: 1px solid $color-text-secondary;
+
+    &:hover {
+      background-color: $color-text-secondary;
+      color: $color-primary-bg;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .accept-btn {
+    background-color: $color-secondary;
+    color: $color-text-primary;
+    font-weight: 700;
+
+    &:hover {
+      background-color: $color-primary-bg;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// ==========================================================================
+// Responsive
+// ==========================================================================
+
+@media (max-width: $breakpoint-tablet) {
+  .legal-page {
+    padding: $spacing * 2 $spacing * 3;
+
+    h1 {
+      font-size: 1.8rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .legal-toc ul {
+    columns: 1;
+  }
+
+  .cookie-settings {
+    padding: $spacing * 1.5;
+
+    .cookie-buttons {
+      flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .legal-page {
+    padding: $spacing * 2 $spacing * 1.5;
+  }
+}
+
+// ==========================================================================
+// Styles d'impression
+// ==========================================================================
+
+@media print {
+  body {
+    font-size: 12pt;
+    color: #000;
+    background: #fff;
+  }
+
+  .header,
+  .footer,
+  .cookie-settings {
+    display: none;
+  }
+
+  .legal-page {
+    max-width: 100%;
+    padding: 0;
+    background-color: #fff;
+    color: #000;
+
+    h1::after {
+      display: none;
+    }
+
+    .legal-toc {
+      background: none;
+      border: 1px solid #000;
+      padding: $spacing;
+
+      &:hover {
+        transform: none;
+      }
+
+      a {
+        color: #000;
+      }
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #000;
+      page-break-after: avoid;
+    }
+
+    p,
+    li {
+      color: #000;
+      page-break-inside: avoid;
+    }
+
+    a {
+      color: #000;
+      text-decoration: none;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    table {
+      th {
+        background-color: #f1f1f1;
+        color: #000;
+        border: 1px solid #000;
+      }
+
+      td {
+        color: #000;
+        background-color: #fff;
+        border: 1px solid #000;
+      }
+
+      tr:hover,
+      tr:nth-child(even),
+      tr:nth-child(odd) {
+        background-color: transparent;
+
+        td {
+          color: #000;
+        }
+      }
+    }
+  }
+}

@@ -80,7 +80,7 @@
 
   &__submit {
     background-color: $color-accent;
-    color: #000;
+    color: $color-primary-bg;
     padding: 0.75rem;
     border-radius: $radius-md;
     text-align: center;
@@ -115,7 +115,7 @@
 
       &:hover {
         background-color: $color-accent;
-        color: #000;
+        color: $color-primary-bg;
       }
     }
   }

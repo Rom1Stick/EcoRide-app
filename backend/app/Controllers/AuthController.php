@@ -66,10 +66,10 @@ class AuthController extends Controller
             // Insérer l'utilisateur dans la table Utilisateur
             // On stocke le nom complet dans le champ nom et on laisse prenom vide
             $stmt = $db->prepare(
-                'INSERT INTO Utilisateur (nom, prenom, email, mot_passe, date_creation)
-                 VALUES (?, ?, ?, ?, NOW())'
+                'INSERT INTO Utilisateur (nom, prenom, email, mot_passe, photo_path, date_creation)
+                 VALUES (?, ?, ?, ?, ?, NOW())'
             );
-            $stmt->execute([$data['name'], '', $data['email'], $hashedPassword]);
+            $stmt->execute([$data['name'], '', $data['email'], $hashedPassword, '/assets/images/Logo_EcoRide.svg']);
 
             // Récupérer l'ID utilisateur
             $userId = $db->lastInsertId();
@@ -143,7 +143,8 @@ class AuthController extends Controller
                 'user' => [
                     'id' => $userId,
                     'name' => $data['name'],
-                    'email' => $data['email']
+                    'email' => $data['email'],
+                    'photoPath' => '/assets/images/Logo_EcoRide.svg'
                 ],
                 'token' => $token,
                 'confirmation_token' => $confirmationToken
@@ -255,9 +256,9 @@ class AuthController extends Controller
         $db = $this->app->getDatabase()->getMysqlConnection();
         // Déterminer le type d'identifiant et récupérer l'utilisateur
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-            $stmt = $db->prepare('SELECT utilisateur_id AS id, CONCAT(nom, " ", prenom) AS name, email, mot_passe AS password FROM Utilisateur WHERE email = ?');
+            $stmt = $db->prepare('SELECT utilisateur_id AS id, CONCAT(nom, " ", prenom) AS name, email, mot_passe AS password, photo_path FROM Utilisateur WHERE email = ?');
         } else {
-            $stmt = $db->prepare('SELECT utilisateur_id AS id, CONCAT(nom, " ", prenom) AS name, email, mot_passe AS password FROM Utilisateur WHERE pseudo = ?');
+            $stmt = $db->prepare('SELECT utilisateur_id AS id, CONCAT(nom, " ", prenom) AS name, email, mot_passe AS password, photo_path FROM Utilisateur WHERE pseudo = ?');
         }
         $stmt->execute([$identifier]);
         $user = $stmt->fetch();
@@ -329,12 +330,19 @@ class AuthController extends Controller
             default:
                 $redirectUrl = '/';
         }
+
+        // Définir l'image par défaut si nécessaire
+        if (empty($user['photo_path'])) {
+            $user['photo_path'] = '/assets/images/Logo_EcoRide.svg';
+        }
+
         return $this->success(
             [
                 'user' => [
                     'id' => $user['id'],
                     'name' => $user['name'],
-                    'email' => $user['email']
+                    'email' => $user['email'],
+                    'photoPath' => $user['photo_path']
                 ],
                 'role' => $role,
                 'token' => $token,
