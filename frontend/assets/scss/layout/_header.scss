@@ -149,7 +149,7 @@
 
     .login-btn {
       background-color: $color-accent;
-      color: black;
+      color: $color-surface-alt;
       padding: 0.8rem;
       border-radius: $radius-md;
       margin-top: 1rem;
@@ -189,11 +189,11 @@
       gap: 0.5rem;
       color: $color-accent;
       font-weight: 600;
-      
+
       i {
         margin-right: 0.3rem;
       }
-      
+
       &:hover {
         background-color: $color-secondary;
       }
@@ -216,7 +216,6 @@
       a {
         width: auto;
         font-size: 1rem;
-        padding: 0 1rem;
         border-bottom: none;
       }
 
@@ -241,13 +240,13 @@
           background-color: $color-secondary;
         }
       }
-      
+
       // Style du lien admin en version desktop
       .admin-link {
         padding: 0.5rem 1rem;
         margin-right: 0.5rem;
         border-radius: $radius-md;
-        
+
         &:hover {
           background-color: $color-secondary;
         }

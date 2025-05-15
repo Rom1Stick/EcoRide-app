@@ -1,4 +1,5 @@
 @use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
 
 // Message d'erreur
 .register-form__error-message {
@@ -20,4 +21,48 @@
   border-radius: $radius-md;
   font-size: 0.875rem;
   margin-top: $spacing;
+}
+
+// Styles pour les messages d'erreur dans les formulaires
+.error-message {
+  color: #ff3d00;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: block;
+  font-weight: 600;
+
+  @include tablet {
+    font-size: 0.85rem;
+  }
+
+  @include desktop {
+    font-size: 0.9rem;
+  }
+}
+
+// Style pour l'état d'erreur dans la page de covoiturage
+.search-form__field .error-message {
+  margin-bottom: 0.5rem;
+  animation: shake 0.5s ease-in-out;
+}
+
+// Animation de tremblement pour attirer l'attention
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
 }

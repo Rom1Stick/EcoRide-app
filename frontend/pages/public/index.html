@@ -65,23 +65,23 @@
           <div class="hero__content">
             <h1>Voyagez écologique, voyagez économique</h1>
             <p>Rejoignez la communauté de covoiturage éco-responsable</p>
-            <form class="search-box">
+            <form class="search-box" id="search-form" action="./covoiturages.html" method="get">
               <label for="from">Départ</label>
               <div class="input-group">
                 <i class="fa-solid fa-location-dot"></i>
-                <input type="text" id="from" placeholder="Ville de départ" required />
+                <input type="text" id="from" name="from" placeholder="Ville de départ" required />
               </div>
 
               <label for="to">Arrivée</label>
               <div class="input-group">
                 <i class="fa-solid fa-location-dot"></i>
-                <input type="text" id="to" placeholder="Ville d'arrivée" required />
+                <input type="text" id="to" name="to" placeholder="Ville d'arrivée" required />
               </div>
 
               <label for="date">Date</label>
               <div class="input-group">
                 <i class="fa-regular fa-calendar"></i>
-                <input type="date" id="date" required />
+                <input type="date" id="date" name="date" required />
               </div>
 
               <button type="submit">Rechercher</button>
@@ -245,5 +245,39 @@
     <script type="module" src="../../assets/js/common/menu.js"></script>
     <script type="module" src="../../assets/js/common/userProfile.js"></script>
     <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+
+    <!-- Script pour le formulaire de recherche -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initialisation du champ de date avec la date du jour
+        const dateInput = document.getElementById('date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+        if (!dateInput.value) {
+          dateInput.value = today;
+        }
+
+        // Validation du formulaire avant soumission
+        const searchForm = document.getElementById('search-form');
+        searchForm.addEventListener('submit', (e) => {
+          const fromInput = document.getElementById('from');
+          const toInput = document.getElementById('to');
+
+          // Validation basique
+          if (!fromInput.value.trim() || !toInput.value.trim() || !dateInput.value) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs pour rechercher un covoiturage.');
+            return;
+          }
+
+          // Vérifier que les lieux sont différents
+          if (fromInput.value.trim().toLowerCase() === toInput.value.trim().toLowerCase()) {
+            e.preventDefault();
+            alert("Les villes de départ et d'arrivée doivent être différentes.");
+            return;
+          }
+        });
+      });
+    </script>
   </body>
 </html>
