@@ -3,7 +3,7 @@
 
 /* Page de profil - Mobile first */
 .profile-page {
-  background-color: $background-color;
+  background-color: $color-text-primary;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
 .profile-container {
   background-color: $color-text-primary;
   border-radius: $radius-md;
-  box-shadow: 0 1px 3px $color-text-secondary;
+  border: 1px solid $color-text-secondary;
   overflow: hidden;
 }
 
@@ -34,7 +34,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: $background-color;
+  background-color: $color-text-primary;
   border-bottom: 1px solid $color-text-secondary;
   
   .profile-image {
@@ -63,7 +63,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 1px 3px $color-text-secondary;
+      border: 1px solid $color-text-secondary;
       transition: background-color 0.2s;
       
       &:hover {
@@ -196,7 +196,7 @@
       &:focus {
         outline: none;
         border-color: $color-secondary;
-        box-shadow: 0 0 0 2px $color-secondary;
+        border-width: 2px;
       }
     }
     
@@ -329,9 +329,10 @@
   }
   
   .danger-zone {
-    background-color: $background-color;
+    background-color: $color-text-primary;
     padding: $spacing;
     border-radius: $radius-md;
+    border: 1px solid $color-surface-alt;
   }
 }
 

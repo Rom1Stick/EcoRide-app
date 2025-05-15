@@ -47,7 +47,7 @@
       border-radius: $radius-lg;
       flex: 1;
       object-position: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 2px solid $color-secondary;
     }
   }
 
@@ -172,6 +172,7 @@
         @include flex-center;
         border-radius: 50%;
         margin-bottom: 1rem;
+        border: 2px solid $color-secondary;
       }
     }
 
@@ -262,7 +263,7 @@
         @include desktop {
           width: 5rem;
           height: 5rem;
-          border: 3px solid $color-secondary;
+          border: 2px solid $color-secondary;
         }
       }
 

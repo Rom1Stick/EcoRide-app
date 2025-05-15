@@ -112,7 +112,8 @@
     flex-direction: column;
     width: 100%;
     z-index: 99;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 0.1rem solid $color-secondary;
+    border-top: none;
     border-bottom-left-radius: $radius-lg;
     border-bottom-right-radius: $radius-lg;
 
@@ -136,7 +137,7 @@
 
       &:hover {
         color: $color-accent;
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: $color-secondary;
       }
     }
 
@@ -154,6 +155,7 @@
       margin-top: 1rem;
       font-weight: 700;
       border: none;
+      justify-content: center;
 
       &:hover {
         background-color: $color-secondary;
@@ -179,16 +181,37 @@
       }
     }
 
+    // Lien vers l'administration pour les utilisateurs admin
+    .admin-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: $color-accent;
+      font-weight: 600;
+      
+      i {
+        margin-right: 0.3rem;
+      }
+      
+      &:hover {
+        background-color: $color-secondary;
+      }
+    }
+
     @include desktop {
       display: flex;
       flex-direction: row;
       position: static;
       padding: 0;
-      box-shadow: none;
+      border: none;
       height: auto;
-      background-color: transparent;
+      background-color: $color-primary-bg;
       overflow-y: visible;
       border-radius: 0;
+      // Centrer les éléments vers la droite
+      justify-content: flex-end;
+      margin-right: 2rem;
 
       a {
         width: auto;
@@ -212,8 +235,19 @@
       .user-profile-btn {
         margin-top: 0;
         padding: 0.5rem 1rem;
-        background-color: transparent;
+        background-color: $color-primary-bg;
 
+        &:hover {
+          background-color: $color-secondary;
+        }
+      }
+      
+      // Style du lien admin en version desktop
+      .admin-link {
+        padding: 0.5rem 1rem;
+        margin-right: 0.5rem;
+        border-radius: $radius-md;
+        
         &:hover {
           background-color: $color-secondary;
         }

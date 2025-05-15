@@ -114,7 +114,7 @@
         padding: 1.5rem;
         gap: 1.2rem;
         border-radius: $radius-lg;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        border: 2px solid $color-secondary;
         max-width: 900px;
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -282,7 +282,7 @@
 
   @include desktop {
     padding: 5rem 3rem;
-    background: linear-gradient(135deg, $color-secondary, $color-primary-bg);
+    background-color: $color-secondary;
   }
 
   h2 {
@@ -325,7 +325,7 @@
 
   button {
     background-color: $color-accent;
-    color: black;
+    color: $color-primary-bg;
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: $radius-md;
@@ -347,7 +347,7 @@
       &:hover {
         background-color: $color-text-primary;
         transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        border: 2px solid $color-accent;
       }
     }
 

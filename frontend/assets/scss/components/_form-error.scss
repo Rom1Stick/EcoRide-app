@@ -3,7 +3,7 @@
 // Message d'erreur
 .register-form__error-message {
   display: block;
-  background-color: rgba($color-accent, 0.1);
+  background-color: $color-primary-bg;
   border: 1px solid $color-accent;
   color: $color-accent;
   border-radius: $radius-md;
@@ -14,9 +14,9 @@
 // Message de succès
 .register-form__success-message {
   display: block;
-  background-color: rgba($color-secondary, 0.1);
+  background-color: $color-primary-bg;
   border: 1px solid $color-secondary;
-  color: $color-secondary;
+  color: $color-accent;
   border-radius: $radius-md;
   font-size: 0.875rem;
   margin-top: $spacing;

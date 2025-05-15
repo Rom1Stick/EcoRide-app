@@ -8,6 +8,29 @@ document.addEventListener('DOMContentLoaded', function () {
   const adminNav = document.getElementById('admin-nav');
   const body = document.body;
   
+  // Gestion du bouton de déconnexion
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async function() {
+      try {
+        // Appel à l'API de déconnexion
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        
+        // Suppression du token d'authentification
+        localStorage.removeItem('auth_token');
+        
+        // Redirection vers la page d'accueil
+        window.location.href = '/pages/public/index.html';
+      } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        alert('Une erreur est survenue lors de la déconnexion. Veuillez réessayer.');
+      }
+    });
+  }
+  
   if (menuToggle && adminNav) {
     // Initialisation - s'assurer que le menu est fermé au chargement
     adminNav.classList.remove('open');
