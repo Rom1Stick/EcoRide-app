@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="Conditions Générales d'Utilisation EcoRide - Plateforme de covoiturage éco-responsable"
+    />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>Conditions Générales d'Utilisation – EcoRide</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+      </div>
+      <!-- Menu de navigation desktop -->
+      <nav class="header__nav">
+        <a href="/">Accueil</a>
+        <a href="./covoiturages.html">Covoiturages</a>
+        <a href="/contact">Contact</a>
+        <div class="auth-container">
+          <!-- Contenu remplacé dynamiquement par JavaScript -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <!-- Bouton de profil (caché par défaut) -->
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/Logo_EcoRide.svg"
+              alt="Avatar"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+        </div>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell"></i>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container legal-page">
+        <h1>Conditions Générales d'Utilisation</h1>
+
+        <div class="legal-toc">
+          <h3>Sommaire</h3>
+          <ul>
+            <li><a href="#preambule">Préambule</a></li>
+            <li><a href="#definitions">Définitions</a></li>
+            <li><a href="#inscription">Inscription et compte utilisateur</a></li>
+            <li><a href="#services">Description des services</a></li>
+            <li><a href="#conducteurs">Conditions applicables aux conducteurs</a></li>
+            <li><a href="#passagers">Conditions applicables aux passagers</a></li>
+            <li><a href="#paiement">Conditions financières</a></li>
+            <li><a href="#annulation">Politique d'annulation</a></li>
+            <li><a href="#responsabilites">Responsabilités et garanties</a></li>
+            <li><a href="#propriete">Propriété intellectuelle</a></li>
+            <li><a href="#donnees">Données personnelles</a></li>
+            <li><a href="#resiliation">Résiliation</a></li>
+            <li><a href="#modification">Modification des CGU</a></li>
+            <li><a href="#litige">Droit applicable et litiges</a></li>
+          </ul>
+        </div>
+
+        <section id="preambule">
+          <h2>1. Préambule</h2>
+          <p>
+            Les présentes Conditions Générales d'Utilisation (ci-après "CGU") ont pour objet de
+            définir les modalités et conditions d'utilisation des services proposés par la société
+            EcoRide SAS (ci-après "EcoRide" ou "nous") sur la plateforme EcoRide accessible via le
+            site internet www.ecoride.com ou l'application mobile EcoRide (ci-après la
+            "Plateforme").
+          </p>
+          <p>
+            L'utilisation de la Plateforme et des services est soumise à l'acceptation sans réserve
+            des présentes CGU. Si vous n'acceptez pas ces conditions, vous ne pouvez pas utiliser la
+            Plateforme ni les services proposés.
+          </p>
+        </section>
+
+        <section id="definitions">
+          <h2>2. Définitions</h2>
+          <p>
+            Dans le cadre des présentes CGU, les termes suivants ont la signification qui leur est
+            donnée ci-dessous :
+          </p>
+          <ul>
+            <li>
+              <strong>Compte</strong>
+              : désigne l'espace personnel de l'Utilisateur sur la Plateforme.
+            </li>
+            <li>
+              <strong>Conducteur</strong>
+              : désigne tout Utilisateur proposant un Trajet à bord d'un Véhicule dont il est le
+              conducteur.
+            </li>
+            <li>
+              <strong>Contenu</strong>
+              : désigne tout contenu publié par un Utilisateur sur la Plateforme, notamment des
+              informations, textes, photos, avis, etc.
+            </li>
+            <li>
+              <strong>Frais de Service</strong>
+              : désigne la somme perçue par EcoRide en contrepartie de l'utilisation de la
+              Plateforme.
+            </li>
+            <li>
+              <strong>Passager</strong>
+              : désigne tout Utilisateur ayant accepté la proposition d'un Conducteur de le
+              transporter dans le cadre d'un Trajet.
+            </li>
+            <li>
+              <strong>Participation aux Frais</strong>
+              : désigne la somme d'argent demandée par le Conducteur au Passager pour sa
+              contribution aux frais de déplacement.
+            </li>
+            <li>
+              <strong>Trajet</strong>
+              : désigne le déplacement proposé par un Conducteur sur la Plateforme.
+            </li>
+            <li>
+              <strong>Utilisateur</strong>
+              : désigne toute personne physique inscrite sur la Plateforme.
+            </li>
+            <li>
+              <strong>Véhicule</strong>
+              : désigne le véhicule utilisé par le Conducteur pour effectuer le Trajet.
+            </li>
+          </ul>
+        </section>
+
+        <section id="inscription">
+          <h2>3. Inscription et compte utilisateur</h2>
+          <h3>3.1 Conditions d'inscription</h3>
+          <p>Pour s'inscrire sur la Plateforme, l'Utilisateur doit :</p>
+          <ul>
+            <li>Être âgé d'au moins 18 ans;</li>
+            <li>Fournir les informations marquées comme obligatoires lors de l'inscription;</li>
+            <li>Accepter les présentes CGU et la Politique de confidentialité.</li>
+          </ul>
+          <h3>3.2 Création de compte</h3>
+          <p>
+            L'inscription sur la Plateforme nécessite la création d'un Compte utilisateur.
+            L'Utilisateur s'engage à fournir des informations exactes, complètes et à jour. En cas
+            de modification de ces informations, l'Utilisateur s'engage à les mettre à jour dans son
+            Compte.
+          </p>
+          <p>
+            L'Utilisateur est responsable du maintien de la confidentialité de ses identifiants de
+            connexion et de toute activité effectuée depuis son Compte. Il s'engage à informer
+            immédiatement EcoRide de toute utilisation non autorisée de son Compte.
+          </p>
+        </section>
+
+        <section id="services">
+          <h2>4. Description des services</h2>
+          <p>
+            EcoRide est une plateforme de mise en relation de particuliers souhaitant partager un
+            trajet. Elle permet :
+          </p>
+          <ul>
+            <li>
+              Aux Conducteurs de proposer des Trajets pour lesquels ils acceptent de transporter des
+              Passagers moyennant une Participation aux Frais;
+            </li>
+            <li>
+              Aux Passagers de rechercher, réserver et payer des Trajets proposés par des
+              Conducteurs.
+            </li>
+          </ul>
+          <p>
+            EcoRide agit uniquement comme intermédiaire dans la mise en relation des Utilisateurs et
+            n'est pas partie au contrat de transport conclu entre le Conducteur et le Passager.
+          </p>
+        </section>
+
+        <section id="conducteurs">
+          <h2>5. Conditions applicables aux conducteurs</h2>
+          <h3>5.1 Obligations générales</h3>
+          <p>Le Conducteur s'engage à :</p>
+          <ul>
+            <li>Être titulaire d'un permis de conduire valide;</li>
+            <li>
+              N'utiliser que des Véhicules dont il est le propriétaire ou qu'il est expressément
+              autorisé à utiliser;
+            </li>
+            <li>Être assuré pour le transport de passagers;</li>
+            <li>Respecter le Code de la route et les règles de sécurité routière;</li>
+            <li>Maintenir son Véhicule en bon état de fonctionnement et de propreté.</li>
+          </ul>
+          <h3>5.2 Publication des Trajets</h3>
+          <p>
+            Le Conducteur s'engage à ne proposer que des Trajets réels qu'il prévoit d'effectuer. Il
+            doit fournir des informations exactes concernant le Trajet (lieu de départ, lieu
+            d'arrivée, date, heure, nombre de places disponibles, etc.).
+          </p>
+          <h3>5.3 Participation aux Frais</h3>
+          <p>
+            La Participation aux Frais demandée par le Conducteur doit correspondre uniquement au
+            partage des frais réels du Trajet. Le Conducteur s'engage à ne pas réaliser de bénéfice
+            par l'utilisation de la Plateforme.
+          </p>
+        </section>
+
+        <section id="passagers">
+          <h2>6. Conditions applicables aux passagers</h2>
+          <h3>6.1 Réservation des Trajets</h3>
+          <p>
+            Le Passager peut rechercher et réserver un Trajet sur la Plateforme en fonction de ses
+            critères de recherche (lieu de départ, lieu d'arrivée, date, etc.). La réservation n'est
+            confirmée qu'après acceptation par le Conducteur et paiement par le Passager.
+          </p>
+          <h3>6.2 Obligations des Passagers</h3>
+          <p>Le Passager s'engage à :</p>
+          <ul>
+            <li>Se présenter au lieu de rendez-vous à l'heure convenue;</li>
+            <li>
+              Adopter un comportement respectueux envers le Conducteur et les autres Passagers;
+            </li>
+            <li>Ne pas transporter d'objets illicites ou dangereux;</li>
+            <li>Respecter le Véhicule du Conducteur;</li>
+            <li>Porter la ceinture de sécurité pendant le Trajet.</li>
+          </ul>
+        </section>
+
+        <section id="paiement">
+          <h2>7. Conditions financières</h2>
+          <h3>7.1 Participation aux Frais</h3>
+          <p>
+            Le montant de la Participation aux Frais est déterminé par le Conducteur, dans la limite
+            d'un plafond fixé par EcoRide pour éviter tout abus. Ce montant doit représenter
+            uniquement un partage de frais et non une rémunération.
+          </p>
+          <h3>7.2 Frais de Service</h3>
+          <p>
+            EcoRide perçoit des Frais de Service sur chaque réservation. Ces frais sont clairement
+            indiqués au Passager avant la confirmation de sa réservation.
+          </p>
+          <h3>7.3 Modalités de paiement</h3>
+          <p>
+            Les paiements s'effectuent en ligne par l'intermédiaire d'un prestataire de paiement
+            sécurisé. Les coordonnées bancaires des Utilisateurs ne sont pas conservées par EcoRide.
+          </p>
+        </section>
+
+        <section id="annulation">
+          <h2>8. Politique d'annulation</h2>
+          <h3>8.1 Annulation par le Passager</h3>
+          <p>
+            Le Passager peut annuler sa réservation à tout moment. Les conditions de remboursement
+            dépendent du délai entre l'annulation et l'heure de départ prévue :
+          </p>
+          <ul>
+            <li>
+              Plus de 24 heures avant le départ : remboursement intégral (sauf Frais de Service);
+            </li>
+            <li>
+              Moins de 24 heures mais plus de 1 heure avant le départ : remboursement de 50% du
+              montant (sauf Frais de Service);
+            </li>
+            <li>Moins de 1 heure avant le départ : aucun remboursement.</li>
+          </ul>
+          <h3>8.2 Annulation par le Conducteur</h3>
+          <p>
+            Le Conducteur peut annuler un Trajet à tout moment. Dans ce cas, les Passagers sont
+            intégralement remboursés (y compris les Frais de Service). Des annulations répétées
+            peuvent entraîner la suspension du Compte du Conducteur.
+          </p>
+        </section>
+
+        <section id="responsabilites">
+          <h2>9. Responsabilités et garanties</h2>
+          <h3>9.1 Responsabilité d'EcoRide</h3>
+          <p>
+            EcoRide agit uniquement comme intermédiaire de mise en relation entre Utilisateurs et
+            n'est pas responsable du comportement des Utilisateurs ou de la qualité des Trajets.
+          </p>
+          <p>EcoRide ne garantit pas que :</p>
+          <ul>
+            <li>La Plateforme sera disponible de manière ininterrompue;</li>
+            <li>La Plateforme sera exempte d'erreurs ou de bugs;</li>
+            <li>Les Utilisateurs respecteront leurs engagements.</li>
+          </ul>
+          <h3>9.2 Responsabilité des Utilisateurs</h3>
+          <p>
+            Chaque Utilisateur est seul responsable de son comportement sur la Plateforme et pendant
+            les Trajets. Le Conducteur est notamment responsable de son Véhicule, de son assurance
+            et du respect du Code de la route.
+          </p>
+        </section>
+
+        <section id="propriete">
+          <h2>10. Propriété intellectuelle</h2>
+          <p>
+            L'ensemble des éléments de la Plateforme (textes, graphismes, logiciels, photos, etc.)
+            sont la propriété exclusive d'EcoRide et sont protégés par les lois relatives à la
+            propriété intellectuelle.
+          </p>
+          <p>
+            Toute reproduction, représentation, modification ou exploitation de tout ou partie de la
+            Plateforme ou de son contenu est interdite sans l'autorisation préalable d'EcoRide.
+          </p>
+        </section>
+
+        <section id="donnees">
+          <h2>11. Données personnelles</h2>
+          <p>
+            EcoRide collecte et traite les données personnelles des Utilisateurs conformément à sa
+            Politique de confidentialité, accessible
+            <a href="./confidentialite.html">ici</a>
+            .
+          </p>
+          <p>
+            Les Utilisateurs disposent de droits d'accès, de rectification, d'effacement, de
+            limitation, de portabilité et d'opposition concernant leurs données personnelles, qu'ils
+            peuvent exercer en contactant rgpd@ecoride.com.
+          </p>
+        </section>
+
+        <section id="resiliation">
+          <h2>12. Résiliation</h2>
+          <h3>12.1 Résiliation par l'Utilisateur</h3>
+          <p>
+            L'Utilisateur peut supprimer son Compte à tout moment depuis son espace personnel. La
+            suppression du Compte entraîne la résiliation des présentes CGU.
+          </p>
+          <h3>12.2 Résiliation par EcoRide</h3>
+          <p>
+            EcoRide se réserve le droit de suspendre ou de supprimer le Compte d'un Utilisateur en
+            cas de :
+          </p>
+          <ul>
+            <li>Violation des présentes CGU;</li>
+            <li>Fourniture d'informations inexactes;</li>
+            <li>Comportement préjudiciable à d'autres Utilisateurs;</li>
+            <li>Utilisation frauduleuse de la Plateforme;</li>
+            <li>Non-utilisation du Compte pendant une période prolongée.</li>
+          </ul>
+        </section>
+
+        <section id="modification">
+          <h2>13. Modification des CGU</h2>
+          <p>
+            EcoRide se réserve le droit de modifier les présentes CGU à tout moment. Les
+            Utilisateurs seront informés de toute modification par email et/ou par une notification
+            sur la Plateforme.
+          </p>
+          <p>
+            Les modifications entreront en vigueur 30 jours après leur notification. L'utilisation
+            continue de la Plateforme après cette période vaut acceptation des nouvelles CGU.
+          </p>
+        </section>
+
+        <section id="litige">
+          <h2>14. Droit applicable et litiges</h2>
+          <p>Les présentes CGU sont régies par le droit français.</p>
+          <p>
+            En cas de litige, les Utilisateurs sont invités à contacter en priorité le service
+            client d'EcoRide pour rechercher une solution amiable. À défaut de résolution amiable,
+            tout litige relatif à l'interprétation ou à l'exécution des CGU sera soumis aux
+            tribunaux français compétents.
+          </p>
+          <p>
+            Conformément aux dispositions du Code de la consommation, l'Utilisateur peut recourir
+            gratuitement au service de médiation de la consommation en contactant [nom et
+            coordonnées du médiateur].
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__top">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope"></i>
+            contact@ecoride.com
+          </p>
+          <p>
+            <i class="fa-solid fa-phone"></i>
+            01 23 45 67 89
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><a href="./index.html">Accueil</a></li>
+              <li><a href="./index.html#about">À propos</a></li>
+              <li><a href="./covoiturages.html">Services</a></li>
+              <li><a href="/contact">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><a href="./conditions.html">Conditions</a></li>
+              <li><a href="./confidentialite.html">Confidentialité</a></li>
+              <li><a href="./cookies.html">Cookies</a></li>
+              <li><a href="./mentions-legales.html">Mentions légales</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+  </body>
+</html>

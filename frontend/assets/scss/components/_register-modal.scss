@@ -9,7 +9,7 @@
   background-color: $color-text-secondary;
   border-radius: $radius-lg;
   padding: $spacing * 1.5;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 2px solid $color-secondary;
   margin: 5rem 2vh 0 2vh;
 
   &__close {

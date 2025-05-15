@@ -28,6 +28,7 @@ class UserRepository extends AbstractRepository
             'first_name',
             'last_name',
             'phone',
+            'photo_path',
             'role',
             'created_at',
             'updated_at'
@@ -46,6 +47,7 @@ class UserRepository extends AbstractRepository
              ->setFirstName($data['first_name'])
              ->setLastName($data['last_name'])
              ->setPhone($data['phone'] ?? null)
+             ->setPhotoPath($data['photo_path'] ?? '/assets/images/Logo_EcoRide.svg')
              ->setRole($data['role']);
 
         // Conversion des dates
@@ -80,6 +82,11 @@ class UserRepository extends AbstractRepository
             $entity->setCreatedAt(new \DateTime());
         }
 
+        // S'assurer que l'image de profil par défaut est définie si aucune n'est spécifiée
+        if ($entity->getPhotoPath() === null) {
+            $entity->setPhotoPath('/assets/images/Logo_EcoRide.svg');
+        }
+
         // Préparation des données
         $query = "INSERT INTO {$this->table} (
                     email, 
@@ -87,6 +94,7 @@ class UserRepository extends AbstractRepository
                     first_name, 
                     last_name, 
                     phone, 
+                    photo_path,
                     role, 
                     created_at, 
                     updated_at
@@ -96,6 +104,7 @@ class UserRepository extends AbstractRepository
                     :firstName, 
                     :lastName, 
                     :phone, 
+                    :photoPath,
                     :role, 
                     :createdAt, 
                     :updatedAt
@@ -109,6 +118,7 @@ class UserRepository extends AbstractRepository
             $firstName = $entity->getFirstName();
             $lastName = $entity->getLastName();
             $phone = $entity->getPhone();
+            $photoPath = $entity->getPhotoPath();
             $role = $entity->getRole();
             $createdAt = $entity->getCreatedAt()->format('Y-m-d H:i:s');
             $updatedAt = $entity->getUpdatedAt() ? $entity->getUpdatedAt()->format('Y-m-d H:i:s') : null;
@@ -118,6 +128,7 @@ class UserRepository extends AbstractRepository
             $stmt->bindParam(':firstName', $firstName, PDO::PARAM_STR);
             $stmt->bindParam(':lastName', $lastName, PDO::PARAM_STR);
             $stmt->bindParam(':phone', $phone, $phone === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':photoPath', $photoPath, $photoPath === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':role', $role, PDO::PARAM_STR);
             $stmt->bindParam(':createdAt', $createdAt, PDO::PARAM_STR);
             $stmt->bindParam(':updatedAt', $updatedAt, $updatedAt === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
@@ -155,6 +166,11 @@ class UserRepository extends AbstractRepository
             throw new \InvalidArgumentException("Impossible de mettre à jour un utilisateur sans ID");
         }
 
+        // S'assurer que l'image de profil par défaut est définie si aucune n'est spécifiée
+        if ($entity->getPhotoPath() === null) {
+            $entity->setPhotoPath('/assets/images/Logo_EcoRide.svg');
+        }
+
         // Mise à jour de la date de modification
         $entity->touch();
 
@@ -165,6 +181,7 @@ class UserRepository extends AbstractRepository
                   first_name = :firstName,
                   last_name = :lastName,
                   phone = :phone,
+                  photo_path = :photoPath,
                   role = :role,
                   updated_at = :updatedAt
                 WHERE id = :id";
@@ -178,6 +195,7 @@ class UserRepository extends AbstractRepository
             $firstName = $entity->getFirstName();
             $lastName = $entity->getLastName();
             $phone = $entity->getPhone();
+            $photoPath = $entity->getPhotoPath();
             $role = $entity->getRole();
             $updatedAt = $entity->getUpdatedAt()->format('Y-m-d H:i:s');
             
@@ -187,6 +205,7 @@ class UserRepository extends AbstractRepository
             $stmt->bindParam(':firstName', $firstName, PDO::PARAM_STR);
             $stmt->bindParam(':lastName', $lastName, PDO::PARAM_STR);
             $stmt->bindParam(':phone', $phone, $phone === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindParam(':photoPath', $photoPath, $photoPath === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindParam(':role', $role, PDO::PARAM_STR);
             $stmt->bindParam(':updatedAt', $updatedAt, PDO::PARAM_STR);
             

@@ -1,0 +1,42 @@
+@use 'variables' as *;
+
+// Mixins pour les media queries
+@mixin tablet {
+  @media (min-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-desktop) {
+    @content;
+  }
+}
+
+// Mixins pour les styles communs
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin hover-transform {
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+@mixin card-base {
+  padding: $spacing;
+  border-radius: $radius-md;
+
+  @include tablet {
+    padding: 1.5rem;
+  }
+
+  @include desktop {
+    padding: 2rem;
+    border-radius: $radius-lg;
+  }
+}

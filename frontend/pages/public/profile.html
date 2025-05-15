@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="description" content="EcoRide - Profil utilisateur" />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>Mon profil - EcoRide</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="profile-page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+      </div>
+      <!-- Menu de navigation desktop -->
+      <nav class="header__nav">
+        <a href="/">Accueil</a>
+        <a href="./covoiturages.html">Covoiturages</a>
+        <a href="/contact">Contact</a>
+        <div class="auth-container">
+          <!-- Le contenu sera ajusté par userProfile.js -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/Logo_EcoRide.svg"
+              alt="Avatar"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+        </div>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell"></i>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container">
+        <section class="section profile-section">
+          <h1>Mon profil</h1>
+
+          <div class="profile-container">
+            <div class="profile-header">
+              <div class="profile-image">
+                <img
+                  src="../../assets/images/Logo_EcoRide.svg"
+                  alt="Photo de profil"
+                  id="profileImage"
+                />
+                <button class="edit-profile-image" aria-label="Modifier la photo de profil">
+                  <i class="fa-solid fa-camera"></i>
+                </button>
+              </div>
+              <div class="profile-info">
+                <h2 id="profileName">Nom d'utilisateur</h2>
+                <p id="profileEmail">email@exemple.com</p>
+                <div class="profile-stats">
+                  <div class="stat">
+                    <span class="value" id="tripsCount">0</span>
+                    <span class="label">Trajets</span>
+                  </div>
+                  <div class="stat">
+                    <span class="value" id="co2Saved">0kg</span>
+                    <span class="label">CO2 économisé</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-tabs">
+              <button class="tab-button active" data-tab="info" id="infoTab">
+                <i class="fa-solid fa-user"></i>
+                <span>Informations</span>
+              </button>
+              <button class="tab-button" data-tab="trips" id="tripsTab">
+                <i class="fa-solid fa-car"></i>
+                <span>Mes trajets</span>
+              </button>
+              <button class="tab-button" data-tab="settings" id="settingsTab">
+                <i class="fa-solid fa-gear"></i>
+                <span>Paramètres</span>
+              </button>
+            </div>
+
+            <div class="tab-content" id="info-tab">
+              <form class="profile-form">
+                <div class="form-group">
+                  <label for="name">Nom complet</label>
+                  <input type="text" id="name" placeholder="Votre nom" />
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" id="email" placeholder="Votre email" />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Téléphone</label>
+                  <input type="tel" id="phone" placeholder="Votre numéro de téléphone" />
+                </div>
+                <div class="form-group">
+                  <label for="bio">Bio</label>
+                  <textarea id="bio" placeholder="Présentez-vous en quelques mots"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Enregistrer</button>
+              </form>
+            </div>
+
+            <div class="tab-content hidden" id="trips-tab">
+              <p class="empty-state">Vous n'avez pas encore effectué de trajets.</p>
+              <!-- Liste des trajets sera chargée dynamiquement -->
+            </div>
+
+            <div class="tab-content hidden" id="settings-tab">
+              <div class="settings-options">
+                <div class="setting-group">
+                  <h3>Notifications</h3>
+                  <div class="switch-group">
+                    <label for="emailNotif">Notifications par email</label>
+                    <div class="switch">
+                      <input type="checkbox" id="emailNotif" checked />
+                      <span class="slider"></span>
+                    </div>
+                  </div>
+                  <div class="switch-group">
+                    <label for="smsNotif">Notifications SMS</label>
+                    <div class="switch">
+                      <input type="checkbox" id="smsNotif" />
+                      <span class="slider"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="setting-group">
+                  <h3>Sécurité</h3>
+                  <button class="btn-secondary" id="changePasswordBtn">
+                    <i class="fa-solid fa-lock"></i>
+                    Changer de mot de passe
+                  </button>
+                </div>
+
+                <div class="setting-group danger-zone">
+                  <h3>Zone de danger</h3>
+                  <button class="btn-danger" id="logoutBtn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Se déconnecter
+                  </button>
+                  <button class="btn-danger" id="deleteAccountBtn">
+                    <i class="fa-solid fa-trash"></i>
+                    Supprimer mon compte
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__top">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope"></i>
+            contact@ecoride.com
+          </p>
+          <p>
+            <i class="fa-solid fa-phone"></i>
+            01 23 45 67 89
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><span>Accueil</span></li>
+              <li><span>À propos</span></li>
+              <li><span>Services</span></li>
+              <li><span>Contact</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><span>Conditions</span></li>
+              <li><span>Confidentialité</span></li>
+              <li><span>Cookies</span></li>
+              <li><span>Mentions légales</span></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+    <script type="module" src="../../assets/js/pages/profile.js"></script>
+  </body>
+</html>

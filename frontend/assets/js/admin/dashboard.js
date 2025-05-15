@@ -1,10 +1,14 @@
 import { initAuthUI } from '../common/auth.js';
+import { checkAdminAccess } from './admin-auth.js';
 
 (async () => {
+  // Vérifier que l'utilisateur est authentifié
   const authOK = await initAuthUI();
   if (!authOK) return;
 
-  console.log('Admin dashboard chargé.');
+  // Vérifier que l'utilisateur a les droits d'administration
+  const isAdmin = await checkAdminAccess();
+  if (!isAdmin) return;
 
   // Préparer les en-têtes
   const token = localStorage.getItem('auth_token');

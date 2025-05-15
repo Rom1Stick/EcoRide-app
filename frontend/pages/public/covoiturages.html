@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="EcoRide - Trouvez les covoiturages disponibles pour votre trajet"
+    />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>EcoRide – Résultats de recherche</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body class="results-page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+      </div>
+      <!-- Menu de navigation desktop -->
+      <nav class="header__nav">
+        <a href="/">Accueil</a>
+        <a href="./covoiturages.html" class="active">Covoiturages</a>
+        <a href="/contact">Contact</a>
+        <div class="auth-container">
+          <!-- Contenu remplacé dynamiquement par JavaScript -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <!-- Bouton de profil (caché par défaut) -->
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/Logo_EcoRide.svg"
+              alt="Avatar"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+        </div>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell"></i>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container">
+        <!-- Section de recherche améliorée -->
+        <section class="search-section">
+          <h1>Rechercher un covoiturage</h1>
+          <form class="search-form" id="search-form">
+            <div class="search-form__field">
+              <label for="from">Départ</label>
+              <div class="input-group">
+                <i class="fa-solid fa-location-dot"></i>
+                <input
+                  type="text"
+                  id="from"
+                  placeholder="Ville de départ"
+                  autocomplete="off"
+                  required
+                />
+                <div class="autocomplete-container" id="from-autocomplete"></div>
+              </div>
+            </div>
+
+            <div class="search-form__field">
+              <label for="to">Arrivée</label>
+              <div class="input-group">
+                <i class="fa-solid fa-location-dot"></i>
+                <input
+                  type="text"
+                  id="to"
+                  placeholder="Ville d'arrivée"
+                  autocomplete="off"
+                  required
+                />
+                <div class="autocomplete-container" id="to-autocomplete"></div>
+              </div>
+            </div>
+
+            <div class="search-form__field">
+              <label for="date">Date</label>
+              <div class="input-group">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="date" required />
+              </div>
+            </div>
+
+            <button type="submit" class="search-button">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Rechercher
+            </button>
+          </form>
+        </section>
+
+        <!-- Section des résultats -->
+        <section class="results-section" id="results-section">
+          <div class="results-header">
+            <h2>Résultats de votre recherche</h2>
+            <div class="results-count" id="results-count">0 trajet(s) trouvé(s)</div>
+            <div class="results-filters">
+              <button class="filter-btn" id="filter-price">
+                <i class="fa-solid fa-euro-sign"></i>
+                Prix
+              </button>
+              <button class="filter-btn" id="filter-time">
+                <i class="fa-regular fa-clock"></i>
+                Heure
+              </button>
+              <button class="filter-btn" id="filter-rating">
+                <i class="fa-solid fa-star"></i>
+                Note
+              </button>
+            </div>
+          </div>
+
+          <div class="results-list" id="results-list">
+            <!-- Les résultats seront injectés ici par JavaScript -->
+            <!-- Template pour un résultat -->
+            <div class="result-card result-card--empty">
+              <div class="empty-state">
+                <i class="fa-solid fa-car-side"></i>
+                <p>Aucun trajet disponible pour cette recherche.</p>
+                <p>Essayez de modifier vos critères ou de choisir une autre date.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__top">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope"></i>
+            contact@ecoride.com
+          </p>
+          <p>
+            <i class="fa-solid fa-phone"></i>
+            01 23 45 67 89
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><span>Accueil</span></li>
+              <li><span>À propos</span></li>
+              <li><span>Services</span></li>
+              <li><span>Contact</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><span>Conditions</span></li>
+              <li><span>Confidentialité</span></li>
+              <li><span>Cookies</span></li>
+              <li><span>Mentions légales</span></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+    <script type="module" src="../../assets/js/pages/covoiturages.js"></script>
+  </body>
+</html>
