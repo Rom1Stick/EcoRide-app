@@ -54,8 +54,8 @@ async function updateUserInterface() {
     }
 
     // Mettre à jour l'avatar si disponible
-    if (userAvatar && currentUser.avatar) {
-      userAvatar.src = currentUser.avatar;
+    if (userAvatar && currentUser.photoPath) {
+      userAvatar.src = currentUser.photoPath;
     }
   } else {
     // Utilisateur non connecté : afficher le bouton de connexion

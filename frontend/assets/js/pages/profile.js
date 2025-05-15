@@ -24,7 +24,7 @@ async function loadUserData() {
 
   if (profileName) profileName.textContent = user.name || 'Utilisateur';
   if (profileEmail) profileEmail.textContent = user.email || '';
-  if (profileImage && user.avatar) profileImage.src = user.avatar;
+  if (profileImage && user.photoPath) profileImage.src = user.photoPath;
 
   // Remplir le formulaire avec les données existantes
   if (nameInput) nameInput.value = user.name || '';

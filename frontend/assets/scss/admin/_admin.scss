@@ -10,7 +10,9 @@
   border-radius: $radius-md;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
 
   &:hover {
     background-color: $color-secondary;
@@ -35,7 +37,6 @@
 .header--admin {
   background-color: $color-primary-bg;
   color: $color-text-primary;
-  padding: $spacing;
   position: relative;
   display: flex;
   align-items: center;
@@ -56,6 +57,7 @@
   /* Bouton menu mobile */
   .mobile-menu-toggle {
     display: block;
+    margin: 0 2rem 0.8rem 0;
     width: 2.5rem;
     height: 2.5rem;
     background-color: $color-secondary;
@@ -67,7 +69,7 @@
     z-index: 101;
     transition: all 0.2s ease;
 
-    &[aria-expanded="true"] {
+    &[aria-expanded='true'] {
       background-color: $color-accent;
       color: black;
     }
@@ -87,7 +89,7 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     border-bottom-left-radius: $radius-lg;
     border-bottom-right-radius: $radius-lg;
-    
+
     &.open {
       display: block;
     }
@@ -118,14 +120,14 @@
         cursor: pointer;
         transition: all 0.2s ease;
         border-bottom: 1px solid $color-secondary;
-        
+
         i {
           margin-right: $spacing * 0.75;
           font-size: 1.1rem;
           min-width: 1.5rem;
           text-align: center;
         }
-        
+
         &:hover,
         &--active {
           background-color: $color-secondary;
@@ -151,13 +153,13 @@
 /* En-tête des sections admin */
 .admin-header {
   margin-bottom: $spacing * 1.5;
-  
+
   &__title {
     font-size: 1.5rem;
     margin: 0 0 $spacing * 0.5;
     color: $color-primary-bg;
   }
-  
+
   &__user {
     font-size: 0.9rem;
     color: $color-text-secondary;
@@ -166,7 +168,7 @@
 
 .admin-section {
   margin-bottom: $spacing * 2;
-  
+
   &__title {
     font-size: 1.2rem;
     margin-bottom: $spacing;
@@ -211,9 +213,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &::before {
-      content: "↑";
+      content: '↑';
       margin-right: 3px;
     }
   }
@@ -242,12 +244,12 @@
     display: flex;
     align-items: center;
     transition: opacity 0.5s;
-    
+
     i {
       margin-left: 0.3rem;
       animation: scroll-right 1.5s infinite;
     }
-    
+
     &.fade-out {
       opacity: 0;
     }
@@ -255,13 +257,18 @@
 
   /* Vue mobile: affichage en cartes plutôt qu'en tableau */
   @media (max-width: 767px) {
-    table, thead, tbody, th, td, tr {
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
       display: block;
     }
-    
+
     table {
       border: 0;
-      
+
       thead {
         position: absolute;
         height: 1px;
@@ -272,22 +279,22 @@
         border: 0;
         padding: 0;
       }
-      
+
       tr {
         margin-bottom: $spacing;
         border-bottom: 2px solid $color-text-secondary;
         padding: $spacing * 0.5;
         position: relative;
-        
+
         &:last-child {
           margin-bottom: 0;
         }
-        
+
         &:nth-child(even) {
           background-color: $background-color;
         }
       }
-      
+
       td {
         display: flex;
         justify-content: space-between;
@@ -295,7 +302,7 @@
         border-bottom: 1px solid $color-text-secondary;
         padding: $spacing * 0.5 0;
         font-size: 0.9rem;
-        
+
         &:before {
           content: attr(data-label);
           font-weight: bold;
@@ -303,17 +310,17 @@
           min-width: 33%;
           color: $color-primary-bg;
         }
-        
+
         &:last-child {
           border-bottom: 0;
           padding-bottom: 0;
         }
-        
+
         &:first-child {
           padding-top: 0;
         }
       }
-      
+
       button {
         @include button-base($color-secondary, $color-text-primary);
         font-size: 0.75rem;
@@ -331,12 +338,12 @@
       }
     }
   }
-  
+
   /* Vue tablette et desktop: tableau standard */
   @media (min-width: $breakpoint-tablet) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -376,7 +383,7 @@
       }
     }
   }
-  
+
   /* Message d'état vide */
   .table-empty-state {
     padding: $spacing;
@@ -388,8 +395,13 @@
 
 /* Animation pour l'indicateur de défilement */
 @keyframes scroll-right {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(3px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(3px);
+  }
 }
 
 /* Footer Admin */
@@ -407,11 +419,11 @@
   .header--admin {
     flex-wrap: nowrap;
     padding: $spacing $spacing * 1.5;
-    
+
     .mobile-menu-toggle {
       display: none; /* Masqué sur desktop */
     }
-    
+
     .header__nav {
       display: block; /* Toujours visible sur desktop */
       position: static;
@@ -421,14 +433,14 @@
       box-shadow: none;
       background-color: transparent;
       border-radius: 0;
-      
+
       .header__list {
         flex-direction: row;
-        
+
         .header__item {
           width: auto;
         }
-        
+
         .header__link {
           padding: $spacing * 0.5 $spacing;
           white-space: nowrap;
@@ -437,20 +449,20 @@
       }
     }
   }
-  
+
   .main--admin {
     padding: $spacing * 1.5;
   }
-  
+
   .dashboard {
     grid-template-columns: repeat(2, 1fr);
     gap: $spacing * 1.2;
-    
+
     &__card {
       padding: $spacing * 1.2;
     }
   }
-  
+
   .admin-table {
     .table-scroll-indicator {
       display: none;
@@ -462,39 +474,39 @@
 @media (min-width: $breakpoint-desktop) {
   .header--admin {
     padding: $spacing * 1.2 $spacing * 2;
-    
+
     .header__logo img {
       height: 3.5rem;
     }
-    
+
     .header__nav .header__list {
       gap: $spacing * 1.5;
-      
+
       .header__link {
         padding: $spacing * 0.5 $spacing * 1.25;
       }
     }
   }
-  
+
   .main--admin {
     max-width: 1200px;
     padding: $spacing * 2;
   }
-  
+
   .dashboard {
     grid-template-columns: repeat(3, 1fr);
     gap: $spacing * 1.5;
-    
+
     &__card-value {
       font-size: 2rem;
     }
   }
-  
+
   .admin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     &__title {
       font-size: 1.8rem;
       margin: 0;
@@ -504,11 +516,10 @@
 
 /* Page admin avec menu mobile ouvert */
 .page-admin.menu-is-open {
-  
   .header--admin {
     z-index: 1000;
   }
-  
+
   .header__nav {
     max-height: 80vh; /* Hauteur maximale du viewport */
     overflow-y: auto;

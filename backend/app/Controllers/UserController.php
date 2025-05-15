@@ -42,7 +42,8 @@ class UserController extends Controller
             'SELECT utilisateur_id AS id,
                     CONCAT(nom, " ", prenom) AS name,
                     email,
-                    pseudo
+                    pseudo,
+                    photo_path
              FROM Utilisateur
              WHERE utilisateur_id = ?'
         );
@@ -53,15 +54,21 @@ class UserController extends Controller
             return $this->error('Utilisateur introuvable', 404);
         }
 
+        // Définir l'image par défaut si nécessaire
+        if (empty($user['photo_path'])) {
+            $user['photo_path'] = '/assets/images/Logo_EcoRide.svg';
+        }
+
         // Nettoyer les données sensibles
         unset($user['mot_passe']);
 
         return $this->success(
             [
-                'id'       => (int)$user['id'],
-                'name'     => $user['name'],
-                'email'    => $user['email'],
-                'username' => $user['pseudo']
+                'id'        => (int)$user['id'],
+                'name'      => $user['name'],
+                'email'     => $user['email'],
+                'username'  => $user['pseudo'],
+                'photoPath' => $user['photo_path']
             ]
         );
     }

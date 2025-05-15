@@ -52,6 +52,13 @@ class User
     private ?string $phone;
 
     /**
+     * Chemin de la photo de profil de l'utilisateur
+     * 
+     * @var string|null
+     */
+    private ?string $photoPath;
+
+    /**
      * Rôle de l'utilisateur
      * 
      * @var string
@@ -79,6 +86,7 @@ class User
     {
         $this->id = null;
         $this->phone = null;
+        $this->photoPath = '/assets/images/Logo_EcoRide.svg'; // Image par défaut
         $this->role = 'ROLE_USER';
         $this->createdAt = new \DateTime();
         $this->updatedAt = null;
@@ -223,6 +231,28 @@ class User
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+        return $this;
+    }
+
+    /**
+     * Get chemin de la photo de profil de l'utilisateur
+     *
+     * @return string|null
+     */
+    public function getPhotoPath(): ?string
+    {
+        return $this->photoPath;
+    }
+
+    /**
+     * Set chemin de la photo de profil de l'utilisateur
+     *
+     * @param string|null $photoPath Chemin de la photo
+     * @return self
+     */
+    public function setPhotoPath(?string $photoPath): self
+    {
+        $this->photoPath = $photoPath;
         return $this;
     }
 
