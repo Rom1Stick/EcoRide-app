@@ -2,29 +2,11 @@
  * Gestion de la recherche et de l'affichage des covoiturages
  */
 
-// Liste des villes françaises pour l'autocomplétion (à remplacer par un appel API)
-const CITIES = [
-  { name: 'Paris', region: 'Île-de-France' },
-  { name: 'Marseille', region: "Provence-Alpes-Côte d'Azur" },
-  { name: 'Lyon', region: 'Auvergne-Rhône-Alpes' },
-  { name: 'Toulouse', region: 'Occitanie' },
-  { name: 'Nice', region: "Provence-Alpes-Côte d'Azur" },
-  { name: 'Nantes', region: 'Pays de la Loire' },
-  { name: 'Strasbourg', region: 'Grand Est' },
-  { name: 'Montpellier', region: 'Occitanie' },
-  { name: 'Bordeaux', region: 'Nouvelle-Aquitaine' },
-  { name: 'Lille', region: 'Hauts-de-France' },
-  { name: 'Rennes', region: 'Bretagne' },
-  { name: 'Reims', region: 'Grand Est' },
-  { name: 'Le Havre', region: 'Normandie' },
-  { name: 'Saint-Étienne', region: 'Auvergne-Rhône-Alpes' },
-  { name: 'Toulon', region: "Provence-Alpes-Côte d'Azur" },
-  { name: 'Grenoble', region: 'Auvergne-Rhône-Alpes' },
-  { name: 'Dijon', region: 'Bourgogne-Franche-Comté' },
-  { name: 'Angers', region: 'Pays de la Loire' },
-  { name: 'Nîmes', region: 'Occitanie' },
-  { name: 'Villeurbanne', region: 'Auvergne-Rhône-Alpes' },
-];
+// URL de l'API Adresse du gouvernement français
+const API_URL = 'https://api-adresse.data.gouv.fr';
+
+// Cache pour les résultats d'autocomplétion
+const autocompleteCache = new Map();
 
 // Éléments DOM
 const fromInput = document.getElementById('from');
@@ -47,6 +29,19 @@ if (!dateInput.value) {
  * Initialisation des composants
  */
 function init() {
+  // Vérification que les éléments du DOM sont bien présents
+  if (
+    !fromInput ||
+    !toInput ||
+    !dateInput ||
+    !searchForm ||
+    !fromAutocompleteContainer ||
+    !toAutocompleteContainer
+  ) {
+    console.error('Certains éléments du DOM sont manquants.');
+    return;
+  }
+
   // Initialisation des champs d'autocomplétion
   setupAutocomplete(fromInput, fromAutocompleteContainer);
   setupAutocomplete(toInput, toAutocompleteContainer);
@@ -55,12 +50,66 @@ function init() {
   searchForm.addEventListener('submit', handleSearch);
 
   // Gestion des filtres de résultats
-  document.getElementById('filter-price').addEventListener('click', () => applyFilter('price'));
-  document.getElementById('filter-time').addEventListener('click', () => applyFilter('time'));
-  document.getElementById('filter-rating').addEventListener('click', () => applyFilter('rating'));
+  const filterPrice = document.getElementById('filter-price');
+  const filterTime = document.getElementById('filter-time');
+  const filterRating = document.getElementById('filter-rating');
+
+  if (filterPrice) filterPrice.addEventListener('click', () => applyFilter('price'));
+  if (filterTime) filterTime.addEventListener('click', () => applyFilter('time'));
+  if (filterRating) filterRating.addEventListener('click', () => applyFilter('rating'));
 
   // Récupérer les paramètres d'URL pour pré-remplir le formulaire et lancer la recherche
   setFormFromUrlParams();
+}
+
+/**
+ * Récupère les suggestions de villes depuis l'API
+ * @param {string} query - La requête de recherche
+ * @returns {Promise<Array>} - La liste des villes correspondantes
+ */
+async function fetchCitySuggestions(query) {
+  if (!query || query.length < 2) return [];
+
+  // Vérifier dans le cache d'abord
+  const cacheKey = query.toLowerCase();
+  if (autocompleteCache.has(cacheKey)) {
+    return autocompleteCache.get(cacheKey);
+  }
+
+  try {
+    // Paramètres de recherche pour l'API
+    const params = new URLSearchParams({
+      q: query,
+      type: 'municipality', // Limiter aux communes
+      autocomplete: 1,
+      limit: 5, // Limiter à 5 résultats
+    });
+
+    const response = await fetch(`${API_URL}/search/?${params}`);
+
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Transformer les résultats dans le format attendu
+    const cities = data.features.map((feature) => ({
+      name: feature.properties.city,
+      postcode: feature.properties.postcode,
+      region: feature.properties.context,
+      citycode: feature.properties.citycode,
+      coordinates: feature.geometry.coordinates,
+    }));
+
+    // Stocker dans le cache
+    autocompleteCache.set(cacheKey, cities);
+
+    return cities;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des suggestions:', error);
+    return [];
+  }
 }
 
 /**
@@ -70,39 +119,60 @@ function init() {
  */
 function setupAutocomplete(input, container) {
   let currentFocus = -1;
+  let currentSuggestions = [];
 
   // Fonction pour afficher les suggestions
-  const showSuggestions = () => {
-    const query = input.value.toLowerCase();
+  const showSuggestions = async () => {
+    const query = input.value.trim();
     closeAllLists();
+    currentFocus = -1;
 
     if (!query) return;
 
-    // Filtrer les villes qui correspondent à la requête
-    const matches = CITIES.filter((city) => city.name.toLowerCase().startsWith(query));
+    try {
+      // Récupérer les suggestions depuis l'API
+      currentSuggestions = await fetchCitySuggestions(query);
 
-    if (matches.length > 0) {
-      container.classList.add('active');
+      if (currentSuggestions.length > 0) {
+        container.classList.add('active');
 
-      // Limiter à 5 suggestions maximum pour une meilleure UX
-      const suggestionsToShow = matches.slice(0, 5);
+        currentSuggestions.forEach((city, index) => {
+          const suggestionItem = document.createElement('div');
+          suggestionItem.className = 'suggestion-item';
 
-      suggestionsToShow.forEach((city, index) => {
-        const suggestionItem = document.createElement('div');
-        suggestionItem.className = 'suggestion-item';
-        suggestionItem.innerHTML = `
-          <div class="main-text">${city.name}</div>
-          <div class="sub-text">${city.region}</div>
-        `;
+          // Mettre en surbrillance la partie correspondant à la requête
+          const cityName = city.name;
+          const matchIndex = cityName.toLowerCase().indexOf(query.toLowerCase());
 
-        // Sélection d'une suggestion au clic
-        suggestionItem.addEventListener('click', () => {
-          input.value = city.name;
-          closeAllLists();
+          let cityHTML = cityName;
+          if (matchIndex >= 0) {
+            const matchEnd = matchIndex + query.length;
+            cityHTML =
+              cityName.substring(0, matchIndex) +
+              '<strong>' +
+              cityName.substring(matchIndex, matchEnd) +
+              '</strong>' +
+              cityName.substring(matchEnd);
+          }
+
+          suggestionItem.innerHTML = `
+            <div class="main-text">${cityHTML}</div>
+            <div class="sub-text">${city.postcode} - ${city.region}</div>
+          `;
+
+          // Sélection d'une suggestion au clic
+          suggestionItem.addEventListener('click', () => {
+            input.value = city.name;
+            // Stocker les données complètes dans un attribut data pour validation ultérieure
+            input.dataset.cityData = JSON.stringify(city);
+            closeAllLists();
+          });
+
+          container.appendChild(suggestionItem);
         });
-
-        container.appendChild(suggestionItem);
-      });
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'affichage des suggestions:", error);
     }
   };
 
@@ -232,14 +302,14 @@ function validateSearchForm() {
 
   // Vérifier si les champs sont remplis
   if (!fromInput.value.trim()) {
-    highlightInvalidField(fromInput);
+    highlightInvalidField(fromInput, 'Ce champ est obligatoire');
     isValid = false;
   } else {
     resetField(fromInput);
   }
 
   if (!toInput.value.trim()) {
-    highlightInvalidField(toInput);
+    highlightInvalidField(toInput, 'Ce champ est obligatoire');
     isValid = false;
   } else {
     resetField(toInput);
@@ -247,15 +317,27 @@ function validateSearchForm() {
 
   // Vérifier si la date est sélectionnée
   if (!dateInput.value) {
-    highlightInvalidField(dateInput);
+    highlightInvalidField(dateInput, 'Veuillez sélectionner une date');
     isValid = false;
   } else {
     resetField(dateInput);
   }
 
-  // Vérifier que les villes existent dans notre liste
-  const fromCity = CITIES.find((city) => city.name.toLowerCase() === fromInput.value.toLowerCase());
-  const toCity = CITIES.find((city) => city.name.toLowerCase() === toInput.value.toLowerCase());
+  // Vérifier que les villes existent
+  let fromCity, toCity;
+
+  try {
+    // Récupérer les données de ville depuis les attributs data si disponibles
+    if (fromInput.dataset.cityData) {
+      fromCity = JSON.parse(fromInput.dataset.cityData);
+    }
+
+    if (toInput.dataset.cityData) {
+      toCity = JSON.parse(toInput.dataset.cityData);
+    }
+  } catch (e) {
+    console.error('Erreur lors de la récupération des données de ville:', e);
+  }
 
   if (!fromCity) {
     highlightInvalidField(fromInput, 'Veuillez sélectionner une ville dans la liste');
@@ -317,20 +399,51 @@ function resetField(field) {
 /**
  * Pré-remplit le formulaire à partir des paramètres d'URL
  */
-function setFormFromUrlParams() {
+async function setFormFromUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
 
   const from = urlParams.get('from');
   const to = urlParams.get('to');
   const date = urlParams.get('date');
 
-  if (from) fromInput.value = from;
-  if (to) toInput.value = to;
-  if (date) dateInput.value = date;
+  if (from) {
+    fromInput.value = from;
+    // Charger les données de la ville pour la validation
+    try {
+      const fromCities = await fetchCitySuggestions(from);
+      const exactMatch = fromCities.find((city) => city.name === from);
+      if (exactMatch) {
+        fromInput.dataset.cityData = JSON.stringify(exactMatch);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des données de ville de départ:', error);
+    }
+  }
+
+  if (to) {
+    toInput.value = to;
+    // Charger les données de la ville pour la validation
+    try {
+      const toCities = await fetchCitySuggestions(to);
+      const exactMatch = toCities.find((city) => city.name === to);
+      if (exactMatch) {
+        toInput.dataset.cityData = JSON.stringify(exactMatch);
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des données de ville d'arrivée:", error);
+    }
+  }
+
+  if (date) {
+    dateInput.value = date;
+  }
 
   // Si tous les paramètres sont présents, lancer la recherche
   if (from && to && date) {
-    handleSearch(new Event('submit'));
+    // Petite temporisation pour permettre le chargement des données de ville
+    setTimeout(() => {
+      handleSearch(new Event('submit'));
+    }, 500);
   }
 }
 
@@ -355,7 +468,7 @@ function displayLoadingResults() {
  * @param {string} date - Date du trajet
  * @returns {Array} Tableau de résultats
  */
-function getMockResults(from, from_region, to, to_region, date) {
+function getMockResults(from, to, date) {
   // Dans un cas réel, ces données viendraient d'une API
 
   // Générer un nombre aléatoire de résultats entre 0 et 5
@@ -545,4 +658,7 @@ function applyFilter(filterType) {
 }
 
 // Initialiser la page au chargement
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Initialisation de la page de covoiturages...');
+  init();
+});

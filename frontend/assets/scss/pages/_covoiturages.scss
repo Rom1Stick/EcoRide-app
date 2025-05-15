@@ -215,6 +215,11 @@
 
   .main-text {
     font-weight: 600;
+
+    strong {
+      color: $color-accent;
+      font-weight: 700;
+    }
   }
 
   .sub-text {
@@ -387,5 +392,48 @@
         }
       }
     }
+  }
+}
+
+// Styles pour l'état de chargement des résultats
+.result-card--loading {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    color: $color-text-secondary;
+
+    .spinner {
+      width: 3rem;
+      height: 3rem;
+      border: 4px solid rgba($color-accent, 0.3);
+      border-radius: 50%;
+      border-top-color: $color-accent;
+      animation: spin 1s ease-in-out infinite;
+
+      @include desktop {
+        width: 4rem;
+        height: 4rem;
+        border-width: 5px;
+      }
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: $color-text-primary;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

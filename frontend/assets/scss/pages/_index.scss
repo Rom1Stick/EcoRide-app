@@ -114,12 +114,20 @@
         padding: 1.5rem;
         gap: 1.2rem;
         border-radius: $radius-lg;
+        border: 2px solid $color-secondary;
         max-width: 900px;
         display: grid;
         grid-template-columns: repeat(4, 1fr);
+        position: relative;
 
         label {
           display: none;
+        }
+
+        .search-form__field,
+        .input-group {
+          width: 100%;
+          min-width: 0;
         }
       }
 
@@ -138,6 +146,7 @@
         display: flex;
         align-items: center;
         padding: 0.5rem 1rem;
+        position: relative;
 
         @include desktop {
           padding: 0.7rem 1.2rem;
@@ -183,6 +192,18 @@
             outline: none;
           }
         }
+
+        .autocomplete-container {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          z-index: 100;
+
+          @include desktop {
+            z-index: 200;
+          }
+        }
       }
 
       button {
@@ -209,6 +230,24 @@
         &:hover {
           background-color: $color-secondary;
           color: $color-text-primary;
+        }
+      }
+
+      .error-message {
+        color: #ff3d00;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        display: block;
+        font-weight: 600;
+
+        @include desktop {
+          position: absolute;
+          bottom: -1.8rem;
+          width: 100%;
+          text-align: center;
+          background-color: rgba($color-surface-alt, 0.9);
+          padding: 0.3rem;
+          border-radius: 0 0 $radius-md $radius-md;
         }
       }
     }
