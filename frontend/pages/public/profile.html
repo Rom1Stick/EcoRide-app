@@ -62,7 +62,7 @@
                   alt="Photo de profil"
                   id="profileImage"
                 />
-                <button class="edit-profile-image">
+                <button class="edit-profile-image" aria-label="Modifier la photo de profil">
                   <i class="fa-solid fa-camera"></i>
                 </button>
               </div>
@@ -83,9 +83,18 @@
             </div>
 
             <div class="profile-tabs">
-              <button class="tab-button active" data-tab="info">Informations personnelles</button>
-              <button class="tab-button" data-tab="trips">Mes trajets</button>
-              <button class="tab-button" data-tab="settings">Paramètres</button>
+              <button class="tab-button active" data-tab="info" id="infoTab">
+                <i class="fa-solid fa-user"></i>
+                <span>Informations</span>
+              </button>
+              <button class="tab-button" data-tab="trips" id="tripsTab">
+                <i class="fa-solid fa-car"></i>
+                <span>Mes trajets</span>
+              </button>
+              <button class="tab-button" data-tab="settings" id="settingsTab">
+                <i class="fa-solid fa-gear"></i>
+                <span>Paramètres</span>
+              </button>
             </div>
 
             <div class="tab-content" id="info-tab">
@@ -106,7 +115,7 @@
                   <label for="bio">Bio</label>
                   <textarea id="bio" placeholder="Présentez-vous en quelques mots"></textarea>
                 </div>
-                <button type="submit" class="btn-primary">Enregistrer les modifications</button>
+                <button type="submit" class="btn-primary">Enregistrer</button>
               </form>
             </div>
 
@@ -138,14 +147,18 @@
                 <div class="setting-group">
                   <h3>Sécurité</h3>
                   <button class="btn-secondary" id="changePasswordBtn">
-                    Changer de mot de passe
+                    <i class="fa-solid fa-lock"></i> Changer de mot de passe
                   </button>
                 </div>
 
                 <div class="setting-group danger-zone">
                   <h3>Zone de danger</h3>
-                  <button class="btn-danger" id="logoutBtn">Se déconnecter</button>
-                  <button class="btn-danger" id="deleteAccountBtn">Supprimer mon compte</button>
+                  <button class="btn-danger" id="logoutBtn">
+                    <i class="fa-solid fa-right-from-bracket"></i> Se déconnecter
+                  </button>
+                  <button class="btn-danger" id="deleteAccountBtn">
+                    <i class="fa-solid fa-trash"></i> Supprimer mon compte
+                  </button>
                 </div>
               </div>
             </div>

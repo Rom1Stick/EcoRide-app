@@ -100,58 +100,82 @@
     }
   }
 
-  // Navigation mobile
+  // Navigation mobile - Nouvelle approche simplifiée
   &__nav {
     display: none; // Masqué par défaut sur mobile
     position: fixed;
-    top: 0;
+    top: 3.5rem; // Hauteur du header
     left: 0;
     right: 0;
     background-color: $color-primary-bg;
-    padding: 5rem 2rem 2rem;
+    padding: 1rem;
     flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    height: auto;
-    max-height: 80vh;
-    overflow-y: auto;
+    width: 100%;
+    z-index: 99;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
-    transform: translateY(-100%);
     border-bottom-left-radius: $radius-lg;
     border-bottom-right-radius: $radius-lg;
 
     &.active {
       display: flex;
-      transform: translateY(0);
     }
 
     a {
       color: $color-text-primary;
       text-decoration: none;
       font-size: 1.1rem;
-      padding: 0.5rem 0;
+      padding: 0.8rem;
       width: 100%;
       text-align: center;
       transition: color 0.2s ease;
+      border-bottom: 1px solid $color-secondary;
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       &:hover {
         color: $color-accent;
+        background-color: rgba(255, 255, 255, 0.05);
       }
+    }
+
+    .auth-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
     }
 
     .login-btn {
       background-color: $color-accent;
       color: black;
-      padding: 0.5rem 1.5rem;
+      padding: 0.8rem;
       border-radius: $radius-md;
-      margin: 1rem 2rem 0 0;
+      margin-top: 1rem;
       font-weight: 700;
-      width: auto;
+      border: none;
 
       &:hover {
         background-color: $color-secondary;
         color: $color-text-primary;
+      }
+    }
+
+    .user-profile-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      background-color: $color-secondary;
+      border-radius: $radius-md;
+
+      .avatar {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        object-fit: cover;
       }
     }
 
@@ -160,22 +184,39 @@
       flex-direction: row;
       position: static;
       padding: 0;
-      transform: translateY(0);
       box-shadow: none;
       height: auto;
       background-color: transparent;
-      max-height: none;
       overflow-y: visible;
       border-radius: 0;
 
       a {
         width: auto;
         font-size: 1rem;
-        padding: 0;
+        padding: 0 1rem;
+        border-bottom: none;
+      }
+
+      .auth-container {
+        display: flex;
+        flex-direction: row;
+        width: auto;
+        align-items: center;
       }
 
       .login-btn {
         margin-top: 0;
+        padding: 0.5rem 1.5rem;
+      }
+
+      .user-profile-btn {
+        margin-top: 0;
+        padding: 0.5rem 1rem;
+        background-color: transparent;
+
+        &:hover {
+          background-color: $color-secondary;
+        }
       }
     }
   }

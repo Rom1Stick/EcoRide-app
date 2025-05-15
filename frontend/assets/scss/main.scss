@@ -15,12 +15,12 @@
 @use 'pages/index';
 @use 'pages/register';
 @use 'pages/login';
+@use 'pages/profile';
 
 // Components
 @use 'components/sections';
 @use 'components/form-error';
 @use 'components/overlay-spinner';
-@use 'components/profile';
 
 // Error
 @use 'error';
