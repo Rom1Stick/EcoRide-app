@@ -1,12 +1,46 @@
 import { initAuthUI } from '../common/auth.js';
+import { checkAdminAccess } from './admin-auth.js';
 
 // En-têtes globaux pour les requêtes API admin
 let headersGlobal = {};
 
-// S'assure que l'utilisateur est connecté et que le token est présent
+// S'assure que l'utilisateur est connecté et a les droits d'administration
 (async () => {
-  const authOK = await initAuthUI(); // initialise la UI et vérifie le token
-  if (!authOK) return; // arrêter si non authentifié
+  // Vérifier que l'utilisateur est authentifié
+  const authOK = await initAuthUI();
+  if (!authOK) return;
+
+  // Vérifier que l'utilisateur a les droits d'administration
+  const isAdmin = await checkAdminAccess();
+  if (!isAdmin) return;
+
+  // Configuration du bouton de déconnexion pour rediriger vers la page d'accueil
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    // Suppression de tous les écouteurs d'événements existants
+    const newLogoutBtn = logoutBtn.cloneNode(true);
+    logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+
+    // Ajout de notre écouteur d'événement personnalisé
+    newLogoutBtn.addEventListener('click', async () => {
+      try {
+        // Appel à l'API de déconnexion
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+
+        // Suppression du token d'authentification
+        localStorage.removeItem('auth_token');
+
+        // Redirection vers la page d'accueil
+        window.location.href = '/pages/public/index.html';
+      } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        alert('Une erreur est survenue lors de la déconnexion. Veuillez réessayer.');
+      }
+    });
+  }
 
   const token = localStorage.getItem('auth_token');
   if (!token) {

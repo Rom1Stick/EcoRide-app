@@ -2,51 +2,356 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="EcoRide - Application de covoiturage écoresponsable" />
-    <link rel="icon" href="../../assets/images/favicon.ico" />
-    <title>EcoRide - Covoiturage écoresponsable</title>
-    <link rel="stylesheet" href="../../assets/css/main.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="EcoRide - Plateforme de covoiturage éco-responsable, économique et conviviale"
+    />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>EcoRide – Covoiturage éco-responsable</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
   </head>
-  <body class="page-home">
+
+  <body class="index-page">
+    <!-- Header -->
     <header class="header">
       <div class="header__logo">
-        <img src="../../assets/images/logo.svg" alt="Logo EcoRide" />
+        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
       </div>
+      <!-- Menu de navigation desktop -->
       <nav class="header__nav">
-        <ul class="header__list">
-          <li class="header__item">
-            <a href="index.html" class="header__link header__link--active">Accueil</a>
-          </li>
-          <li class="header__item" id="nav-register">
-            <a href="register.html" class="header__link">Inscription</a>
-          </li>
-          <li class="header__item" id="nav-login">
-            <a href="login.html" class="header__link">Connexion</a>
-          </li>
-          <li class="header__item" id="nav-user" style="display: none">
-            <span id="user-greeting" class="header__link"></span>
-          </li>
-          <li class="header__item" id="nav-logout" style="display: none">
-            <button id="logout-btn" class="header__link button button--link">Déconnexion</button>
-          </li>
-        </ul>
-      </nav>
-    </header>
-    <main class="main">
-      <section class="hero">
-        <h1 class="hero__title">Bienvenue sur EcoRide</h1>
-        <p class="hero__text">Votre plateforme de covoiturage écoresponsable</p>
-        <div class="hero__cta">
-          <a href="register.html" class="button button--primary">S'inscrire</a>
-          <a href="login.html" class="button button--secondary">Se connecter</a>
+        <a href="/">Accueil</a>
+        <a href="./covoiturages.html">Covoiturages</a>
+        <a href="/contact">Contact</a>
+        <div class="auth-container">
+          <!-- Contenu remplacé dynamiquement par JavaScript -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <!-- Bouton de profil (caché par défaut) -->
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/Logo_EcoRide.svg"
+              alt="Avatar"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
         </div>
-      </section>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell"></i>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+          <div
+            class="hero__background"
+            style="background-image: url('../../assets/images/hero_bg1.svg')"
+          ></div>
+          <div class="hero__content">
+            <h1>Voyagez écologique, voyagez économique</h1>
+            <p>Rejoignez la communauté de covoiturage éco-responsable</p>
+            <form class="search-box" id="search-form" action="./covoiturages.html" method="get">
+              <label for="from">Départ</label>
+              <div class="input-group">
+                <i class="fa-solid fa-location-dot"></i>
+                <input
+                  type="text"
+                  id="from"
+                  name="from"
+                  placeholder="Ville de départ"
+                  required
+                  autocomplete="off"
+                />
+                <div class="autocomplete-container" id="from-autocomplete"></div>
+              </div>
+
+              <label for="to">Arrivée</label>
+              <div class="input-group">
+                <i class="fa-solid fa-location-dot"></i>
+                <input
+                  type="text"
+                  id="to"
+                  name="to"
+                  placeholder="Ville d'arrivée"
+                  required
+                  autocomplete="off"
+                />
+                <div class="autocomplete-container" id="to-autocomplete"></div>
+              </div>
+
+              <label for="date">Date</label>
+              <div class="input-group">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="date" name="date" required />
+              </div>
+
+              <button type="submit">Rechercher</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- À propos -->
+        <section id="about" class="section section--alt about">
+          <h2>À propos d'EcoRide</h2>
+          <div class="about-content">
+            <div class="about-text">
+              <p>
+                Notre mission est de rendre le covoiturage accessible à tous tout en réduisant
+                l'impact environnemental des déplacements quotidiens.
+              </p>
+              <div class="stats">
+                <div class="stat">
+                  <div class="value">5000+</div>
+                  <div class="label">Trajets partagés</div>
+                </div>
+                <div class="stat">
+                  <div class="value">-2.5T</div>
+                  <div class="label">CO2 économisé</div>
+                </div>
+              </div>
+            </div>
+            <img
+              src="../../assets/images/about.svg"
+              alt="Illustration EcoRide"
+              class="illustration"
+            />
+          </div>
+        </section>
+
+        <!-- Avantages -->
+        <section class="section section--primary benefits">
+          <h2>Nos avantages</h2>
+          <div class="benefits__grid">
+            <div class="card">
+              <i class="fa-solid fa-wallet"></i>
+              <h3>Économie financière</h3>
+              <p>Réduisez vos frais de transport quotidiens</p>
+            </div>
+            <div class="card">
+              <i class="fa-solid fa-leaf"></i>
+              <h3>Écologique</h3>
+              <p>Réduisez votre empreinte carbone</p>
+            </div>
+            <div class="card">
+              <i class="fa-solid fa-users"></i>
+              <h3>Convivial</h3>
+              <p>Rencontrez de nouvelles personnes</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Témoignages -->
+        <section class="section section--alt testimonials">
+          <h2>Témoignages</h2>
+          <div class="testimonials__slider">
+            <div class="testimonial">
+              <div class="user">
+                <img src="../../assets/images/profile_Marie.svg" alt="Marie D." />
+                <div>
+                  <div class="name">Marie D.</div>
+                  <div class="stars">★★★★★</div>
+                </div>
+              </div>
+              <p>"Super expérience ! J'économise et je fais ma part pour l'environnement."</p>
+            </div>
+            <div class="testimonial">
+              <div class="user">
+                <img src="../../assets/images/profile_Paul.svg" alt="Paul M." />
+                <div>
+                  <div class="name">Paul M.</div>
+                  <div class="stars">★★★★☆</div>
+                </div>
+              </div>
+              <p>"Application très intuitive et communauté sympathique !"</p>
+            </div>
+            <div class="testimonial">
+              <div class="user">
+                <img src="../../assets/images/profile_Claire.svg" alt="Claire B." />
+                <div>
+                  <div class="name">Claire B.</div>
+                  <div class="stars">★★★★★</div>
+                </div>
+              </div>
+              <p>
+                "EcoRide m'a permis de faire de belles rencontres tout en réduisant mon budget
+                transport."
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Appel à l'action -->
+        <section class="cta">
+          <h2>Rejoignez notre communauté éco-responsable</h2>
+          <p>Créez votre compte gratuitement et commencez à covoiturer</p>
+          <button class="btn btn--primary" onclick="window.location.href='./register.html'">
+            Créer un compte
+          </button>
+          <div class="eco-label">
+            <i class="fa-solid fa-award"></i>
+            <div class="label">Certifié éco-responsable</div>
+          </div>
+        </section>
+      </div>
     </main>
+
+    <!-- Pied de page -->
     <footer class="footer">
-      <p class="footer__text">&copy; 2025 EcoRide</p>
+      <div class="container">
+        <div class="footer__top">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope"></i>
+            contact@ecoride.com
+          </p>
+          <p>
+            <i class="fa-solid fa-phone"></i>
+            01 23 45 67 89
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><a href="./index.html">Accueil</a></li>
+              <li><a href="./index.html#about">À propos</a></li>
+              <li><a href="./covoiturages.html">Services</a></li>
+              <li><a href="/contact">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><a href="./conditions.html">Conditions</a></li>
+              <li><a href="./confidentialite.html">Confidentialité</a></li>
+              <li><a href="./cookies.html">Cookies</a></li>
+              <li><a href="./mentions-legales.html">Mentions légales</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
     </footer>
+
+    <!-- Scripts -->
     <script type="module" src="../../assets/js/common/api.js"></script>
     <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+    <script type="module" src="../../assets/js/pages/index.js"></script>
+
+    <!-- Style supplémentaire pour les suggestions d'autocomplétion -->
+    <style>
+      .autocomplete-container {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #4e342e;
+        border-radius: 0 0 0.75rem 0.75rem;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 100;
+      }
+
+      .autocomplete-container.active {
+        max-height: 300px;
+        overflow-y: auto;
+        opacity: 1;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid #388e3c;
+        border-top: none;
+      }
+
+      .suggestion-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(168, 176, 165, 0.2);
+        transition: background-color 0.2s ease;
+        color: #f1f1f1;
+      }
+
+      .suggestion-item:last-child {
+        border-bottom: none;
+      }
+
+      .suggestion-item:hover,
+      .suggestion-item.selected {
+        background-color: #388e3c;
+      }
+
+      .suggestion-item .main-text {
+        font-weight: 600;
+      }
+
+      .suggestion-item .main-text strong {
+        color: #ffc107;
+        font-weight: 700;
+      }
+
+      .suggestion-item .sub-text {
+        font-size: 0.8rem;
+        color: #a8b0a5;
+        margin-top: 0.25rem;
+      }
+
+      .error-message {
+        color: #ff3d00;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        display: block;
+        font-weight: 600;
+        animation: shake 0.5s ease-in-out;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+
+      .input-group {
+        position: relative;
+      }
+    </style>
   </body>
 </html>

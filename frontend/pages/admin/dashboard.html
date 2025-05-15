@@ -7,25 +7,47 @@
     <link rel="icon" href="../../assets/images/favicon.ico" />
     <title>Dashboard Administration - EcoRide</title>
     <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
   </head>
   <body class="page-admin">
     <header class="header header--admin">
       <div class="header__logo">
         <img src="../../assets/images/LogoText_Ecoride.svg" alt="Logo EcoRide" />
       </div>
-      <nav class="header__nav">
+      <!-- Bouton menu mobile -->
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Ouvrir le menu"
+        aria-expanded="false"
+      >
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <nav class="header__nav" id="admin-nav">
         <ul class="header__list">
           <li class="header__item">
-            <a href="dashboard.html" class="header__link header__link--active">Tableau de bord</a>
+            <a href="dashboard.html" class="header__link header__link--active">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Tableau de bord</span>
+            </a>
           </li>
           <li class="header__item">
-            <a href="manage-users.html" class="header__link">Gestion des utilisateurs</a>
+            <a href="manage-users.html" class="header__link">
+              <i class="fa-solid fa-users"></i>
+              <span>Gestion des utilisateurs</span>
+            </a>
           </li>
           <li class="header__item">
-            <a href="/pages/public/index.html" class="header__link">Voir le site</a>
+            <a href="/pages/public/index.html" class="header__link">
+              <i class="fa-solid fa-globe"></i>
+              <span>Voir le site</span>
+            </a>
           </li>
           <li class="header__item">
-            <button id="logout-btn" class="header__link">Déconnexion</button>
+            <button id="logout-btn" class="header__link">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>Déconnexion</span>
+            </button>
           </li>
         </ul>
       </nav>
@@ -71,8 +93,21 @@
             </thead>
             <tbody id="pending-users-tbody">
               <!-- Les données seront chargées dynamiquement via JavaScript -->
+              <!-- Template d'exemple pour le JavaScript -->
+              <tr id="user-row-template" style="display: none">
+                <td data-label="Nom" class="user-name"></td>
+                <td data-label="Email" class="user-email"></td>
+                <td data-label="Date" class="user-date"></td>
+                <td data-label="État" class="user-status"></td>
+                <td data-label="Actions" class="user-actions">
+                  <button class="approve-btn">Approuver</button>
+                </td>
+              </tr>
             </tbody>
           </table>
+          <div class="table-empty-state" id="no-users-message" style="display: none">
+            <p>Aucun utilisateur récemment inscrit</p>
+          </div>
         </div>
       </div>
     </main>
@@ -80,6 +115,9 @@
       <p class="footer__text">&copy; 2025 EcoRide - Administration</p>
     </footer>
     <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/admin/admin-auth.js"></script>
     <script type="module" src="../../assets/js/admin/dashboard.js"></script>
+    <script src="../../assets/js/admin/admin-menu.js"></script>
+    <script src="../../assets/js/admin/admin-tables.js"></script>
   </body>
 </html>

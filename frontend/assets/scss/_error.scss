@@ -23,13 +23,13 @@
   &__title {
     font-size: 2rem;
     margin-bottom: $spacing;
-    color: $color-primary;
+    color: $color-primary-bg;
   }
 
   &__text {
     font-size: 1.2rem;
     margin-bottom: $spacing * 2;
-    color: $text-color;
+    color: $color-text-primary;
   }
 
   &__code {

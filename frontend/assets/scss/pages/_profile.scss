@@ -1,0 +1,429 @@
+@use 'sass:math';
+@import '../abstracts/variables';
+
+/* Page de profil - Mobile first */
+.profile-page {
+  background-color: $color-text-primary;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-section {
+  padding: $spacing;
+  flex: 1;
+  
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: $spacing;
+    color: $color-primary-bg;
+  }
+}
+
+/* Container principal du profil */
+.profile-container {
+  background-color: $color-text-primary;
+  border-radius: $radius-md;
+  border: 1px solid $color-text-secondary;
+  overflow: hidden;
+}
+
+/* En-tête du profil avec avatar */
+.profile-header {
+  padding: $spacing;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $color-text-primary;
+  border-bottom: 1px solid $color-text-secondary;
+  
+  .profile-image {
+    position: relative;
+    margin-bottom: $spacing;
+    
+    img {
+      width: 6rem;
+      height: 6rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid $color-accent;
+    }
+    
+    .edit-profile-image {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background-color: $color-secondary;
+      color: $color-text-primary;
+      border: none;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid $color-text-secondary;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: $color-primary-bg;
+      }
+    }
+  }
+  
+  .profile-info {
+    text-align: center;
+    width: 100%;
+    
+    h2 {
+      margin: 0 0 $spacing * 0.25;
+      font-size: 1.25rem;
+      color: $color-primary-bg;
+    }
+    
+    p {
+      color: $color-text-secondary;
+      font-size: 0.9rem;
+      margin-bottom: $spacing * 0.75;
+    }
+  }
+}
+
+/* Statistiques du profil */
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: $spacing;
+  margin-top: $spacing * 0.5;
+  
+  .stat {
+    text-align: center;
+    
+    .value {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: $color-secondary;
+    }
+    
+    .label {
+      font-size: 0.8rem;
+      color: $color-text-secondary;
+    }
+  }
+}
+
+/* Onglets du profil */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid $color-text-secondary;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  .tab-button {
+    flex: 1;
+    min-width: fit-content;
+    padding: $spacing * 0.75 $spacing * 0.5;
+    background-color: transparent;
+    border: none;
+    color: $color-text-secondary;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    white-space: nowrap;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: transparent;
+      transition: background-color 0.2s;
+    }
+    
+    &.active {
+      color: $color-primary-bg;
+      font-weight: 600;
+      
+      &:after {
+        background-color: $color-primary-bg;
+      }
+    }
+    
+    &:hover:not(.active) {
+      color: $color-secondary;
+      
+      &:after {
+        background-color: $color-secondary;
+      }
+    }
+  }
+}
+
+/* Contenu des onglets */
+.tab-content {
+  padding: $spacing;
+  
+  &.hidden {
+    display: none;
+  }
+}
+
+/* Formulaire du profil */
+.profile-form {
+  .form-group {
+    margin-bottom: $spacing;
+    
+    label {
+      display: block;
+      margin-bottom: $spacing * 0.25;
+      font-size: 0.9rem;
+      color: $color-text-secondary;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: $spacing * 0.75;
+      border: 1px solid $color-text-secondary;
+      border-radius: $radius-md;
+      font-size: 1rem;
+      background-color: $color-text-primary;
+      
+      &:focus {
+        outline: none;
+        border-color: $color-secondary;
+        border-width: 2px;
+      }
+    }
+    
+    textarea {
+      min-height: $spacing * 5;
+      resize: vertical;
+    }
+  }
+  
+  .btn-primary {
+    background-color: $color-primary-bg;
+    color: $color-text-primary;
+    border: none;
+    border-radius: $radius-md;
+    padding: $spacing * 0.75 $spacing * 1.5;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    
+    &:hover {
+      background-color: $color-secondary;
+    }
+  }
+}
+
+/* Options de paramètres */
+.settings-options {
+  .setting-group {
+    margin-bottom: $spacing * 1.5;
+    padding-bottom: $spacing;
+    border-bottom: 1px solid $color-text-secondary;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: $spacing * 0.75;
+      color: $color-primary-bg;
+    }
+  }
+  
+  .switch-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing * 0.5;
+    
+    label {
+      font-size: 0.9rem;
+    }
+    
+    /* Switch toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 3rem;
+      height: 1.5rem;
+      
+      input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        
+        &:checked + .slider {
+          background-color: $color-secondary;
+          
+          &:before {
+            transform: translateX(1.5rem);
+          }
+        }
+      }
+      
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: $color-text-secondary;
+        border-radius: 1.5rem;
+        transition: .3s;
+        
+        &:before {
+          position: absolute;
+          content: "";
+          height: 1.1rem;
+          width: 1.1rem;
+          left: 0.2rem;
+          bottom: 0.2rem;
+          background-color: $color-text-primary;
+          border-radius: 50%;
+          transition: .3s;
+        }
+      }
+    }
+  }
+  
+  /* Boutons de paramètres */
+  .btn-secondary, .btn-danger {
+    width: 100%;
+    padding: $spacing * 0.75;
+    border: none;
+    border-radius: $radius-md;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: $spacing * 0.5;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-secondary {
+    background-color: $color-secondary;
+    color: $color-text-primary;
+    
+    &:hover {
+      background-color: $color-primary-bg;
+    }
+  }
+  
+  .btn-danger {
+    background-color: $color-surface-alt;
+    color: $color-text-primary;
+    
+    &:hover {
+      background-color: $color-primary-bg;
+    }
+  }
+  
+  .danger-zone {
+    background-color: $color-text-primary;
+    padding: $spacing;
+    border-radius: $radius-md;
+    border: 1px solid $color-surface-alt;
+  }
+}
+
+/* État vide */
+.empty-state {
+  text-align: center;
+  padding: $spacing * 2;
+  color: $color-text-secondary;
+  font-style: italic;
+}
+
+/* Responsive - Tablette */
+@media (min-width: $breakpoint-tablet) {
+  .profile-section {
+    padding: $spacing * 1.5;
+  }
+  
+  .profile-header {
+    flex-direction: row;
+    align-items: flex-start;
+    
+    .profile-image {
+      margin-right: $spacing * 1.5;
+      margin-bottom: 0;
+    }
+    
+    .profile-info {
+      text-align: left;
+    }
+  }
+  
+  .profile-stats {
+    justify-content: flex-start;
+  }
+  
+  .profile-tabs {
+    .tab-button {
+      padding: $spacing $spacing * 1.25;
+    }
+  }
+  
+  .profile-form {
+    .btn-primary {
+      width: auto;
+      padding: $spacing * 0.75 $spacing * 2;
+    }
+  }
+  
+  .settings-options {
+    .btn-secondary, .btn-danger {
+      width: auto;
+      padding: $spacing * 0.75 $spacing * 1.5;
+    }
+  }
+}
+
+/* Responsive - Desktop */
+@media (min-width: $breakpoint-desktop) {
+  .profile-section {
+    padding: $spacing * 2;
+    
+    h1 {
+      font-size: 1.8rem;
+    }
+  }
+  
+  .profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .profile-header {
+    padding: $spacing * 1.5;
+    
+    .profile-image img {
+      width: 8rem;
+      height: 8rem;
+    }
+    
+    .profile-info h2 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .profile-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing;
+    
+    .form-group:last-of-type {
+      grid-column: span 2;
+    }
+  }
+} 
