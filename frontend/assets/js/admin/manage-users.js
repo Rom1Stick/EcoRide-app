@@ -1,12 +1,18 @@
 import { initAuthUI } from '../common/auth.js';
+import { checkAdminAccess } from './admin-auth.js';
 
 // En-têtes globaux pour les requêtes API admin
 let headersGlobal = {};
 
-// S'assure que l'utilisateur est connecté et que le token est présent
+// S'assure que l'utilisateur est connecté et a les droits d'administration
 (async () => {
-  const authOK = await initAuthUI(); // initialise la UI et vérifie le token
-  if (!authOK) return; // arrêter si non authentifié
+  // Vérifier que l'utilisateur est authentifié
+  const authOK = await initAuthUI();
+  if (!authOK) return;
+
+  // Vérifier que l'utilisateur a les droits d'administration
+  const isAdmin = await checkAdminAccess();
+  if (!isAdmin) return;
 
   // Configuration du bouton de déconnexion pour rediriger vers la page d'accueil
   const logoutBtn = document.getElementById('logout-btn');
@@ -14,7 +20,7 @@ let headersGlobal = {};
     // Suppression de tous les écouteurs d'événements existants
     const newLogoutBtn = logoutBtn.cloneNode(true);
     logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-    
+
     // Ajout de notre écouteur d'événement personnalisé
     newLogoutBtn.addEventListener('click', async () => {
       try {
@@ -23,10 +29,10 @@ let headersGlobal = {};
           method: 'POST',
           credentials: 'include',
         });
-        
+
         // Suppression du token d'authentification
         localStorage.removeItem('auth_token');
-        
+
         // Redirection vers la page d'accueil
         window.location.href = '/pages/public/index.html';
       } catch (error) {

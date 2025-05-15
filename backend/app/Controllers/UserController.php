@@ -59,18 +59,40 @@ class UserController extends Controller
             $user['photo_path'] = '/assets/images/Logo_EcoRide.svg';
         }
 
+        // Récupérer les rôles de l'utilisateur
+        $rolesStmt = $db->prepare(
+            'SELECT r.role_id AS id, r.libelle AS name
+             FROM Role r
+             JOIN Possede p ON r.role_id = p.role_id
+             WHERE p.utilisateur_id = ?'
+        );
+        $rolesStmt->execute([$userId]);
+        $roles = $rolesStmt->fetchAll(\PDO::FETCH_ASSOC);
+
         // Nettoyer les données sensibles
         unset($user['mot_passe']);
 
-        return $this->success(
-            [
-                'id'        => (int)$user['id'],
-                'name'      => $user['name'],
-                'email'     => $user['email'],
-                'username'  => $user['pseudo'],
-                'photoPath' => $user['photo_path']
-            ]
-        );
+        // Créer une réponse structurée
+        $userData = [
+            'id'        => (int)$user['id'],
+            'name'      => $user['name'],
+            'email'     => $user['email'],
+            'username'  => $user['pseudo'],
+            'photoPath' => $user['photo_path'],
+            'roles'     => $roles
+        ];
+
+        // Marquer l'utilisateur comme admin s'il a un rôle d'administrateur
+        $isAdmin = false;
+        foreach ($roles as $role) {
+            if (stripos($role['name'], 'admin') !== false) {
+                $isAdmin = true;
+                break;
+            }
+        }
+        $userData['isAdmin'] = $isAdmin;
+
+        return $this->success($userData);
     }
 
     /**

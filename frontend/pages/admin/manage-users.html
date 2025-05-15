@@ -13,7 +13,12 @@
         <img src="../../assets/images/LogoText_Ecoride.svg" alt="Logo EcoRide" />
       </div>
       <!-- Bouton menu mobile -->
-      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Ouvrir le menu"
+        aria-expanded="false"
+      >
         <i class="fa-solid fa-bars"></i>
       </button>
       <nav class="header__nav" id="admin-nav">
@@ -49,7 +54,7 @@
       <div class="admin-header">
         <h1 class="admin-header__title">Gestion des utilisateurs</h1>
       </div>
-      
+
       <div class="admin-table">
         <div class="table-scroll-indicator">
           <span>Faire défiler pour voir tous les détails</span>
@@ -67,7 +72,7 @@
           <tbody id="users-tbody">
             <!-- Chargé dynamiquement -->
             <!-- Template d'exemple pour le JavaScript -->
-            <tr id="user-row-template" style="display: none;">
+            <tr id="user-row-template" style="display: none">
               <td data-label="Nom" class="user-name"></td>
               <td data-label="Email" class="user-email"></td>
               <td data-label="Rôles" class="user-roles"></td>
@@ -82,7 +87,7 @@
             </tr>
           </tbody>
         </table>
-        <div class="table-empty-state" id="no-users-message" style="display: none;">
+        <div class="table-empty-state" id="no-users-message" style="display: none">
           <p>Aucun utilisateur trouvé</p>
         </div>
       </div>
@@ -90,6 +95,8 @@
     <footer class="footer footer--admin">
       <p class="footer__text">&copy; 2025 EcoRide - Administration</p>
     </footer>
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/admin/admin-auth.js"></script>
     <script type="module" src="../../assets/js/admin/manage-users.js"></script>
     <script src="../../assets/js/admin/admin-menu.js"></script>
     <script src="../../assets/js/admin/admin-tables.js"></script>
