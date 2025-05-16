@@ -1,0 +1,121 @@
+@use '../../abstracts/variables' as *;
+@use '../../abstracts/mixins' as *;
+
+// Styles pour la mise en page générale de la page de covoiturages
+
+// Styles spécifiques à la page de résultats uniquement
+.results-page {
+  // Style pour s'assurer que la page results-page fonctionne correctement avec le footer
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  // Ajustement pour que le contenu puisse défiler normalement avec le footer à sa taille d'origine
+  main {
+    // Le header a une position fixed avec une hauteur de 3.5rem en mobile et 4rem en desktop
+    min-height: calc(100vh - 3.5rem);
+    margin-top: 3.5rem; // Ajoute une marge égale à la hauteur du header pour éviter la superposition
+
+    @include tablet {
+      min-height: calc(100vh - 4rem);
+      margin-top: 4rem; // Marge adaptée pour tablette
+    }
+
+    @include desktop {
+      min-height: calc(100vh - 4rem);
+      margin-top: 4rem; // Marge adaptée pour desktop
+    }
+
+    .container {
+      padding: 1rem;
+      padding-top: 1.5rem; // Marge supplémentaire entre le bord supérieur du conteneur et son contenu
+
+      @include tablet {
+        padding: 1.25rem;
+        padding-top: 1.5rem;
+      }
+
+      @include desktop {
+        padding: 1.5rem;
+        padding-top: 1.5rem;
+        margin-top: 2rem;
+      }
+    }
+  }
+
+  // Grid layout occupe tout l'espace disponible
+  .grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @include tablet {
+      gap: 1.25rem;
+    }
+
+    @include desktop {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  // Colonne de gauche (4/12)
+  .search-column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @include desktop {
+      grid-column: span 4;
+    }
+  }
+
+  // Colonne de droite (8/12)
+  .results-column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+
+    @include desktop {
+      grid-column: span 8;
+      overflow: hidden; // Le défilement est géré uniquement dans .results-list
+    }
+  }
+
+  // Scrollbars plus fines pour les zones de défilement
+  .results-list,
+  .search-column,
+  .results-column {
+    scrollbar-width: thin;
+    scrollbar-color: $color-accent $color-primary-bg;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $color-primary-bg;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: $color-accent;
+      border-radius: $radius-md;
+    }
+  }
+}
+
+// Ajout d'une classe pour les éléments masqués visuellement mais accessibles aux lecteurs d'écran
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

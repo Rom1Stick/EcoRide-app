@@ -2,6 +2,8 @@
  * Gestion de la recherche et de l'affichage des covoiturages
  */
 
+// Styles pour la page de résultats de covoiturages
+
 // URL de l'API Adresse du gouvernement français
 const API_URL = 'https://api-adresse.data.gouv.fr';
 
@@ -49,17 +51,166 @@ function init() {
   // Gestion de la soumission du formulaire
   searchForm.addEventListener('submit', handleSearch);
 
-  // Gestion des filtres de résultats
-  const filterPrice = document.getElementById('filter-price');
-  const filterTime = document.getElementById('filter-time');
-  const filterRating = document.getElementById('filter-rating');
+  // Configuration des boutons de la section résultats
+  setupResultsButtons();
 
-  if (filterPrice) filterPrice.addEventListener('click', () => applyFilter('price'));
-  if (filterTime) filterTime.addEventListener('click', () => applyFilter('time'));
-  if (filterRating) filterRating.addEventListener('click', () => applyFilter('rating'));
+  // Gestion des filtres de résultats
+  const filterSelect = document.getElementById('sort-filter');
+  if (filterSelect) {
+    filterSelect.addEventListener('change', function () {
+      const filterType = this.value;
+      if (filterType) {
+        applyFilter(filterType);
+      }
+    });
+  }
 
   // Récupérer les paramètres d'URL pour pré-remplir le formulaire et lancer la recherche
-  setFormFromUrlParams();
+  const hasUrlParams = setFormFromUrlParams();
+
+  // Si aucun paramètre d'URL, simuler une recherche avec des villes par défaut
+  if (!hasUrlParams) {
+    simulateSearch();
+  }
+
+  // Gestion des filtres avancés
+  const toggleFiltersBtn = document.getElementById('toggle-filters');
+  const filtersContent = document.getElementById('filters-content');
+
+  if (toggleFiltersBtn && filtersContent) {
+    // Vérifier si on est en mode desktop
+    const isDesktop = window.innerWidth >= 1024; // Correspond à notre mixin desktop
+
+    // En mobile : masquer les filtres avancés par défaut
+    // En desktop : toujours afficher les filtres
+    if (!isDesktop) {
+      // Forcer l'état fermé sur mobile
+      filtersContent.style.display = 'none';
+      toggleFiltersBtn.setAttribute('aria-expanded', 'false');
+      // S'assurer que l'icône est correcte
+      const chevronIcon = toggleFiltersBtn.querySelector('.fa-chevron-down, .fa-chevron-up');
+      if (chevronIcon) {
+        chevronIcon.className = 'fa-solid fa-chevron-down';
+      }
+    } else {
+      filtersContent.style.display = 'flex';
+      toggleFiltersBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    // Gestion du toggle des filtres avancés
+    toggleFiltersBtn.addEventListener('click', function () {
+      const expanded = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', !expanded);
+
+      // Référence au contenu à afficher/masquer
+      const filtersContent = document.getElementById('filters-content');
+
+      // Référence à l'icône de chevron
+      const chevronIcon = this.querySelector('.fa-chevron-down, .fa-chevron-up');
+
+      if (expanded) {
+        // Animation de fermeture
+        if (filtersContent) {
+          filtersContent.style.display = 'none';
+        }
+
+        // Changer l'icône pour indiquer que le contenu est fermé
+        if (chevronIcon) {
+          chevronIcon.className = 'fa-solid fa-chevron-down';
+        }
+      } else {
+        // Animation d'ouverture
+        if (filtersContent) {
+          filtersContent.style.display = 'flex';
+        }
+
+        // Changer l'icône pour indiquer que le contenu est ouvert
+        if (chevronIcon) {
+          chevronIcon.className = 'fa-solid fa-chevron-up';
+        }
+      }
+    });
+
+    // Ajuster l'affichage des filtres lors du redimensionnement de la fenêtre
+    window.addEventListener('resize', function () {
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop) {
+        filtersContent.style.display = 'flex';
+        toggleFiltersBtn.setAttribute('aria-expanded', 'true');
+      } else if (toggleFiltersBtn.getAttribute('aria-expanded') === 'false') {
+        filtersContent.style.display = 'none';
+      }
+    });
+
+    // Gestion du changement de valeur du prix maximum
+    const maxPriceInput = document.getElementById('max-price');
+    if (maxPriceInput) {
+      maxPriceInput.addEventListener('input', function () {
+        document.getElementById('price-label').textContent = `Prix maximum: ${this.value}€`;
+        maxPriceInput.setAttribute('aria-valuenow', this.value);
+        maxPriceInput.setAttribute('aria-valuetext', `${this.value}€`);
+
+        // Appliquer les filtres immédiatement si des résultats sont déjà affichés
+        if (resultsList && resultsList.children.length > 0) {
+          applyAdvancedFilters();
+        }
+      });
+    }
+
+    // Ajouter les événements pour les cases à cocher des filtres avancés
+    const advancedFilterCheckboxes = [
+      'electric-only',
+      'verified-only',
+      'non-smoking',
+      'pets-allowed',
+    ];
+
+    advancedFilterCheckboxes.forEach((id) => {
+      const checkbox = document.getElementById(id);
+      if (checkbox) {
+        checkbox.addEventListener('change', function () {
+          if (resultsList) {
+            // Appliquer les filtres avancés aux résultats
+            applyAdvancedFilters();
+          }
+        });
+      }
+    });
+
+    // Gestion du bouton de réinitialisation des filtres
+    const resetFiltersBtn = document.getElementById('reset-filters');
+    if (resetFiltersBtn) {
+      resetFiltersBtn.addEventListener('click', function () {
+        // Réinitialiser tous les checkboxes
+        advancedFilterCheckboxes.forEach((id) => {
+          const checkbox = document.getElementById(id);
+          if (checkbox) {
+            checkbox.checked = false;
+          }
+        });
+
+        // Réinitialiser le curseur de prix
+        if (maxPriceInput) {
+          maxPriceInput.value = 50;
+          document.getElementById('price-label').textContent = 'Prix maximum: 50€';
+          maxPriceInput.setAttribute('aria-valuenow', 50);
+          maxPriceInput.setAttribute('aria-valuetext', '50€');
+        }
+
+        // Appliquer les filtres réinitialisés
+        if (resultsList && resultsList.children.length > 0) {
+          // Retirer tous les filtres et afficher tous les résultats
+          const allRideCards = document.querySelectorAll('.ride-card');
+          allRideCards.forEach((card) => {
+            card.style.display = 'block';
+          });
+
+          // Mettre à jour le compteur de résultats
+          resultsCount.textContent = `${allRideCards.length} trajet(s) trouvé(s)`;
+        }
+      });
+    }
+  }
 }
 
 /**
@@ -445,6 +596,8 @@ async function setFormFromUrlParams() {
       handleSearch(new Event('submit'));
     }, 500);
   }
+
+  return from && to && date;
 }
 
 /**
@@ -471,12 +624,8 @@ function displayLoadingResults() {
 function getMockResults(from, to, date) {
   // Dans un cas réel, ces données viendraient d'une API
 
-  // Générer un nombre aléatoire de résultats entre 0 et 5
-  const count = Math.floor(Math.random() * 6);
-
-  if (count === 0) {
-    return [];
-  }
+  // Générer un nombre aléatoire de résultats entre 10 et 20
+  const count = Math.floor(Math.random() * 11) + 10;
 
   const results = [];
   const dateObj = new Date(date);
@@ -485,6 +634,19 @@ function getMockResults(from, to, date) {
     day: 'numeric',
     month: 'long',
   });
+
+  // Liste des prénoms pour les conducteurs
+  const firstNames = ['Sophie', 'Thomas', 'Marie', 'Lucas', 'Camille'];
+  const lastInitials = ['D.', 'M.', 'L.', 'B.', 'R.'];
+
+  // Précharger les images pour éviter les erreurs 404
+  const profilePics = [
+    '../../assets/images/profile_Marie.svg',
+    '../../assets/images/profile_Paul.svg',
+    '../../assets/images/profile_Claire.svg',
+    '../../assets/images/profile_Sophie.svg',
+    '../../assets/images/profile_Thomas.svg',
+  ];
 
   for (let i = 0; i < count; i++) {
     // Générer une heure aléatoire entre 6h et 20h
@@ -501,6 +663,28 @@ function getMockResults(from, to, date) {
     // Places disponibles aléatoires entre 1 et 4
     const availableSeats = Math.floor(Math.random() * 4) + 1;
 
+    // Calcul de l'heure d'arrivée
+    const durationMinutes = Math.floor(Math.random() * 150) + 30;
+
+    // Calcul du temps de trajet pour l'affichage
+    const durationHours = Math.floor(durationMinutes / 60);
+    const remainingMinutes = durationMinutes % 60;
+    const durationStr =
+      durationHours > 0
+        ? `${durationHours}h${remainingMinutes > 0 ? remainingMinutes : ''}`
+        : `${remainingMinutes}min`;
+
+    // Choisir un index aléatoire pour les noms/images
+    const nameIndex = Math.floor(Math.random() * firstNames.length);
+    const lastNameIndex = Math.floor(Math.random() * lastInitials.length);
+    const imageIndex = Math.floor(Math.random() * profilePics.length);
+
+    // Données aléatoires pour les filtres
+    const electricVehicle = Math.random() > 0.7;
+    const nonSmoking = Math.random() > 0.4;
+    const petsAllowed = Math.random() > 0.6;
+    const driverVerified = Math.random() > 0.5;
+
     results.push({
       id: `trip-${i}`,
       from: from,
@@ -509,17 +693,19 @@ function getMockResults(from, to, date) {
       time: formattedTime,
       price: price,
       driver: {
-        name:
-          ['Sophie', 'Thomas', 'Marie', 'Lucas', 'Camille'][Math.floor(Math.random() * 5)] +
-          ' ' +
-          ['D.', 'M.', 'L.', 'B.', 'R.'][Math.floor(Math.random() * 5)],
+        name: firstNames[nameIndex] + ' ' + lastInitials[lastNameIndex],
         rating: rating,
         trips: Math.floor(Math.random() * 80) + 20,
-        image: `../../assets/images/profile_${['Sophie', 'Thomas', 'Marie', 'Lucas', 'Camille'][Math.floor(Math.random() * 5)]}.svg`,
+        image: profilePics[imageIndex],
       },
       vehicleType: ['Citadine', 'Berline', 'SUV', 'Compacte'][Math.floor(Math.random() * 4)],
       co2Saved: Math.floor(Math.random() * 30) + 10,
       availableSeats: availableSeats,
+      duration: durationStr,
+      electricVehicle: electricVehicle,
+      nonSmoking: nonSmoking,
+      petsAllowed: petsAllowed,
+      driverVerified: driverVerified,
     });
   }
 
@@ -527,90 +713,358 @@ function getMockResults(from, to, date) {
 }
 
 /**
+ * Construit le HTML pour afficher la notation en étoiles
+ * @param {number} rating - La note du conducteur
+ * @returns {string} - Le HTML des étoiles
+ */
+function buildStarRating(rating) {
+  if (!rating) return '';
+
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+  let starsHTML = '';
+
+  // Ajouter les étoiles pleines
+  for (let i = 0; i < fullStars; i++) {
+    starsHTML += '<i class="fa-solid fa-star"></i>';
+  }
+
+  // Ajouter une demi-étoile si nécessaire
+  if (halfStar) {
+    starsHTML += '<i class="fa-solid fa-star-half-stroke"></i>';
+  }
+
+  // Ajouter les étoiles vides
+  for (let i = 0; i < emptyStars; i++) {
+    starsHTML += '<i class="fa-regular fa-star"></i>';
+  }
+
+  return starsHTML;
+}
+
+/**
+ * Construit et retourne le HTML pour les badges d'options d'un trajet
+ * @param {Object} ride - Données du trajet
+ * @returns {string} - HTML pour les badges d'options
+ */
+function buildOptionBadges(ride) {
+  const badges = [];
+
+  // Vérifier si c'est un véhicule électrique
+  if (ride.car && ride.car.electric) {
+    badges.push(`
+      <div class="badge" title="Véhicule électrique">
+        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+        Électrique
+      </div>
+    `);
+  }
+
+  // Vérifier si le conducteur est vérifié
+  if (ride.driver && ride.driver.verified) {
+    badges.push(`
+      <div class="badge" title="Conducteur vérifié">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        Vérifié
+      </div>
+    `);
+  }
+
+  // Vérifier les préférences
+  if (ride.preferences) {
+    // Non-fumeur
+    if (ride.preferences.nonSmoking) {
+      badges.push(`
+        <div class="badge" title="Trajet non-fumeur">
+          <i class="fa-solid fa-smoking-ban" aria-hidden="true"></i>
+          Non-fumeur
+        </div>
+      `);
+    }
+
+    // Animaux acceptés
+    if (ride.preferences.petsAllowed) {
+      badges.push(`
+        <div class="badge" title="Animaux acceptés">
+          <i class="fa-solid fa-paw" aria-hidden="true"></i>
+          Animaux
+        </div>
+      `);
+    }
+  }
+
+  // Si aucun badge, retourner une chaîne vide
+  if (badges.length === 0) {
+    return '';
+  }
+
+  // Sinon, retourner les badges dans un conteneur
+  return `
+    <div class="option-badges">
+      ${badges.join('')}
+    </div>
+  `;
+}
+
+/**
  * Affiche les résultats de recherche
  * @param {Array} results - Tableau des résultats à afficher
+ * @param {boolean} isInitialLoad - Indique s'il s'agit du chargement initial
  */
-function displayResults(results) {
-  // Mise à jour du compteur de résultats
-  resultsCount.textContent = `${results.length} trajet(s) trouvé(s)`;
+function displayResults(results, isInitialLoad = true) {
+  if (!resultsList) return;
 
-  // Si aucun résultat, afficher l'état vide
   if (results.length === 0) {
     resultsList.innerHTML = `
-      <div class="result-card result-card--empty">
-        <div class="empty-state">
-          <i class="fa-solid fa-car-side"></i>
-          <p>Aucun trajet disponible pour cette recherche.</p>
-          <p>Essayez de modifier vos critères ou de choisir une autre date.</p>
+      <div class="empty-results">
+        <i class="fa-solid fa-route-slash" aria-hidden="true"></i>
+        <p>Aucun covoiturage ne correspond à votre recherche.</p>
+        <p>Essayez de modifier vos critères ou de rechercher à une autre date.</p>
+        <div class="suggest-alert">
+          <i class="fa-solid fa-bell" aria-hidden="true"></i>
+          Créez une alerte pour être informé dès qu'un trajet est disponible.
         </div>
       </div>
     `;
+    if (resultsCount) {
+      resultsCount.textContent = '0 trajet trouvé';
+    }
     return;
   }
 
-  // Générer le HTML pour chaque résultat
-  const resultsHTML = results
-    .map(
-      (result) => `
-    <div class="result-card" data-id="${result.id}">
-      <div class="result-card__time">
-        <div class="time">${result.time}</div>
-        <div class="date">${result.date}</div>
-      </div>
-      <div class="result-card__route">
-        <div class="from">
-          <i class="fa-solid fa-location-dot"></i>
-          <span>${result.from}</span>
+  // Mise à jour du compteur - montrer toujours le nombre total de trajets disponibles
+  if (isInitialLoad && resultsCount) {
+    // Stocker tous les résultats dans un attribut data pour un accès ultérieur
+    resultsList.dataset.allResults = JSON.stringify(results);
+
+    resultsCount.textContent = `${results.length} trajet${results.length > 1 ? 's' : ''} trouvé${
+      results.length > 1 ? 's' : ''
+    }`;
+
+    // Vider la liste si c'est le chargement initial
+    resultsList.innerHTML = '';
+
+    // N'afficher que les 3 premiers résultats
+    const initialResults = results.slice(0, 3);
+    // Définir l'index actuel
+    resultsList.dataset.currentIndex = '3';
+
+    // Montrer/cacher le bouton "Charger plus de résultats" selon le nombre total
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display = results.length > 3 ? 'block' : 'none';
+    }
+
+    // On utilise les 3 premiers résultats pour l'affichage initial
+    results = initialResults;
+  }
+
+  // Création des cartes de covoiturage (sans vider la liste si ce n'est pas le chargement initial)
+  results.forEach((ride) => {
+    // Création de la carte avec le nouveau format
+    const card = document.createElement('div');
+    card.className = 'ride-card';
+
+    // Ajout des attributs data pour les filtres avancés
+    card.dataset.price = ride.price;
+    card.dataset.electric = ride.electricVehicle;
+    card.dataset.verified = ride.driverVerified;
+    card.dataset.nonsmoking = ride.nonSmoking;
+    card.dataset.petsallowed = ride.petsAllowed;
+    card.dataset.id = ride.id; // Stocker l'ID du trajet pour la redirection
+
+    // Calcul de l'heure d'arrivée à partir de l'heure de départ
+    const arrivalTime = calculateArrivalTime(ride.time);
+
+    // Construire les étoiles pour la notation du conducteur
+    const starsHtml = buildStarRating(ride.driver.rating || 4.5);
+
+    // Formater la date pour l'affichage
+    const formattedDate = formatDate(ride.date);
+
+    // Image par défaut si aucune image n'est fournie
+    const driverImage = ride.driver.image || '../../assets/images/default-avatar.jpg';
+
+    // Définir le type de véhicule pour l'affichage
+    const vehicleTypeDisplay = ride.electricVehicle
+      ? `${ride.vehicleType} - Électrique`
+      : ride.vehicleType;
+
+    // Badges pour les options du trajet
+    const badges = [];
+
+    if (ride.electricVehicle) {
+      badges.push(`
+        <div class="badge" title="Véhicule électrique">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+          Électrique
         </div>
-        <div class="journey-line"></div>
-        <div class="to">
-          <i class="fa-solid fa-location-dot"></i>
-          <span>${result.to}</span>
+      `);
+    }
+
+    if (ride.driverVerified) {
+      badges.push(`
+        <div class="badge" title="Conducteur vérifié">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          Vérifié
         </div>
+      `);
+    }
+
+    if (ride.nonSmoking) {
+      badges.push(`
+        <div class="badge" title="Trajet non-fumeur">
+          <i class="fa-solid fa-smoking-ban" aria-hidden="true"></i>
+          Non-fumeur
+        </div>
+      `);
+    }
+
+    if (ride.petsAllowed) {
+      badges.push(`
+        <div class="badge" title="Animaux acceptés">
+          <i class="fa-solid fa-paw" aria-hidden="true"></i>
+          Animaux
+        </div>
+      `);
+    }
+
+    const badgesHtml = badges.length
+      ? `
+      <div class="option-badges">
+        ${badges.join('')}
       </div>
-      <div class="result-card__driver">
-        <img src="${result.driver.image}" alt="${result.driver.name}" />
-        <div class="info">
-          <div class="name">${result.driver.name}</div>
-          <div class="rating">
-            <i class="fa-solid fa-star"></i>
-            <span>${result.driver.rating.toFixed(1)}</span>
-            <span class="trips">(${result.driver.trips} trajets)</span>
+    `
+      : '';
+
+    // Création du HTML de la carte
+    card.innerHTML = `
+      <div class="ride-card__header">
+        <div class="driver-info">
+          <img src="${driverImage}" alt="${ride.driver.name}" />
+          <div class="driver-details">
+            <span class="name">${ride.driver.name}</span>
+            <div class="rating">
+              ${starsHtml}
+              <span>(${ride.driver.trips || 0})</span>
+            </div>
           </div>
         </div>
+        <div class="price">${ride.price}€</div>
       </div>
-      <div class="result-card__details">
-        <div class="eco">
-          <i class="fa-solid fa-leaf"></i>
-          <span>-${result.co2Saved}kg CO2</span>
+      
+      <div class="ride-card__route">
+        <div class="route-info">
+          <div class="from">
+            <i class="fa-solid fa-circle" aria-hidden="true"></i>
+            ${ride.from}
+          </div>
+          <span class="route-separator">→</span>
+          <div class="to">
+            <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+            ${ride.to}
+          </div>
         </div>
-        <div class="vehicle">
-          <i class="fa-solid fa-car"></i>
-          <span>${result.vehicleType}</span>
-        </div>
-        <div class="seats">
-          <i class="fa-solid fa-user-group"></i>
-          <span>${result.availableSeats} place${result.availableSeats > 1 ? 's' : ''}</span>
+        <div class="time-info">
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+          ${ride.time} (${formattedDate})
         </div>
       </div>
-      <div class="result-card__action">
-        <div class="price">${result.price}€</div>
-        <button class="book-btn">Réserver</button>
+      
+      ${badgesHtml}
+      
+      <div class="ride-card__footer">
+        <div class="eco-info">
+          <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+          ${vehicleTypeDisplay}
+        </div>
+        <div class="seats-info">
+          <i class="fa-solid fa-user" aria-hidden="true"></i>
+          ${ride.availableSeats} place(s) disponible(s)
+        </div>
+        <button class="details-button" data-ride-id="${ride.id}" aria-label="Voir les détails de ce trajet de covoiturage">
+          Détails
+        </button>
       </div>
-    </div>
-  `
-    )
-    .join('');
+    `;
 
-  resultsList.innerHTML = resultsHTML;
+    // Ajout de l'événement sur le bouton de détails
+    card.querySelector('.details-button').addEventListener('click', function () {
+      window.location.href = `detail-covoiturage.html?id=${ride.id}`;
+    });
 
-  // Ajouter les écouteurs d'événements pour les cartes
-  const cards = resultsList.querySelectorAll('.result-card');
-  cards.forEach((card) => {
-    const bookBtn = card.querySelector('.book-btn');
-    if (bookBtn) {
-      bookBtn.addEventListener('click', () => {
-        alert('Fonctionnalité de réservation à implémenter dans une prochaine itération.');
+    // Ajout de la carte à la liste des résultats
+    resultsList.appendChild(card);
+  });
+}
+
+/**
+ * Configure les événements pour les boutons supplémentaires
+ */
+function setupResultsButtons() {
+  // Bouton de tri
+  const sortButton = document.getElementById('sort-button');
+  const sortSelect = document.getElementById('sort-filter');
+
+  if (sortButton && sortSelect) {
+    sortButton.addEventListener('click', function () {
+      // Afficher un menu de tri personnalisé ou utiliser le select existant
+      sortSelect.click();
+    });
+  }
+
+  // Bouton "Charger plus de résultats"
+  const loadMoreBtn = document.getElementById('load-more-btn');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function () {
+      if (!resultsList || !resultsList.dataset.allResults) return;
+
+      // Récupérer tous les résultats stockés
+      const allResults = JSON.parse(resultsList.dataset.allResults);
+
+      // Récupérer l'index actuel
+      const currentIndex = parseInt(resultsList.dataset.currentIndex || '0');
+
+      // Déterminer combien de résultats afficher ensuite (max 3)
+      const nextBatch = allResults.slice(currentIndex, currentIndex + 3);
+
+      // S'il n'y a plus de résultats à afficher, masquer le bouton
+      if (currentIndex + 3 >= allResults.length) {
+        loadMoreBtn.style.display = 'none';
+      }
+
+      // Mettre à jour l'index actuel
+      resultsList.dataset.currentIndex = (currentIndex + nextBatch.length).toString();
+
+      // Ajouter les nouveaux résultats sans vider la liste existante
+      displayResults(nextBatch, false);
+    });
+  }
+
+  // Bouton "Créer une alerte"
+  const createAlertBtn = document.getElementById('create-alert-btn');
+  if (createAlertBtn) {
+    createAlertBtn.addEventListener('click', function () {
+      alert(
+        'Alerte créée pour ce trajet ! Vous recevrez une notification lorsque de nouveaux trajets correspondant à vos critères seront disponibles.'
+      );
+    });
+  }
+
+  // Récupérer tous les nouveaux boutons "Détails" de la liste
+  // Cette étape est nécessaire car displayResults ajoute déjà des listeners pour les nouveaux boutons
+  // mais on veut s'assurer que tous les boutons sont bien configurés
+  document.querySelectorAll('.details-button').forEach((button) => {
+    // Vérifier si le bouton a déjà un événement de clic (pour éviter les doublons)
+    if (!button.hasAttribute('data-event-attached')) {
+      button.setAttribute('data-event-attached', 'true');
+      button.addEventListener('click', function () {
+        const rideId = this.getAttribute('data-ride-id') || this.closest('.ride-card').dataset.id;
+        if (rideId) {
+          window.location.href = `./detail-covoiturage.html?id=${rideId}`;
+        }
       });
     }
   });
@@ -618,43 +1072,211 @@ function displayResults(results) {
 
 /**
  * Applique un filtre sur les résultats de recherche
- * @param {string} filterType - Type de filtre (price, time, rating)
+ * @param {string} filterType - Type de filtre (price-asc, price-desc, time, rating)
  */
 function applyFilter(filterType) {
-  // Marquer le bouton de filtre comme actif
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  filterButtons.forEach((btn) => {
-    if (btn.id === `filter-${filterType}`) {
-      btn.classList.toggle('active');
+  // Afficher l'état de chargement
+  displayLoadingResults();
+
+  setTimeout(() => {
+    const results = getMockResults(fromInput.value, toInput.value, dateInput.value);
+
+    // Tri des résultats selon le filtre
+    if (filterType === 'price-asc') {
+      results.sort((a, b) => a.price - b.price);
+    } else if (filterType === 'price-desc') {
+      results.sort((a, b) => b.price - a.price);
+    } else if (filterType === 'time') {
+      results.sort((a, b) => {
+        // Extraire les heures et minutes pour comparer
+        const [hoursA, minutesA] = a.time.split('h');
+        const [hoursB, minutesB] = b.time.split('h');
+
+        // Convertir en minutes pour comparer facilement
+        const timeA = parseInt(hoursA) * 60 + parseInt(minutesA || 0);
+        const timeB = parseInt(hoursB) * 60 + parseInt(minutesB || 0);
+
+        return timeA - timeB;
+      });
+    } else if (filterType === 'rating') {
+      results.sort((a, b) => b.driver.rating - a.driver.rating);
+    }
+
+    // Réinitialiser l'affichage avec les résultats triés
+    displayResults(results, true);
+
+    // Réafficher le bouton "Charger plus de résultats" s'il y a plus de 3 résultats
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display = results.length > 3 ? 'block' : 'none';
+    }
+  }, 500);
+}
+
+/**
+ * Applique les filtres avancés aux résultats
+ */
+function applyAdvancedFilters() {
+  const rideCards = document.querySelectorAll('.ride-card');
+  if (!rideCards.length) return;
+
+  // On récupère l'état des filtres avancés
+  const electricOnly = document.getElementById('electric-only')?.checked || false;
+  const verifiedOnly = document.getElementById('verified-only')?.checked || false;
+  const nonSmoking = document.getElementById('non-smoking')?.checked || false;
+  const petsAllowed = document.getElementById('pets-allowed')?.checked || false;
+  const maxPrice = document.getElementById('max-price')?.value || 100;
+
+  let visibleCount = 0;
+
+  // Pour chaque covoiturage, on vérifie s'il correspond aux critères
+  rideCards.forEach((card) => {
+    // Récupération des données du covoiturage depuis les attributs data
+    const price = parseFloat(card.dataset.price) || 0;
+    const isElectric = card.dataset.electric === 'true';
+    const isVerified = card.dataset.verified === 'true';
+    const isNonSmoking = card.dataset.nonsmoking === 'true';
+    const allowsPets = card.dataset.petsallowed === 'true';
+
+    // Vérification des critères
+    let shouldShow = true;
+
+    if (electricOnly && !isElectric) shouldShow = false;
+    if (verifiedOnly && !isVerified) shouldShow = false;
+    if (nonSmoking && !isNonSmoking) shouldShow = false;
+    if (petsAllowed && !allowsPets) shouldShow = false;
+    if (price > maxPrice) shouldShow = false;
+
+    // Application de la visibilité
+    if (shouldShow) {
+      card.style.display = 'flex';
+      visibleCount++;
     } else {
-      btn.classList.remove('active');
+      card.style.display = 'none';
     }
   });
 
-  // TODO: Implémenter le tri réel des résultats
-  // Pour la démo, on simule un rechargement
-  const isActive = document.getElementById(`filter-${filterType}`).classList.contains('active');
-
-  if (isActive) {
-    displayLoadingResults();
-    setTimeout(() => {
-      const results = getMockResults(fromInput.value, toInput.value, dateInput.value);
-
-      // Tri des résultats selon le filtre
-      if (filterType === 'price') {
-        results.sort((a, b) => a.price - b.price);
-      } else if (filterType === 'time') {
-        results.sort((a, b) => a.time.localeCompare(b.time));
-      } else if (filterType === 'rating') {
-        results.sort((a, b) => b.driver.rating - a.driver.rating);
-      }
-
-      displayResults(results);
-    }, 500);
-  } else {
-    // Si le filtre est désactivé, recharger les résultats sans tri
-    handleSearch(new Event('submit'));
+  // Mise à jour du compteur de résultats
+  if (resultsCount) {
+    resultsCount.textContent = `${visibleCount} trajet(s) trouvé(s)`;
   }
+}
+
+/**
+ * Génère l'aperçu du trajet
+ * @param {Object} ride - Les données du trajet
+ * @returns {string} - Le HTML de l'aperçu du trajet
+ */
+function buildRoutePreview(ride) {
+  if (!ride.from || !ride.to) return '';
+
+  // Dans un cas réel, on utiliserait les coordonnées pour générer un trajet avec des arrêts
+  // Pour la démo, on simplifie
+
+  return `
+    <div class="route-point departure">
+      <div class="point"></div>
+      <div class="info">
+        <strong>${ride.from}</strong>
+        <span class="time">${ride.time}</span>
+      </div>
+    </div>
+    <div class="route-line">
+      <div class="line"></div>
+    </div>
+    <div class="route-point arrival">
+      <div class="point"></div>
+      <div class="info">
+        <strong>${ride.to}</strong>
+        <span class="time">${calculateArrivalTime(ride.time)}</span>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Calcule l'heure d'arrivée en fonction de l'heure de départ
+ * @param {string} departureTime - L'heure de départ (format HHhMM)
+ * @returns {string} - L'heure d'arrivée (format HHhMM)
+ */
+function calculateArrivalTime(departureTime) {
+  // Parse the departure time
+  const parts = departureTime.split('h');
+  let hours = parseInt(parts[0], 10);
+  let minutes = parseInt(parts[1], 10);
+
+  // Add a random duration between 30 minutes and 3 hours
+  const durationMinutes = Math.floor(Math.random() * 150) + 30;
+
+  // Calculate arrival time
+  minutes += durationMinutes;
+  hours += Math.floor(minutes / 60);
+  minutes = minutes % 60;
+  hours = hours % 24;
+
+  return `${hours.toString().padStart(2, '0')}h${minutes.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Formate une date pour l'affichage
+ * @param {string} dateStr - La date à formater
+ * @returns {string} - La date formatée
+ */
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+
+  // Si la date est déjà formatée, on la retourne telle quelle
+  if (typeof dateStr === 'string' && dateStr.includes(' ')) {
+    return dateStr;
+  }
+
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    });
+  } catch (e) {
+    console.error('Erreur de formatage de date:', e);
+    return dateStr || '';
+  }
+}
+
+/**
+ * Simule une recherche avec des valeurs par défaut
+ */
+function simulateSearch() {
+  // Définir des valeurs par défaut pour la recherche
+  fromInput.value = 'Paris';
+  toInput.value = 'Lyon';
+
+  // Définir la date à aujourd'hui
+  dateInput.value = today;
+
+  // Simuler des données de ville pour la validation
+  fromInput.dataset.cityData = JSON.stringify({
+    name: 'Paris',
+    postcode: '75000',
+    region: 'Île-de-France',
+    coordinates: [2.3522, 48.8566],
+  });
+
+  toInput.dataset.cityData = JSON.stringify({
+    name: 'Lyon',
+    postcode: '69000',
+    region: 'Auvergne-Rhône-Alpes',
+    coordinates: [4.8357, 45.764],
+  });
+
+  // Simuler un chargement des résultats
+  displayLoadingResults();
+
+  // Simuler un délai et afficher des résultats
+  setTimeout(() => {
+    const results = getMockResults('Paris', 'Lyon', today);
+    displayResults(results, true);
+  }, 1000);
 }
 
 // Initialiser la page au chargement

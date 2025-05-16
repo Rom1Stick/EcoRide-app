@@ -40,3 +40,8 @@
     border-radius: $radius-lg;
   }
 }
+
+@mixin focus-visible {
+  outline: 2px solid $color-accent;
+  outline-offset: 2px;
+}

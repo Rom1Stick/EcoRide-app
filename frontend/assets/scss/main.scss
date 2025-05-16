@@ -16,7 +16,12 @@
 @use 'pages/register';
 @use 'pages/login';
 @use 'pages/profile';
-@use 'pages/covoiturages';
+// Modules pour la page covoiturages
+@use 'pages/covoiturages/layout';
+@use 'pages/covoiturages/search-section';
+@use 'pages/covoiturages/filters';
+@use 'pages/covoiturages/results';
+@use 'pages/covoiturages/ride-card';
 @use 'pages/legal';
 
 // Components
