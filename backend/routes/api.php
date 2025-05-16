@@ -40,6 +40,13 @@ $router->get('/api/bookings', 'BookingController@index')->middleware('auth');
 $router->post('/api/rides/{id}/book', 'BookingController@store')->middleware('auth');
 $router->delete('/api/bookings/{id}', 'BookingController@destroy')->middleware('auth');
 
+// Routes du système de crédits
+$router->get('/api/credits/balance', 'CreditsController@balance')->middleware('auth');
+$router->get('/api/credits/transactions', 'CreditsController@transactions')->middleware('auth');
+$router->post('/api/credits/transfer', 'CreditsController@transfer')->middleware('auth');
+$router->get('/api/credits/pricing', 'CreditsController@pricing');
+$router->get('/api/admin/credits/alerts', 'CreditsController@alerts')->middleware('auth');
+
 // Routes d'administration (gestion des rôles et utilisateurs)
 $router->get('/api/admin/users', 'AdminController@listUsers')->middleware('auth');
 $router->post('/api/admin/users/{userId}/roles', 'AdminController@addUserRole')->middleware('auth');
