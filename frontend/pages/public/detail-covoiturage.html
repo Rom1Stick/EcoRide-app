@@ -2,128 +2,470 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta name="description" content="EcoRide - Détails du covoiturage sélectionné" />
-    <meta name="theme-color" content="#1b5e20" />
-    <title>EcoRide – Détails du covoiturage</title>
-    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Détails du trajet – EcoRide</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
     <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
   </head>
 
-  <body>
-    <!-- Header -->
-    <header class="header">
-      <div class="header__logo">
-        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
-      </div>
-      <!-- Menu de navigation desktop -->
-      <nav class="header__nav">
-        <a href="/">Accueil</a>
-        <a href="./covoiturages.html" class="active">Covoiturages</a>
-        <a href="/contact">Contact</a>
-        <div class="auth-container">
-          <!-- Contenu remplacé dynamiquement par JavaScript -->
-          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
-          <!-- Bouton de profil (caché par défaut) -->
-          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
-            <img
-              src="../../assets/images/Logo_EcoRide.svg"
-              alt="Avatar"
-              class="avatar"
-              id="userAvatar"
-            />
-            <span class="username" id="username">Utilisateur</span>
-            <i class="fa-solid fa-chevron-down"></i>
-          </a>
+  <body class="detail-page">
+    <div class="desktop-view">
+      <!-- Header -->
+      <header class="header">
+        <div class="header__logo">
+          <button aria-label="Retour" onclick="window.history.back()">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <span>Détails du trajet</span>
         </div>
-      </nav>
-      <!-- Bouton de menu mobile -->
-      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
-        <i class="fa-regular fa-bell"></i>
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </header>
+        <button class="header__menu" aria-label="Partager">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+      </header>
 
-    <main>
-      <div class="container">
-        <!-- Fil d'Ariane / Navigation -->
-        <div class="breadcrumb">
-          <a href="/">Accueil</a>
-          &gt;
-          <a href="./covoiturages.html">Covoiturages</a>
-          &gt;
-          <span id="breadcrumb-route">Détails du trajet</span>
+      <main class="detail-main">
+        <!-- Icône carte / hero (affiché uniquement sur mobile) -->
+        <section class="trip-hero">
+          <div class="icon-map">
+            <i class="fa-solid fa-map"></i>
+          </div>
+        </section>
+
+        <!-- Contenu principal (colonne gauche sur desktop) -->
+        <div class="trip-content">
+          <!-- Section conducteur (première sur desktop) -->
+          <section class="driver-section">
+            <div class="driver-header">
+              <img
+                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"
+                alt="Thomas D."
+              />
+              <div class="info">
+                <div class="name">Thomas D.</div>
+                <div class="meta">
+                  <i class="fa-solid fa-star"></i>
+                  <span>4.8</span>
+                  <span>•</span>
+                  <span>42 trajets</span>
+                </div>
+              </div>
+              <i class="verified fa-solid fa-circle-check"></i>
+            </div>
+            <div class="driver-stats">
+              <span>
+                <span>Taux de réponse</span>
+                <span>98%</span>
+              </span>
+              <span>
+                <span>Délai de réponse</span>
+                <span>&lt; 1 heure</span>
+              </span>
+            </div>
+            <button class="contact-btn" aria-label="Contacter le conducteur">
+              Contacter Thomas
+            </button>
+          </section>
+
+          <!-- Détails du trajet -->
+          <section class="trip-details">
+            <div class="trip-details__header">
+              <div class="infos">
+                <div class="date">Lundi 24 mars 2025</div>
+                <div class="route">Paris → Lyon</div>
+              </div>
+              <div class="price">
+                <div class="amount">25€</div>
+                <div class="unit">par personne</div>
+              </div>
+            </div>
+
+            <div class="stats">
+              <div class="stat-item">
+                <i class="fa-regular fa-clock"></i>
+                <div class="detail">
+                  <div class="main">Départ à 8:00 • Arrivée à 11:30</div>
+                  <div class="sub">3h30 de trajet</div>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <i class="fa-solid fa-user-group"></i>
+                <div class="detail">
+                  <div class="main">2 places disponibles</div>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <i class="fa-solid fa-leaf"></i>
+                <div class="detail">
+                  <div class="main">120g CO₂/km</div>
+                  <div class="sub">Impact environnemental modéré</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Véhicule (partie des détails du trajet) -->
+            <div class="vehicle-section">
+              <h3>Véhicule</h3>
+              <div class="vehicle-info">
+                <div class="icon-wrapper">
+                  <i class="fa-solid fa-car"></i>
+                </div>
+                <div class="details">
+                  <div class="model">Tesla Model 3</div>
+                  <div class="specs">2023 • Électrique</div>
+                  <div class="tags">
+                    <span>Confort ++</span>
+                    <span>Écologique</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section Avis -->
+          <section class="reviews-section">
+            <div class="reviews-section__header">
+              <h3>Avis</h3>
+              <div class="rating">
+                <i class="fa-solid fa-star"></i>
+                <span>4.8</span>
+                <span>(24)</span>
+              </div>
+            </div>
+            <div class="reviews-list">
+              <div class="review">
+                <div class="review-header">
+                  <img
+                    src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg"
+                    alt="Marie L."
+                  />
+                  <div class="info">
+                    <div class="author">Marie L.</div>
+                    <div class="date">Mars 2025</div>
+                  </div>
+                  <div class="score">
+                    <i class="fa-solid fa-star"></i>
+                    <span>5.0</span>
+                  </div>
+                </div>
+                <p>Très bon trajet, Thomas est ponctuel et sympathique !</p>
+              </div>
+              <div class="review">
+                <div class="review-header">
+                  <img
+                    src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg"
+                    alt="Pierre M."
+                  />
+                  <div class="info">
+                    <div class="author">Pierre M.</div>
+                    <div class="date">Février 2025</div>
+                  </div>
+                  <div class="score">
+                    <i class="fa-solid fa-star"></i>
+                    <span>4.5</span>
+                  </div>
+                </div>
+                <p>Voiture très confortable et trajet agréable.</p>
+              </div>
+              <div class="review">
+                <div class="review-header">
+                  <img
+                    src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg"
+                    alt="Sophie R."
+                  />
+                  <div class="info">
+                    <div class="author">Sophie R.</div>
+                    <div class="date">Janvier 2025</div>
+                  </div>
+                  <div class="score">
+                    <i class="fa-solid fa-star"></i>
+                    <span>5.0</span>
+                  </div>
+                </div>
+                <p>Excellent conducteur, je recommande vivement !</p>
+              </div>
+            </div>
+            <button class="view-all" aria-label="Voir tous les avis sur le conducteur">
+              Voir tous les avis
+            </button>
+          </section>
         </div>
 
-        <!-- Contenu principal -->
-        <div class="ride-detail" id="ride-detail">
-          <!-- Les détails du trajet seront chargés ici par JavaScript -->
-          <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Chargement des détails du trajet...</p>
+        <!-- Barre latérale (affiché uniquement sur desktop) -->
+        <div class="trip-sidebar">
+          <!-- Préférences -->
+          <section class="preferences-section">
+            <h3>Préférences</h3>
+            <div class="prefs-list">
+              <div class="pref-item">
+                <i class="fa-solid fa-smoking-ban"></i>
+                <span>Non-fumeur</span>
+              </div>
+              <div class="pref-item">
+                <i class="fa-solid fa-paw"></i>
+                <span>Animaux acceptés</span>
+              </div>
+              <div class="pref-item">
+                <i class="fa-solid fa-music"></i>
+                <span>Musique ok</span>
+              </div>
+              <div class="pref-item">
+                <i class="fa-solid fa-message"></i>
+                <span>Discussion ok</span>
+              </div>
+            </div>
+
+            <!-- Réservation (version desktop) -->
+            <div class="booking-desktop">
+              <div class="info">
+                <div class="price">
+                  <div class="label">Prix total</div>
+                  <div class="amount">25€</div>
+                </div>
+                <button class="btn-book" aria-label="Réserver ce trajet">Réserver</button>
+              </div>
+              <div class="cancel-info">Annulation gratuite jusqu'à 24h avant le départ</div>
+            </div>
+          </section>
+
+          <!-- Logo EcoRide (visible uniquement en desktop) -->
+          <div class="logo-desktop">
+            <img src="../../assets/images/Logo_EcoRide.svg" alt="EcoRide" />
           </div>
         </div>
-      </div>
-    </main>
-
-    <!-- Pied de page -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer__top">
-          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
-        </div>
-        <div class="footer__contact">
-          <p>
-            <i class="fa-regular fa-envelope"></i>
-            contact@ecoride.com
-          </p>
-          <p>
-            <i class="fa-solid fa-phone"></i>
-            01 23 45 67 89
-          </p>
-        </div>
-        <div class="footer__socials">
-          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        </div>
-        <nav class="footer__legal">
-          <div>
-            <h3>Navigation</h3>
-            <ul>
-              <li><span>Accueil</span></li>
-              <li><span>À propos</span></li>
-              <li><span>Services</span></li>
-              <li><span>Contact</span></li>
-            </ul>
+      </main>
+    </div>
+    <div class="mobile-view">
+      <div class="mobile-root">
+        <header class="mobile-header">
+          <div class="mobile-header__content">
+            <div class="mobile-header__wrapper">
+              <button
+                class="mobile-header__back-btn"
+                aria-label="Retour"
+                onclick="window.history.back()"
+              >
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
+              <h1 class="mobile-header__title">Détails du trajet</h1>
+              <button class="mobile-header__share-btn" aria-label="Partager">
+                <i class="fa-solid fa-share-nodes"></i>
+              </button>
+            </div>
           </div>
-          <div>
-            <h3>Légal</h3>
-            <ul>
-              <li><span>Conditions</span></li>
-              <li><span>Confidentialité</span></li>
-              <li><span>Cookies</span></li>
-              <li><span>Mentions légales</span></li>
-            </ul>
+        </header>
+        <main class="mobile-main">
+          <div class="mobile-hero">
+            <div class="mobile-hero__icon">
+              <img src="../../assets/images/Logo_EcoRide.svg" alt="EcoRide" />
+            </div>
           </div>
-        </nav>
+          <section class="mobile-detail">
+            <div class="mobile-detail__header">
+              <div class="mobile-detail__date-route">
+                <div class="mobile-detail__date">Lundi 24 mars 2025</div>
+                <div class="mobile-detail__route">Paris → Lyon</div>
+              </div>
+              <div class="mobile-detail__price-wrapper">
+                <div class="mobile-detail__price">25€</div>
+                <div class="mobile-detail__price-unit">par personne</div>
+              </div>
+            </div>
+            <div class="mobile-stats">
+              <div class="mobile-stats__item">
+                <div class="mobile-stats__icon">
+                  <i class="fa-regular fa-clock"></i>
+                </div>
+                <div class="mobile-stats__content">
+                  <div class="mobile-stats__main">Départ à 8:00 • Arrivée à 11:30</div>
+                  <div class="mobile-stats__sub">3h30 de trajet</div>
+                </div>
+              </div>
+              <div class="mobile-stats__item">
+                <div class="mobile-stats__icon">
+                  <i class="fa-solid fa-user-group"></i>
+                </div>
+                <div class="mobile-stats__content">
+                  <div class="mobile-stats__main">2 places disponibles</div>
+                </div>
+              </div>
+              <div class="mobile-stats__item">
+                <div class="mobile-stats__icon">
+                  <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div class="mobile-stats__content">
+                  <div class="mobile-stats__main">120g CO₂/km</div>
+                  <div class="mobile-stats__sub">Impact environnemental modéré</div>
+                </div>
+              </div>
+            </div>
+            <div class="mobile-driver">
+              <div class="mobile-driver__header">
+                <img
+                  src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"
+                  class="mobile-driver__avatar"
+                  alt="Thomas D."
+                />
+                <div class="mobile-driver__info">
+                  <div class="mobile-driver__name">Thomas D.</div>
+                  <div class="mobile-driver__meta">
+                    <i class="fa-solid fa-star"></i>
+                    <span>4.8</span>
+                    <span>•</span>
+                    <span>42 trajets</span>
+                  </div>
+                </div>
+                <i class="fa-solid fa-circle-check mobile-driver__verified"></i>
+              </div>
+              <div class="mobile-driver__stats">
+                <div class="mobile-driver__stat">
+                  <span class="mobile-driver__stat-label">Taux de réponse</span>
+                  <span class="mobile-driver__stat-value">98%</span>
+                </div>
+                <div class="mobile-driver__stat">
+                  <span class="mobile-driver__stat-label">Délai de réponse</span>
+                  <span class="mobile-driver__stat-value">< 1 heure</span>
+                </div>
+              </div>
+              <button class="mobile-driver__contact-btn" aria-label="Contacter le conducteur">
+                Contacter Thomas
+              </button>
+            </div>
+            <div class="mobile-vehicle">
+              <h3 class="mobile-vehicle__title">Véhicule</h3>
+              <div class="mobile-vehicle__info">
+                <div class="mobile-vehicle__icon">
+                  <i class="fa-solid fa-car"></i>
+                </div>
+                <div class="mobile-vehicle__details">
+                  <div class="mobile-vehicle__model">Tesla Model 3</div>
+                  <div class="mobile-vehicle__specs">2023 • Électrique</div>
+                  <div class="mobile-vehicle__tags">
+                    <span class="mobile-vehicle__tag">Confort ++</span>
+                    <span class="mobile-vehicle__tag">Écologique</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mobile-prefs">
+              <h3 class="mobile-prefs__title">Préférences</h3>
+              <div class="mobile-prefs__grid">
+                <div class="mobile-prefs__item">
+                  <i class="fa-solid fa-ban-smoking"></i>
+                  <span>Non-fumeur</span>
+                </div>
+                <div class="mobile-prefs__item">
+                  <i class="fa-solid fa-paw"></i>
+                  <span>Animaux acceptés</span>
+                </div>
+                <div class="mobile-prefs__item">
+                  <i class="fa-solid fa-music"></i>
+                  <span>Musique ok</span>
+                </div>
+                <div class="mobile-prefs__item">
+                  <i class="fa-solid fa-message"></i>
+                  <span>Discussion ok</span>
+                </div>
+              </div>
+            </div>
+            <div class="mobile-reviews">
+              <div class="mobile-reviews__header">
+                <h3 class="mobile-reviews__title">Avis</h3>
+                <div class="mobile-reviews__rating">
+                  <i class="fa-solid fa-star"></i>
+                  <span>4.8</span>
+                  <span>(24)</span>
+                </div>
+              </div>
+              <div class="mobile-reviews__list">
+                <div class="mobile-review">
+                  <div class="mobile-review__header">
+                    <img
+                      src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg"
+                      class="mobile-review__avatar"
+                      alt="Marie L."
+                    />
+                    <div class="mobile-review__info">
+                      <div class="mobile-review__author">Marie L.</div>
+                      <div class="mobile-review__date">Mars 2025</div>
+                    </div>
+                    <div class="mobile-review__score">
+                      <i class="fa-solid fa-star"></i>
+                      <span>5.0</span>
+                    </div>
+                  </div>
+                  <p class="mobile-review__text">
+                    Très bon trajet, Thomas est ponctuel et sympathique !
+                  </p>
+                </div>
+                <div class="mobile-review">
+                  <div class="mobile-review__header">
+                    <img
+                      src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg"
+                      class="mobile-review__avatar"
+                      alt="Pierre M."
+                    />
+                    <div class="mobile-review__info">
+                      <div class="mobile-review__author">Pierre M.</div>
+                      <div class="mobile-review__date">Février 2025</div>
+                    </div>
+                    <div class="mobile-review__score">
+                      <i class="fa-solid fa-star"></i>
+                      <span>4.5</span>
+                    </div>
+                  </div>
+                  <p class="mobile-review__text">Voiture très confortable et trajet agréable.</p>
+                </div>
+                <div class="mobile-review">
+                  <div class="mobile-review__header">
+                    <img
+                      src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg"
+                      class="mobile-review__avatar"
+                      alt="Sophie R."
+                    />
+                    <div class="mobile-review__info">
+                      <div class="mobile-review__author">Sophie R.</div>
+                      <div class="mobile-review__date">Janvier 2025</div>
+                    </div>
+                    <div class="mobile-review__score">
+                      <i class="fa-solid fa-star"></i>
+                      <span>5.0</span>
+                    </div>
+                  </div>
+                  <p class="mobile-review__text">Excellent conducteur, je recommande vivement !</p>
+                </div>
+              </div>
+              <button
+                class="mobile-reviews__view-all"
+                aria-label="Voir tous les avis sur le conducteur"
+              >
+                Voir tous les avis
+              </button>
+            </div>
+          </section>
+        </main>
+        <div class="mobile-booking-footer">
+          <div class="mobile-booking-footer__content">
+            <div class="mobile-booking-footer__price-info">
+              <div class="mobile-booking-footer__price-label">Prix total</div>
+              <div class="mobile-booking-footer__price">25€</div>
+            </div>
+            <button class="mobile-booking-footer__btn" aria-label="Réserver ce trajet">
+              Réserver
+            </button>
+          </div>
+          <p class="mobile-booking-footer__note">Annulation gratuite jusqu'à 24h avant le départ</p>
+        </div>
       </div>
-      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
-    </footer>
-
+    </div>
     <!-- Scripts -->
     <script type="module" src="../../assets/js/common/api.js"></script>
     <script type="module" src="../../assets/js/common/auth.js"></script>
-    <script type="module" src="../../assets/js/common/menu.js"></script>
-    <script type="module" src="../../assets/js/common/userProfile.js"></script>
-    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
     <script type="module" src="../../assets/js/pages/detail-covoiturage.js"></script>
   </body>
 </html>

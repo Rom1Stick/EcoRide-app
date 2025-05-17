@@ -1,275 +1,165 @@
 /**
- * Gestion de l'affichage des détails d'un covoiturage
+ * Script pour la page détail d'un covoiturage
  */
+import { getCsrfToken } from '../common/api.js';
+import { checkAuthentication } from '../common/auth.js';
 
-// Éléments DOM
-const rideDetailContainer = document.getElementById('ride-detail');
-const breadcrumbRoute = document.getElementById('breadcrumb-route');
-
-// Initialisation de la page
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('Initialisation de la page de détail du covoiturage...');
-
-  // Récupérer l'ID du trajet depuis l'URL
+/**
+ * Récupère l'ID du covoiturage depuis l'URL
+ * @returns {string|null} L'ID du covoiturage ou null si non trouvé
+ */
+function getRideId() {
   const urlParams = new URLSearchParams(window.location.search);
-  const rideId = urlParams.get('id');
-
-  if (!rideId) {
-    displayError('Aucun identifiant de trajet spécifié');
-    return;
-  }
-
-  // Charger les détails du trajet
-  loadRideDetails(rideId);
-});
+  return urlParams.get('id');
+}
 
 /**
- * Charge les détails d'un trajet spécifique
- * @param {string} rideId - L'identifiant du trajet
+ * Gère le bouton de retour
  */
-function loadRideDetails(rideId) {
-  // Simuler un chargement (dans un cas réel, on ferait un appel API)
-  setTimeout(() => {
-    // Simuler la récupération des détails du trajet
-    const rideDetails = getMockRideDetails(rideId);
+function setupBackButton() {
+  const backButton = document.querySelector('.header__logo button');
 
-    if (rideDetails) {
-      displayRideDetails(rideDetails);
+  backButton.addEventListener('click', () => {
+    // Retour à la page précédente si elle existe, sinon à la liste des covoiturages
+    if (document.referrer && document.referrer.includes(window.location.origin)) {
+      window.history.back();
     } else {
-      displayError('Trajet non trouvé');
+      window.location.href = '/frontend/pages/public/covoiturages.html';
     }
-  }, 1000);
+  });
 }
 
 /**
- * Affiche les détails du trajet dans l'interface
- * @param {Object} ride - Les détails du trajet
+ * Gère le bouton de partage
  */
-function displayRideDetails(ride) {
-  // Mettre à jour le fil d'Ariane
-  if (breadcrumbRoute) {
-    breadcrumbRoute.textContent = `Trajet ${ride.from} → ${ride.to}`;
-  }
+function setupShareButton() {
+  const shareButton = document.querySelector('.header__menu');
 
-  // Mettre à jour le titre de la page
-  document.title = `EcoRide – Trajet ${ride.from} → ${ride.to}`;
-
-  if (!rideDetailContainer) return;
-
-  // Calculer l'heure d'arrivée estimée
-  const arrivalTime = calculateArrivalTime(ride.time);
-
-  // Formatage du CO2 économisé
-  const co2Value = ride.co2Saved ? `${ride.co2Saved}g CO2/km` : '120g CO2/km';
-
-  // Construire l'affichage HTML des détails du trajet
-  rideDetailContainer.innerHTML = `
-    <div class="ride-detail__header">
-      <div class="back-btn">
-        <a href="./covoiturages.html" class="btn-back">
-          <i class="fa-solid fa-arrow-left"></i> Retour aux résultats
-        </a>
-      </div>
-      <h1>Trajet ${ride.from} → ${ride.to}</h1>
-      <p class="ride-date">${ride.date} à ${ride.time}</p>
-    </div>
-    
-    <div class="ride-detail__content">
-      <div class="ride-detail__main">
-        <div class="ride-detail__card">
-          <div class="ride-detail__driver">
-            <img src="${ride.driver.image || '../../assets/images/avatar-placeholder.jpg'}" alt="${ride.driver.name}" class="driver-avatar">
-            <div class="driver-info">
-              <h2>${ride.driver.name}</h2>
-              <div class="rating">
-                ${buildStarRating(ride.driver.rating)}
-                <span>${ride.driver.rating.toFixed(1)} (${ride.driver.trips} trajets)</span>
-              </div>
-              ${ride.driverVerified ? '<div class="verified"><i class="fa-solid fa-shield-check"></i> Conducteur vérifié</div>' : ''}
-            </div>
-          </div>
-          
-          <div class="ride-detail__route">
-            <div class="route-map">
-              <div class="route-points">
-                <div class="route-point departure">
-                  <div class="time">${ride.time}</div>
-                  <div class="point"></div>
-                  <div class="location">${ride.from}</div>
-                </div>
-                <div class="route-line">
-                  <span class="duration">${ride.duration}</span>
-                </div>
-                <div class="route-point arrival">
-                  <div class="time">${arrivalTime}</div>
-                  <div class="point"></div>
-                  <div class="location">${ride.to}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="ride-detail__info">
-            <div class="info-item">
-              <i class="fa-solid fa-car"></i>
-              <span>${ride.vehicleType}</span>
-            </div>
-            <div class="info-item">
-              <i class="fa-solid fa-leaf"></i>
-              <span>${co2Value}</span>
-            </div>
-            ${ride.electricVehicle ? '<div class="info-item"><i class="fa-solid fa-bolt"></i><span>Véhicule électrique</span></div>' : ''}
-            ${ride.nonSmoking ? '<div class="info-item"><i class="fa-solid fa-smoking-ban"></i><span>Non-fumeur</span></div>' : ''}
-            ${ride.petsAllowed ? '<div class="info-item"><i class="fa-solid fa-paw"></i><span>Animaux acceptés</span></div>' : ''}
-          </div>
-        </div>
-        
-        <div class="ride-detail__preferences">
-          <h3>Préférences du conducteur</h3>
-          <div class="preferences-list">
-            <div class="preference-item">
-              <i class="fa-solid fa-music"></i>
-              <span>Musique modérée</span>
-            </div>
-            <div class="preference-item">
-              <i class="fa-solid fa-comment"></i>
-              <span>Conversation occasionnelle</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="ride-detail__booking">
-        <div class="price-box">
-          <div class="price">${ride.price}€</div>
-          <div class="seats">
-            <i class="fa-solid fa-user-group"></i>
-            <span>${ride.availableSeats} place${ride.availableSeats > 1 ? 's' : ''} disponible${ride.availableSeats > 1 ? 's' : ''}</span>
-          </div>
-        </div>
-        <button class="book-btn">Réserver ce trajet</button>
-        <button class="contact-btn"><i class="fa-solid fa-message"></i> Contacter ${ride.driver.name.split(' ')[0]}</button>
-      </div>
-    </div>
-  `;
-
-  // Ajouter des événements pour les boutons
-  const bookBtn = rideDetailContainer.querySelector('.book-btn');
-  if (bookBtn) {
-    bookBtn.addEventListener('click', function () {
-      alert('Fonctionnalité de réservation à implémenter dans la tâche correspondante.');
-    });
-  }
-
-  const contactBtn = rideDetailContainer.querySelector('.contact-btn');
-  if (contactBtn) {
-    contactBtn.addEventListener('click', function () {
-      alert('Fonctionnalité de messagerie à implémenter dans la tâche correspondante.');
-    });
-  }
+  shareButton.addEventListener('click', () => {
+    // Vérifier si l'API Web Share est disponible
+    if (navigator.share) {
+      navigator
+        .share({
+          title: 'EcoRide - Détails du trajet',
+          text: 'Découvrez ce trajet sur EcoRide',
+          url: window.location.href,
+        })
+        .catch((error) => console.error('Erreur lors du partage:', error));
+    } else {
+      // Fallback: copier l'URL dans le presse-papier
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(() => {
+          alert('Lien copié dans le presse-papier !');
+        })
+        .catch((error) => console.error('Erreur lors de la copie:', error));
+    }
+  });
 }
 
 /**
- * Affiche un message d'erreur
- * @param {string} message - Le message d'erreur
+ * Gère le bouton de réservation
  */
-function displayError(message) {
-  if (!rideDetailContainer) return;
+function setupBookingButton() {
+  const bookButton = document.querySelector('.btn-book');
 
-  rideDetailContainer.innerHTML = `
-    <div class="error-message">
-      <i class="fa-solid fa-circle-exclamation"></i>
-      <h2>Erreur</h2>
-      <p>${message}</p>
-      <a href="./covoiturages.html" class="btn-back">Retour à la recherche</a>
-    </div>
-  `;
+  bookButton.addEventListener('click', async () => {
+    const isLoggedIn = await checkAuthentication();
+
+    if (!isLoggedIn) {
+      // Rediriger vers la page de connexion avec une redirection de retour
+      const returnUrl = encodeURIComponent(window.location.href);
+      window.location.href = `/frontend/pages/public/login.html?redirect=${returnUrl}`;
+      return;
+    }
+
+    // TODO: Implémenter la logique de réservation
+    console.log('Réservation initiée');
+    alert('La fonctionnalité de réservation sera bientôt disponible !');
+  });
 }
 
 /**
- * Récupère les détails fictifs d'un trajet
- * @param {string} rideId - L'identifiant du trajet
- * @returns {Object|null} - Les détails du trajet ou null si non trouvé
+ * Gère le bouton de contact
  */
-function getMockRideDetails(rideId) {
-  // Dans un cas réel, ces données viendraient d'une API
-  // Pour la démo, on simule un trajet avec l'ID donné
+function setupContactButton() {
+  const contactButton = document.querySelector('.contact-btn');
 
-  return {
-    id: rideId,
-    from: 'Paris',
-    to: 'Lyon',
-    date: 'Lundi 10 juin',
-    time: '08h30',
-    price: 25,
-    driver: {
-      name: 'Sophie D.',
-      rating: 4.8,
-      trips: 47,
-      image: '../../assets/images/profile_Sophie.svg',
-    },
-    vehicleType: 'Citadine',
-    co2Saved: 15,
-    availableSeats: 3,
-    duration: '3h45',
-    electricVehicle: true,
-    nonSmoking: true,
-    petsAllowed: false,
-    driverVerified: true,
-  };
+  contactButton.addEventListener('click', async () => {
+    const isLoggedIn = await checkAuthentication();
+
+    if (!isLoggedIn) {
+      // Rediriger vers la page de connexion avec une redirection de retour
+      const returnUrl = encodeURIComponent(window.location.href);
+      window.location.href = `/frontend/pages/public/login.html?redirect=${returnUrl}`;
+      return;
+    }
+
+    // TODO: Implémenter la logique de contact
+    console.log('Contact initié');
+    alert('La fonctionnalité de messagerie sera bientôt disponible !');
+  });
 }
 
 /**
- * Calcule l'heure d'arrivée en fonction de l'heure de départ
- * @param {string} departureTime - L'heure de départ (format HHhMM)
- * @returns {string} - L'heure d'arrivée (format HHhMM)
+ * Gère le bouton "Voir tous les avis"
  */
-function calculateArrivalTime(departureTime) {
-  // Parse the departure time
-  const parts = departureTime.split('h');
-  let hours = parseInt(parts[0], 10);
-  let minutes = parseInt(parts[1] || '0', 10);
+function setupReviewsButton() {
+  const viewAllButton = document.querySelector('.view-all');
 
-  // Add a random duration between 30 minutes and 3 hours
-  const durationMinutes = Math.floor(Math.random() * 150) + 30;
-
-  // Calculate arrival time
-  minutes += durationMinutes;
-  hours += Math.floor(minutes / 60);
-  minutes = minutes % 60;
-  hours = hours % 24;
-
-  return `${hours.toString().padStart(2, '0')}h${minutes.toString().padStart(2, '0')}`;
+  viewAllButton.addEventListener('click', () => {
+    // Dans une version future, cela pourrait ouvrir une modale ou une nouvelle page
+    alert('Cette fonctionnalité sera disponible prochainement !');
+  });
 }
 
 /**
- * Construit le HTML pour afficher la notation en étoiles
- * @param {number} rating - La note du conducteur
- * @returns {string} - Le HTML des étoiles
+ * Initialisation au chargement de la page
  */
-function buildStarRating(rating) {
-  if (!rating) return '';
-
-  const fullStars = Math.floor(rating);
-  const halfStar = rating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
-  let starsHTML = '';
-
-  // Ajouter les étoiles pleines
-  for (let i = 0; i < fullStars; i++) {
-    starsHTML += '<i class="fa-solid fa-star"></i>';
+document.addEventListener('DOMContentLoaded', () => {
+  // Vérifier si on a un ID de trajet
+  const rideId = getRideId();
+  if (!rideId) {
+    console.warn("ID de trajet non trouvé dans l'URL");
+    // On ne redirige pas car nous sommes sur une page statique de démonstration
   }
 
-  // Ajouter une demi-étoile si nécessaire
-  if (halfStar) {
-    starsHTML += '<i class="fa-solid fa-star-half-stroke"></i>';
-  }
+  // Configurer les boutons
+  setupBackButton();
+  setupShareButton();
+  setupBookingButton();
+  setupContactButton();
+  setupReviewsButton();
 
-  // Ajouter les étoiles vides
-  for (let i = 0; i < emptyStars; i++) {
-    starsHTML += '<i class="fa-regular fa-star"></i>';
-  }
+  console.log('Page de détail du covoiturage initialisée');
 
-  return starsHTML;
-}
+  // Reorganisation mobile des sections (déplacement dans trip-details)
+  function reorderSectionsForMobile() {
+    const mql = window.matchMedia('(max-width: 1023px)');
+    if (!mql.matches) return;
+    const tripDetails = document.querySelector('.trip-details');
+    const driverSection = document.querySelector('.driver-section');
+    const preferencesSection = document.querySelector('.preferences-section');
+    const reviewsSection = document.querySelector('.reviews-section');
+    const vehicleSection = tripDetails ? tripDetails.querySelector('.vehicle-section') : null;
+    // Placer conducteur avant véhicule
+    if (driverSection && vehicleSection) {
+      tripDetails.insertBefore(driverSection, vehicleSection);
+    }
+    // Placer préférences avant avis
+    if (preferencesSection && reviewsSection) {
+      tripDetails.insertBefore(preferencesSection, reviewsSection);
+    }
+    // Déplacer avis à la fin
+    if (reviewsSection) {
+      tripDetails.appendChild(reviewsSection);
+    }
+    // Cacher la barre latérale
+    const sidebar = document.querySelector('.trip-sidebar');
+    if (sidebar) {
+      sidebar.style.display = 'none';
+    }
+  }
+  window.addEventListener('load', reorderSectionsForMobile);
+  window.addEventListener('resize', reorderSectionsForMobile);
+});
