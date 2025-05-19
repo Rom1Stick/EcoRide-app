@@ -2,7 +2,8 @@
  * Gestion de la recherche et de l'affichage des covoiturages
  */
 
-// Styles pour la page de résultats de covoiturages
+// Imports
+import { RideService } from '../services/ride-service.js';
 
 // URL de l'API Adresse du gouvernement français
 const API_URL = 'https://api-adresse.data.gouv.fr';
@@ -690,6 +691,7 @@ function getMockResults(from, to, date) {
       from: from,
       to: to,
       date: formattedDate,
+      rawDate: dateObj.toISOString(), // Ajouter la date au format ISO
       time: formattedTime,
       price: price,
       driver: {
@@ -992,6 +994,49 @@ function displayResults(results, isInitialLoad = true) {
 
     // Ajout de l'événement sur le bouton de détails
     card.querySelector('.details-button').addEventListener('click', function () {
+      // Transformer les données du trajet dans le format attendu par la page de détail
+      const rideDetails = {
+        id: ride.id,
+        departure: ride.from,
+        destination: ride.to,
+        date: ride.rawDate || ensureISODate(dateInput.value), // Utiliser la date de recherche
+        departureTime: ride.time.replace('h', ':'),
+        arrivalTime: calculateArrivalTime(ride.time).replace('h', ':'),
+        price: ride.price,
+        availableSeats: ride.availableSeats,
+        co2Emission: ride.co2Emission || (ride.electricVehicle ? 0 : 120),
+        driverId: ride.driver.id || `driver-${ride.id}`,
+        vehicle: {
+          model: ride.vehicleType + (ride.electricVehicle ? ' électrique' : ''),
+          year: new Date().getFullYear().toString(),
+          fuelType: ride.electricVehicle ? 'Électrique' : 'Thermique',
+          tags: [
+            ride.electricVehicle ? 'Écologique' : '',
+            'Confort ++'
+          ].filter(tag => tag)
+        },
+        preferences: {
+          smoking: !ride.nonSmoking,
+          pets: ride.petsAllowed,
+          music: true,
+          talking: true
+        },
+        driver: {
+          firstName: ride.driver.name.split(' ')[0],
+          lastName: ride.driver.name.split(' ').slice(1).join(' '),
+          avatar: ride.driver.image || '../../assets/images/default-avatar.jpg',
+          rating: ride.driver.rating || 4.5,
+          ridesCount: ride.driver.trips || 42,
+          responseRate: 98,
+          responseTime: '< 1 heure',
+          verified: ride.driverVerified
+        }
+      };
+      
+      // Sauvegarder les données du trajet dans le sessionStorage
+      RideService.saveToSession(ride.id, rideDetails);
+      
+      // Rediriger vers la page de détail
       window.location.href = `detail-covoiturage.html?id=${ride.id}`;
     });
 
@@ -1241,6 +1286,46 @@ function formatDate(dateStr) {
     console.error('Erreur de formatage de date:', e);
     return dateStr || '';
   }
+}
+
+/**
+ * Convertit n'importe quel format de date en chaîne ISO pour un stockage cohérent
+ * @param {string|Date} date - La date à convertir
+ * @returns {string} - La date au format ISO
+ */
+function ensureISODate(date) {
+  if (!date) {
+    return new Date().toISOString();
+  }
+  
+  // Si c'est déjà un objet Date
+  if (date instanceof Date) {
+    return date.toISOString();
+  }
+
+  // Si c'est une chaîne qui ressemble déjà à un format ISO
+  if (typeof date === 'string' && date.includes('T') && date.includes('Z')) {
+    try {
+      return new Date(date).toISOString();
+    } catch (e) {
+      console.warn('La date semble être au format ISO mais n\'est pas valide:', date);
+      return new Date().toISOString();
+    }
+  }
+
+  // Si c'est une date simple (YYYY-MM-DD)
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    try {
+      return new Date(date).toISOString();
+    } catch (e) {
+      console.warn('La date simple n\'est pas valide:', date);
+      return new Date().toISOString();
+    }
+  }
+
+  // Pour les autres formats (comme les dates localisées en français), on utilise la date actuelle
+  console.warn('Impossible d\'analyser la date, utilisation de la date actuelle:', date);
+  return new Date().toISOString();
 }
 
 /**

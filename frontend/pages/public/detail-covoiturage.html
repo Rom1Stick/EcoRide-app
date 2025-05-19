@@ -41,32 +41,33 @@
           <section class="driver-section">
             <div class="driver-header">
               <img
-                src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"
-                alt="Thomas D."
+                id="driver-avatar"
+                src="../../assets/images/avatar-placeholder.jpg"
+                alt="Photo du conducteur"
               />
               <div class="info">
-                <div class="name">Thomas D.</div>
+                <div class="name" id="driver-name">Chargement...</div>
                 <div class="meta">
                   <i class="fa-solid fa-star"></i>
-                  <span>4.8</span>
+                  <span id="driver-rating">0.0</span>
                   <span>•</span>
-                  <span>42 trajets</span>
+                  <span id="driver-trips">0 trajets</span>
                 </div>
               </div>
-              <i class="verified fa-solid fa-circle-check"></i>
+              <i class="verified fa-solid fa-circle-check" id="verified-badge"></i>
             </div>
             <div class="driver-stats">
               <span>
                 <span>Taux de réponse</span>
-                <span>98%</span>
+                <span id="response-rate">--</span>
               </span>
               <span>
                 <span>Délai de réponse</span>
-                <span>&lt; 1 heure</span>
+                <span id="response-time">--</span>
               </span>
             </div>
-            <button class="contact-btn" aria-label="Contacter le conducteur">
-              Contacter Thomas
+            <button class="contact-btn" aria-label="Contacter le conducteur" id="contact-btn">
+              Contacter le conducteur
             </button>
           </section>
 
@@ -74,11 +75,11 @@
           <section class="trip-details">
             <div class="trip-details__header">
               <div class="infos">
-                <div class="date">Lundi 24 mars 2025</div>
-                <div class="route">Paris → Lyon</div>
+                <div class="date" id="trip-date">Chargement...</div>
+                <div class="route" id="trip-route">Chargement...</div>
               </div>
               <div class="price">
-                <div class="amount">25€</div>
+                <div class="amount" id="trip-price">--€</div>
                 <div class="unit">par personne</div>
               </div>
             </div>
@@ -87,23 +88,23 @@
               <div class="stat-item">
                 <i class="fa-regular fa-clock"></i>
                 <div class="detail">
-                  <div class="main">Départ à 8:00 • Arrivée à 11:30</div>
-                  <div class="sub">3h30 de trajet</div>
+                  <div class="main" id="trip-times">Chargement...</div>
+                  <div class="sub" id="trip-duration">-- de trajet</div>
                 </div>
               </div>
 
               <div class="stat-item">
                 <i class="fa-solid fa-user-group"></i>
                 <div class="detail">
-                  <div class="main">2 places disponibles</div>
+                  <div class="main" id="seats-available">-- places disponibles</div>
                 </div>
               </div>
 
               <div class="stat-item">
                 <i class="fa-solid fa-leaf"></i>
                 <div class="detail">
-                  <div class="main">120g CO₂/km</div>
-                  <div class="sub">Impact environnemental modéré</div>
+                  <div class="main" id="co2-info">-- CO₂/km</div>
+                  <div class="sub" id="environmental-impact">Impact environnemental --</div>
                 </div>
               </div>
             </div>
@@ -116,11 +117,10 @@
                   <i class="fa-solid fa-car"></i>
                 </div>
                 <div class="details">
-                  <div class="model">Tesla Model 3</div>
-                  <div class="specs">2023 • Électrique</div>
-                  <div class="tags">
-                    <span>Confort ++</span>
-                    <span>Écologique</span>
+                  <div class="model" id="vehicle-model">Chargement...</div>
+                  <div class="specs" id="vehicle-specs">-- • --</div>
+                  <div class="tags" id="vehicle-tags">
+                    <span>Chargement...</span>
                   </div>
                 </div>
               </div>
@@ -133,62 +133,12 @@
               <h3>Avis</h3>
               <div class="rating">
                 <i class="fa-solid fa-star"></i>
-                <span>4.8</span>
-                <span>(24)</span>
+                <span id="reviews-rating">--</span>
+                <span id="reviews-count">(--)</span>
               </div>
             </div>
-            <div class="reviews-list">
-              <div class="review">
-                <div class="review-header">
-                  <img
-                    src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg"
-                    alt="Marie L."
-                  />
-                  <div class="info">
-                    <div class="author">Marie L.</div>
-                    <div class="date">Mars 2025</div>
-                  </div>
-                  <div class="score">
-                    <i class="fa-solid fa-star"></i>
-                    <span>5.0</span>
-                  </div>
-                </div>
-                <p>Très bon trajet, Thomas est ponctuel et sympathique !</p>
-              </div>
-              <div class="review">
-                <div class="review-header">
-                  <img
-                    src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg"
-                    alt="Pierre M."
-                  />
-                  <div class="info">
-                    <div class="author">Pierre M.</div>
-                    <div class="date">Février 2025</div>
-                  </div>
-                  <div class="score">
-                    <i class="fa-solid fa-star"></i>
-                    <span>4.5</span>
-                  </div>
-                </div>
-                <p>Voiture très confortable et trajet agréable.</p>
-              </div>
-              <div class="review">
-                <div class="review-header">
-                  <img
-                    src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg"
-                    alt="Sophie R."
-                  />
-                  <div class="info">
-                    <div class="author">Sophie R.</div>
-                    <div class="date">Janvier 2025</div>
-                  </div>
-                  <div class="score">
-                    <i class="fa-solid fa-star"></i>
-                    <span>5.0</span>
-                  </div>
-                </div>
-                <p>Excellent conducteur, je recommande vivement !</p>
-              </div>
+            <div class="reviews-list" id="reviews-list">
+              <!-- Les avis seront injectés ici dynamiquement -->
             </div>
             <button class="view-all" aria-label="Voir tous les avis sur le conducteur">
               Voir tous les avis
@@ -201,23 +151,8 @@
           <!-- Préférences -->
           <section class="preferences-section">
             <h3>Préférences</h3>
-            <div class="prefs-list">
-              <div class="pref-item">
-                <i class="fa-solid fa-smoking-ban"></i>
-                <span>Non-fumeur</span>
-              </div>
-              <div class="pref-item">
-                <i class="fa-solid fa-paw"></i>
-                <span>Animaux acceptés</span>
-              </div>
-              <div class="pref-item">
-                <i class="fa-solid fa-music"></i>
-                <span>Musique ok</span>
-              </div>
-              <div class="pref-item">
-                <i class="fa-solid fa-message"></i>
-                <span>Discussion ok</span>
-              </div>
+            <div class="prefs-list" id="prefs-list">
+              <!-- Les préférences seront injectées ici dynamiquement -->
             </div>
 
             <!-- Réservation (version desktop) -->
@@ -225,7 +160,7 @@
               <div class="info">
                 <div class="price">
                   <div class="label">Prix total</div>
-                  <div class="amount">25€</div>
+                  <div class="amount" id="total-price">--€</div>
                 </div>
                 <button class="btn-book" aria-label="Réserver ce trajet">Réserver</button>
               </div>
@@ -268,11 +203,11 @@
           <section class="mobile-detail">
             <div class="mobile-detail__header">
               <div class="mobile-detail__date-route">
-                <div class="mobile-detail__date">Lundi 24 mars 2025</div>
-                <div class="mobile-detail__route">Paris → Lyon</div>
+                <div class="mobile-detail__date" id="mobile-trip-date">Chargement...</div>
+                <div class="mobile-detail__route" id="mobile-trip-route">Chargement...</div>
               </div>
               <div class="mobile-detail__price-wrapper">
-                <div class="mobile-detail__price">25€</div>
+                <div class="mobile-detail__price" id="mobile-price">--€</div>
                 <div class="mobile-detail__price-unit">par personne</div>
               </div>
             </div>
@@ -282,8 +217,8 @@
                   <i class="fa-regular fa-clock"></i>
                 </div>
                 <div class="mobile-stats__content">
-                  <div class="mobile-stats__main">Départ à 8:00 • Arrivée à 11:30</div>
-                  <div class="mobile-stats__sub">3h30 de trajet</div>
+                  <div class="mobile-stats__main" id="mobile-trip-times">Chargement...</div>
+                  <div class="mobile-stats__sub" id="mobile-trip-duration">-- de trajet</div>
                 </div>
               </div>
               <div class="mobile-stats__item">
@@ -291,7 +226,7 @@
                   <i class="fa-solid fa-user-group"></i>
                 </div>
                 <div class="mobile-stats__content">
-                  <div class="mobile-stats__main">2 places disponibles</div>
+                  <div class="mobile-stats__main" id="mobile-seats-available">-- places disponibles</div>
                 </div>
               </div>
               <div class="mobile-stats__item">
@@ -299,41 +234,42 @@
                   <i class="fa-solid fa-leaf"></i>
                 </div>
                 <div class="mobile-stats__content">
-                  <div class="mobile-stats__main">120g CO₂/km</div>
-                  <div class="mobile-stats__sub">Impact environnemental modéré</div>
+                  <div class="mobile-stats__main" id="mobile-co2-info">-- CO₂/km</div>
+                  <div class="mobile-stats__sub" id="mobile-environmental-impact">Impact environnemental --</div>
                 </div>
               </div>
             </div>
             <div class="mobile-driver">
               <div class="mobile-driver__header">
                 <img
-                  src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg"
+                  id="mobile-driver-avatar"
+                  src="../../assets/images/avatar-placeholder.jpg"
                   class="mobile-driver__avatar"
-                  alt="Thomas D."
+                  alt="Photo du conducteur"
                 />
                 <div class="mobile-driver__info">
-                  <div class="mobile-driver__name">Thomas D.</div>
+                  <div class="mobile-driver__name" id="mobile-driver-name">Chargement...</div>
                   <div class="mobile-driver__meta">
                     <i class="fa-solid fa-star"></i>
-                    <span>4.8</span>
+                    <span id="mobile-driver-rating">--</span>
                     <span>•</span>
-                    <span>42 trajets</span>
+                    <span id="mobile-driver-trips">-- trajets</span>
                   </div>
                 </div>
-                <i class="fa-solid fa-circle-check mobile-driver__verified"></i>
+                <i class="fa-solid fa-circle-check mobile-driver__verified" id="mobile-verified-badge"></i>
               </div>
               <div class="mobile-driver__stats">
                 <div class="mobile-driver__stat">
                   <span class="mobile-driver__stat-label">Taux de réponse</span>
-                  <span class="mobile-driver__stat-value">98%</span>
+                  <span class="mobile-driver__stat-value" id="mobile-response-rate">--</span>
                 </div>
                 <div class="mobile-driver__stat">
                   <span class="mobile-driver__stat-label">Délai de réponse</span>
-                  <span class="mobile-driver__stat-value">< 1 heure</span>
+                  <span class="mobile-driver__stat-value" id="mobile-response-time">--</span>
                 </div>
               </div>
-              <button class="mobile-driver__contact-btn" aria-label="Contacter le conducteur">
-                Contacter Thomas
+              <button class="mobile-driver__contact-btn" aria-label="Contacter le conducteur" id="mobile-contact-btn">
+                Contacter le conducteur
               </button>
             </div>
             <div class="mobile-vehicle">
@@ -343,34 +279,18 @@
                   <i class="fa-solid fa-car"></i>
                 </div>
                 <div class="mobile-vehicle__details">
-                  <div class="mobile-vehicle__model">Tesla Model 3</div>
-                  <div class="mobile-vehicle__specs">2023 • Électrique</div>
-                  <div class="mobile-vehicle__tags">
-                    <span class="mobile-vehicle__tag">Confort ++</span>
-                    <span class="mobile-vehicle__tag">Écologique</span>
+                  <div class="mobile-vehicle__model" id="mobile-vehicle-model">Chargement...</div>
+                  <div class="mobile-vehicle__specs" id="mobile-vehicle-specs">-- • --</div>
+                  <div class="mobile-vehicle__tags" id="mobile-vehicle-tags">
+                    <span class="mobile-vehicle__tag">Chargement...</span>
                   </div>
                 </div>
               </div>
             </div>
             <div class="mobile-prefs">
               <h3 class="mobile-prefs__title">Préférences</h3>
-              <div class="mobile-prefs__grid">
-                <div class="mobile-prefs__item">
-                  <i class="fa-solid fa-ban-smoking"></i>
-                  <span>Non-fumeur</span>
-                </div>
-                <div class="mobile-prefs__item">
-                  <i class="fa-solid fa-paw"></i>
-                  <span>Animaux acceptés</span>
-                </div>
-                <div class="mobile-prefs__item">
-                  <i class="fa-solid fa-music"></i>
-                  <span>Musique ok</span>
-                </div>
-                <div class="mobile-prefs__item">
-                  <i class="fa-solid fa-message"></i>
-                  <span>Discussion ok</span>
-                </div>
+              <div class="mobile-prefs__grid" id="mobile-prefs-list">
+                <!-- Les préférences seront injectées ici dynamiquement -->
               </div>
             </div>
             <div class="mobile-reviews">
@@ -378,67 +298,12 @@
                 <h3 class="mobile-reviews__title">Avis</h3>
                 <div class="mobile-reviews__rating">
                   <i class="fa-solid fa-star"></i>
-                  <span>4.8</span>
-                  <span>(24)</span>
+                  <span id="mobile-reviews-rating">--</span>
+                  <span id="mobile-reviews-count">(--)</span>
                 </div>
               </div>
-              <div class="mobile-reviews__list">
-                <div class="mobile-review">
-                  <div class="mobile-review__header">
-                    <img
-                      src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg"
-                      class="mobile-review__avatar"
-                      alt="Marie L."
-                    />
-                    <div class="mobile-review__info">
-                      <div class="mobile-review__author">Marie L.</div>
-                      <div class="mobile-review__date">Mars 2025</div>
-                    </div>
-                    <div class="mobile-review__score">
-                      <i class="fa-solid fa-star"></i>
-                      <span>5.0</span>
-                    </div>
-                  </div>
-                  <p class="mobile-review__text">
-                    Très bon trajet, Thomas est ponctuel et sympathique !
-                  </p>
-                </div>
-                <div class="mobile-review">
-                  <div class="mobile-review__header">
-                    <img
-                      src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg"
-                      class="mobile-review__avatar"
-                      alt="Pierre M."
-                    />
-                    <div class="mobile-review__info">
-                      <div class="mobile-review__author">Pierre M.</div>
-                      <div class="mobile-review__date">Février 2025</div>
-                    </div>
-                    <div class="mobile-review__score">
-                      <i class="fa-solid fa-star"></i>
-                      <span>4.5</span>
-                    </div>
-                  </div>
-                  <p class="mobile-review__text">Voiture très confortable et trajet agréable.</p>
-                </div>
-                <div class="mobile-review">
-                  <div class="mobile-review__header">
-                    <img
-                      src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg"
-                      class="mobile-review__avatar"
-                      alt="Sophie R."
-                    />
-                    <div class="mobile-review__info">
-                      <div class="mobile-review__author">Sophie R.</div>
-                      <div class="mobile-review__date">Janvier 2025</div>
-                    </div>
-                    <div class="mobile-review__score">
-                      <i class="fa-solid fa-star"></i>
-                      <span>5.0</span>
-                    </div>
-                  </div>
-                  <p class="mobile-review__text">Excellent conducteur, je recommande vivement !</p>
-                </div>
+              <div class="mobile-reviews__list" id="mobile-reviews-list">
+                <!-- Les avis seront injectés ici dynamiquement -->
               </div>
               <button
                 class="mobile-reviews__view-all"
@@ -453,7 +318,7 @@
           <div class="mobile-booking-footer__content">
             <div class="mobile-booking-footer__price-info">
               <div class="mobile-booking-footer__price-label">Prix total</div>
-              <div class="mobile-booking-footer__price">25€</div>
+              <div class="mobile-booking-footer__price" id="mobile-total-price">--€</div>
             </div>
             <button class="mobile-booking-footer__btn" aria-label="Réserver ce trajet">
               Réserver
