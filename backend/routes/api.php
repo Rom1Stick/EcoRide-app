@@ -27,8 +27,9 @@ $router->post('/api/rides', 'RideController@store')->middleware('auth');
 $router->put('/api/rides/{id}', 'RideController@update')->middleware('auth');
 $router->delete('/api/rides/{id}', 'RideController@destroy')->middleware('auth');
 
-// Routes de recherche
+// Routes de recherche (double route pour compatibilité)
 $router->get('/api/rides/search', 'SearchController@search');
+$router->get('/api/trips/search', 'SearchController@search');
 
 // Routes des utilisateurs
 $router->get('/api/users/me', 'UserController@me');
