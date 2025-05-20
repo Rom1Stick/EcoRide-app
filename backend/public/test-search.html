@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API de Recherche EcoRide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #219653;
+        }
+        .results {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .ride-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+        .ride-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .ride-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .driver-info {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .driver-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            background-color: #3498db;
+            margin: 0 5px;
+        }
+        .pagination button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .error {
+            color: #e74c3c;
+            padding: 10px;
+            background-color: #fadbd8;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test API de Recherche EcoRide</h1>
+    
+    <div class="search-form">
+        <div class="form-group">
+            <label for="departureLocation">Lieu de départ :</label>
+            <input type="text" id="departureLocation" required placeholder="Ex: Paris">
+        </div>
+        <div class="form-group">
+            <label for="arrivalLocation">Lieu d'arrivée :</label>
+            <input type="text" id="arrivalLocation" required placeholder="Ex: Lyon">
+        </div>
+        <div class="form-group">
+            <label for="date">Date :</label>
+            <input type="date" id="date" required>
+        </div>
+        <div class="form-group">
+            <label for="departureTime">Heure de départ (optionnel) :</label>
+            <input type="time" id="departureTime">
+        </div>
+        <div class="form-group">
+            <label for="maxPrice">Prix maximum (optionnel) :</label>
+            <input type="number" id="maxPrice" min="0" step="0.01" placeholder="Ex: 30">
+        </div>
+        <div class="form-group">
+            <label for="sortBy">Trier par :</label>
+            <select id="sortBy">
+                <option value="departureTime">Heure de départ</option>
+                <option value="price">Prix</option>
+            </select>
+        </div>
+        <button id="searchButton">Rechercher</button>
+    </div>
+    
+    <div class="results" id="results">
+        <h2>Résultats</h2>
+        <div id="ridesList"></div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+    
+    <div class="results" style="margin-top: 20px;">
+        <h2>Réponse API brute</h2>
+        <pre id="apiResponse">Effectuez une recherche pour voir la réponse API...</pre>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Définir la date d'aujourd'hui comme date minimale
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').min = today;
+            document.getElementById('date').value = today;
+            
+            // Gérer la soumission du formulaire
+            document.getElementById('searchButton').addEventListener('click', function() {
+                search(1);
+            });
+            
+            // Fonction de recherche
+            function search(page) {
+                const departureLocation = document.getElementById('departureLocation').value;
+                const arrivalLocation = document.getElementById('arrivalLocation').value;
+                const date = document.getElementById('date').value;
+                const departureTime = document.getElementById('departureTime').value;
+                const maxPrice = document.getElementById('maxPrice').value;
+                const sortBy = document.getElementById('sortBy').value;
+                
+                // Validation minimale
+                if (!departureLocation || !arrivalLocation || !date) {
+                    alert('Veuillez remplir tous les champs obligatoires.');
+                    return;
+                }
+                
+                // Construire l'URL de l'API
+                let url = `/api/rides/search?departureLocation=${encodeURIComponent(departureLocation)}&arrivalLocation=${encodeURIComponent(arrivalLocation)}&date=${encodeURIComponent(date)}&page=${page}&limit=5`;
+                
+                if (departureTime) {
+                    url += `&departureTime=${encodeURIComponent(departureTime)}`;
+                }
+                
+                if (maxPrice) {
+                    url += `&maxPrice=${encodeURIComponent(maxPrice)}`;
+                }
+                
+                url += `&sortBy=${encodeURIComponent(sortBy)}`;
+                
+                // Effacer les résultats précédents
+                document.getElementById('ridesList').innerHTML = 'Chargement...';
+                document.getElementById('pagination').innerHTML = '';
+                
+                // Appeler l'API
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Afficher la réponse brute
+                        document.getElementById('apiResponse').textContent = JSON.stringify(data, null, 2);
+                        
+                        // Traiter et afficher les résultats
+                        displayResults(data, page);
+                    })
+                    .catch(error => {
+                        document.getElementById('ridesList').innerHTML = `
+                            <div class="error">
+                                Erreur lors de la recherche : ${error.message}
+                            </div>
+                        `;
+                        console.error('Erreur:', error);
+                    });
+            }
+            
+            // Fonction d'affichage des résultats
+            function displayResults(data, currentPage) {
+                const ridesListElement = document.getElementById('ridesList');
+                const paginationElement = document.getElementById('pagination');
+                
+                // Vérifier si la recherche a réussi
+                if (!data.success) {
+                    ridesListElement.innerHTML = `
+                        <div class="error">
+                            ${data.message || 'Erreur lors de la recherche.'}
+                        </div>
+                    `;
+                    if (data.errors) {
+                        const errorsHtml = Object.entries(data.errors)
+                            .map(([field, message]) => `<p><strong>${field}:</strong> ${message}</p>`)
+                            .join('');
+                        ridesListElement.innerHTML += `<div class="error">${errorsHtml}</div>`;
+                    }
+                    return;
+                }
+                
+                // Afficher les trajets
+                if (data.data.length === 0) {
+                    ridesListElement.innerHTML = '<p>Aucun trajet trouvé pour ces critères.</p>';
+                    return;
+                }
+                
+                const ridesHtml = data.data.map(ride => {
+                    return `
+                        <div class="ride-card">
+                            <h3>${ride.departure.location} → ${ride.arrival.location}</h3>
+                            <div class="ride-info">
+                                <div>
+                                    <strong>Départ:</strong> ${ride.departure.date} à ${ride.departure.time}
+                                </div>
+                                <div>
+                                    <strong>Arrivée:</strong> ${ride.arrival.date} à ${ride.arrival.time}
+                                </div>
+                            </div>
+                            <div class="ride-info">
+                                <div>
+                                    <strong>Prix:</strong> ${ride.price} €
+                                </div>
+                                <div>
+                                    <strong>Places disponibles:</strong> ${ride.seats.available}/${ride.seats.total}
+                                </div>
+                            </div>
+                            <div class="ride-info">
+                                <div>
+                                    <strong>Véhicule:</strong> ${ride.vehicle.brand} ${ride.vehicle.model} (${ride.vehicle.energy})
+                                </div>
+                                <div>
+                                    <strong>Empreinte carbone:</strong> ${ride.ecologicalImpact.carbonFootprint} kg CO2
+                                </div>
+                            </div>
+                            <div class="driver-info">
+                                <img src="${ride.driver.profilePicture || 'https://via.placeholder.com/50'}" alt="Photo de profil">
+                                <div>
+                                    <strong>${ride.driver.username}</strong><br>
+                                    Note: ${ride.driver.rating}/5
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                ridesListElement.innerHTML = ridesHtml;
+                
+                // Pagination
+                if (data.pagination) {
+                    const { total, page, limit, pages } = data.pagination;
+                    
+                    let paginationHtml = '';
+                    
+                    // Bouton précédent
+                    paginationHtml += `
+                        <button onclick="search(${page - 1})" ${page <= 1 ? 'disabled' : ''}>
+                            Précédent
+                        </button>
+                    `;
+                    
+                    // Afficher le numéro de page actuelle et le total
+                    paginationHtml += `<span style="margin: 0 10px;">Page ${page} sur ${pages}</span>`;
+                    
+                    // Bouton suivant
+                    paginationHtml += `
+                        <button onclick="search(${page + 1})" ${page >= pages ? 'disabled' : ''}>
+                            Suivant
+                        </button>
+                    `;
+                    
+                    paginationElement.innerHTML = paginationHtml;
+                    
+                    // Rendre la fonction search disponible globalement pour la pagination
+                    window.search = search;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,12 +1,12 @@
 /**
- * Gestion du formulaire de recherche sur la page d'accueil
+ * Gestion de la recherche sur la page d'accueil
  */
+
+// Imports
+import { LocationService } from '../services/location-service.js';
 
 // URL de l'API Adresse du gouvernement français
 const API_URL = 'https://api-adresse.data.gouv.fr';
-
-// Cache pour les résultats d'autocomplétion
-const autocompleteCache = new Map();
 
 // Éléments DOM
 const fromInput = document.getElementById('from');
@@ -16,38 +16,72 @@ const searchForm = document.getElementById('search-form');
 const fromAutocompleteContainer = document.getElementById('from-autocomplete');
 const toAutocompleteContainer = document.getElementById('to-autocomplete');
 
-// Configuration du sélecteur de date avec date minimale = aujourd'hui
-const today = new Date().toISOString().split('T')[0];
-dateInput.setAttribute('min', today);
-if (!dateInput.value) {
-  dateInput.value = today;
-}
+/**
+ * Initialisation de la page au chargement
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("Initialisation de la page d'accueil...");
+  initSearchForm();
+});
 
 /**
- * Initialisation des composants
+ * Initialisation du formulaire de recherche
  */
-function init() {
+function initSearchForm() {
   // Vérification que les éléments du DOM sont bien présents
-  if (
-    !fromInput ||
-    !toInput ||
-    !dateInput ||
-    !searchForm ||
-    !fromAutocompleteContainer ||
-    !toAutocompleteContainer
-  ) {
+  if (!fromInput || !toInput || !dateInput || !searchForm) {
     console.error('Certains éléments du DOM sont manquants.');
     return;
   }
 
-  // Initialisation des champs d'autocomplétion
-  setupAutocomplete(fromInput, fromAutocompleteContainer);
-  setupAutocomplete(toInput, toAutocompleteContainer);
+  // Configuration de la date minimale (demain pour éviter les problèmes)
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const formattedDate = tomorrow.toISOString().split('T')[0];
+  
+  dateInput.setAttribute('min', today.toISOString().split('T')[0]);
+  dateInput.value = formattedDate;
 
-  // Validation du formulaire avant soumission
+  // Initialisation de l'autocomplétion avec LocationService
+  LocationService.initAutocomplete(fromInput, (city) => {
+    console.log('Ville de départ sélectionnée:', city);
+  });
+  
+  LocationService.initAutocomplete(toInput, (city) => {
+    console.log('Ville d\'arrivée sélectionnée:', city);
+  });
+
+  // Gestion de la soumission du formulaire
   searchForm.addEventListener('submit', handleSearch);
+}
 
-  console.log("Formulaire de recherche initialisé sur la page d'accueil.");
+/**
+ * Gestion de la soumission du formulaire de recherche
+ * @param {Event} e - L'événement de soumission
+ */
+function handleSearch(e) {
+  e.preventDefault();
+  
+  // Valider les champs de ville
+  const cityFields = ['from', 'to'];
+  const citiesValid = LocationService.validateCityFields(searchForm, cityFields);
+  
+  if (!citiesValid) {
+    // Ne pas soumettre le formulaire si les villes ne sont pas valides
+    console.error('Veuillez sélectionner des villes valides parmi les suggestions proposées');
+    return;
+  }
+  
+  // Récupérer les données du formulaire
+  const fromCity = fromInput.value;
+  const toCity = toInput.value;
+  const date = dateInput.value;
+  
+  console.log('Recherche de covoiturage:', { from: fromCity, to: toCity, date });
+  
+  // Rediriger vers la page de résultats avec les paramètres
+  window.location.href = `./covoiturages.html?from=${encodeURIComponent(fromCity)}&to=${encodeURIComponent(toCity)}&date=${encodeURIComponent(date)}`;
 }
 
 /**
@@ -248,21 +282,6 @@ function debounce(func, wait) {
 }
 
 /**
- * Validation et soumission du formulaire de recherche
- * @param {Event} e - L'événement de soumission
- */
-function handleSearch(e) {
-  // Validation des champs
-  if (!validateSearchForm()) {
-    e.preventDefault();
-    return;
-  }
-
-  // Continuer la soumission normale du formulaire
-  console.log('Formulaire valide, redirection vers la page de résultats...');
-}
-
-/**
  * Validation du formulaire de recherche
  * @returns {boolean} Vrai si le formulaire est valide
  */
@@ -338,9 +357,3 @@ function resetField(field) {
     errorElement.remove();
   }
 }
-
-// Initialiser la page au chargement
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("Initialisation de la page d'accueil...");
-  init();
-});

@@ -22,13 +22,15 @@ $router->get('/api/auth/confirm', 'AuthController@confirm');
 
 // Routes des trajets
 $router->get('/api/rides', 'RideController@index');
+$router->get('/api/rides/my', 'RideController@getMyRides')->middleware('auth');
 $router->get('/api/rides/{id}', 'RideController@show');
 $router->post('/api/rides', 'RideController@store')->middleware('auth');
 $router->put('/api/rides/{id}', 'RideController@update')->middleware('auth');
 $router->delete('/api/rides/{id}', 'RideController@destroy')->middleware('auth');
 
-// Routes de recherche
+// Routes de recherche (double route pour compatibilité)
 $router->get('/api/rides/search', 'SearchController@search');
+$router->get('/api/trips/search', 'SearchController@search');
 
 // Routes des utilisateurs
 $router->get('/api/users/me', 'UserController@me');
@@ -40,12 +42,25 @@ $router->get('/api/bookings', 'BookingController@index')->middleware('auth');
 $router->post('/api/rides/{id}/book', 'BookingController@store')->middleware('auth');
 $router->delete('/api/bookings/{id}', 'BookingController@destroy')->middleware('auth');
 
+// Routes des véhicules
+$router->get('/api/vehicles', 'VehicleController@getUserVehicle')->middleware('auth');
+$router->post('/api/vehicles', 'VehicleController@store')->middleware('auth');
+$router->put('/api/vehicles/{id}', 'VehicleController@update')->middleware('auth');
+$router->delete('/api/vehicles/{id}', 'VehicleController@destroy')->middleware('auth');
+
+// Route des types d'énergie
+$router->get('/api/energy-types', 'VehicleController@getEnergyTypes');
+
 // Routes du système de crédits
 $router->get('/api/credits/balance', 'CreditsController@balance')->middleware('auth');
 $router->get('/api/credits/transactions', 'CreditsController@transactions')->middleware('auth');
 $router->post('/api/credits/transfer', 'CreditsController@transfer')->middleware('auth');
 $router->get('/api/credits/pricing', 'CreditsController@pricing');
 $router->get('/api/admin/credits/alerts', 'CreditsController@alerts')->middleware('auth');
+
+// Routes de recherche de lieux (autocomplétion)
+$router->get('/api/locations/search', 'LocationController@search');
+$router->get('/api/locations/popular', 'LocationController@getPopular');
 
 // Routes d'administration (gestion des rôles et utilisateurs)
 $router->get('/api/admin/users', 'AdminController@listUsers')->middleware('auth');

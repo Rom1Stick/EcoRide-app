@@ -84,12 +84,23 @@ class Application
      */
     private function sendResponse($response): void
     {
+        // S'assurer qu'aucun contenu n'a été envoyé avant
+        if (!headers_sent()) {
         // Définir l'en-tête Content-Type
-        header('Content-Type: application/json');
+            header('Content-Type: application/json; charset=UTF-8');
+        }
 
         // Si la réponse n'est pas déjà une chaîne JSON, la convertir
         if (!is_string($response)) {
-            $response = json_encode($response);
+            $response = json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($response === false) {
+                // En cas d'échec de l'encodage JSON, renvoyer une erreur formatée
+                http_response_code(500);
+                $response = json_encode([
+                    'error' => true,
+                    'message' => 'Erreur de conversion JSON'
+                ]);
+            }
         }
 
         // Envoyer la réponse
