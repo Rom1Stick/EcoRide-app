@@ -75,6 +75,9 @@
                       autocomplete="off"
                       required
                       aria-required="true"
+                      maxlength="25"
+                      data-valid-city="false"
+                      aria-describedby="from-error"
                     />
                     <div
                       class="autocomplete-container"
@@ -82,6 +85,10 @@
                       aria-live="polite"
                       role="listbox"
                     ></div>
+                    <span id="from-error" class="error-message" role="alert" aria-live="assertive" style="display: none;">
+                      <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                      Veuillez sélectionner une ville dans la liste
+                    </span>
                   </div>
                 </div>
 
@@ -96,6 +103,9 @@
                       autocomplete="off"
                       required
                       aria-required="true"
+                      maxlength="25"
+                      data-valid-city="false"
+                      aria-describedby="to-error"
                     />
                     <div
                       class="autocomplete-container"
@@ -103,6 +113,10 @@
                       aria-live="polite"
                       role="listbox"
                     ></div>
+                    <span id="to-error" class="error-message" role="alert" aria-live="assertive" style="display: none;">
+                      <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                      Veuillez sélectionner une ville dans la liste
+                    </span>
                   </div>
                 </div>
 

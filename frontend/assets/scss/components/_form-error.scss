@@ -25,11 +25,12 @@
 
 // Styles pour les messages d'erreur dans les formulaires
 .error-message {
-  color: #ff3d00;
+  color: $color-accent;
   font-size: 0.8rem;
   margin-top: 0.5rem;
-  display: block;
+  display: none;
   font-weight: 600;
+  animation: shake 0.5s ease-in-out;
 
   @include tablet {
     font-size: 0.85rem;
@@ -43,7 +44,29 @@
 // Style pour l'état d'erreur dans la page de covoiturage
 .search-form__field .error-message {
   margin-bottom: 0.5rem;
-  animation: shake 0.5s ease-in-out;
+}
+
+// Styles pour les icônes d'erreur
+.error-icon {
+  margin-right: 0.5rem;
+  color: $color-accent;
+}
+
+// Conteneur d'erreur
+.error-container {
+  margin-top: 0.5rem;
+}
+
+// Style pour les champs invalides
+.input-error {
+  border: 1px solid $color-accent !important;
+  box-shadow: 0 0 0 1px $color-accent !important;
+}
+
+// Style pour les champs valides
+.input-valid {
+  border: 1px solid $color-secondary !important;
+  box-shadow: 0 0 0 1px $color-secondary !important;
 }
 
 // Animation de tremblement pour attirer l'attention

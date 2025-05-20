@@ -476,7 +476,7 @@
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: darken($color-accent, 10%);
+        background-color: $color-primary-bg;
       }
     }
 

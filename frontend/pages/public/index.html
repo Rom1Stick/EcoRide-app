@@ -76,8 +76,15 @@
                   placeholder="Ville de départ"
                   required
                   autocomplete="off"
+                  maxlength="25"
+                  data-valid-city="false"
+                  aria-describedby="from-error"
                 />
                 <div class="autocomplete-container" id="from-autocomplete"></div>
+                <span id="from-error" class="error-message" role="alert" aria-live="assertive" style="display: none;">
+                  <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                  Veuillez sélectionner une ville dans la liste
+                </span>
               </div>
 
               <label for="to">Arrivée</label>
@@ -90,8 +97,15 @@
                   placeholder="Ville d'arrivée"
                   required
                   autocomplete="off"
+                  maxlength="25"
+                  data-valid-city="false"
+                  aria-describedby="to-error"
                 />
                 <div class="autocomplete-container" id="to-autocomplete"></div>
+                <span id="to-error" class="error-message" role="alert" aria-live="assertive" style="display: none;">
+                  <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                  Veuillez sélectionner une ville dans la liste
+                </span>
               </div>
 
               <label for="date">Date</label>
@@ -262,96 +276,5 @@
     <script type="module" src="../../assets/js/common/userProfile.js"></script>
     <script type="module" src="../../assets/js/common/menu-auth.js"></script>
     <script type="module" src="../../assets/js/pages/index.js"></script>
-
-    <!-- Style supplémentaire pour les suggestions d'autocomplétion -->
-    <style>
-      .autocomplete-container {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background-color: #4e342e;
-        border-radius: 0 0 0.75rem 0.75rem;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: all 0.3s ease;
-        z-index: 100;
-      }
-
-      .autocomplete-container.active {
-        max-height: 300px;
-        overflow-y: auto;
-        opacity: 1;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border: 1px solid #388e3c;
-        border-top: none;
-      }
-
-      .suggestion-item {
-        padding: 0.75rem 1rem;
-        cursor: pointer;
-        border-bottom: 1px solid rgba(168, 176, 165, 0.2);
-        transition: background-color 0.2s ease;
-        color: #f1f1f1;
-      }
-
-      .suggestion-item:last-child {
-        border-bottom: none;
-      }
-
-      .suggestion-item:hover,
-      .suggestion-item.selected {
-        background-color: #388e3c;
-      }
-
-      .suggestion-item .main-text {
-        font-weight: 600;
-      }
-
-      .suggestion-item .main-text strong {
-        color: #ffc107;
-        font-weight: 700;
-      }
-
-      .suggestion-item .sub-text {
-        font-size: 0.8rem;
-        color: #a8b0a5;
-        margin-top: 0.25rem;
-      }
-
-      .error-message {
-        color: #ff3d00;
-        font-size: 0.8rem;
-        margin-top: 0.5rem;
-        display: block;
-        font-weight: 600;
-        animation: shake 0.5s ease-in-out;
-      }
-
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        10%,
-        30%,
-        50%,
-        70%,
-        90% {
-          transform: translateX(-5px);
-        }
-        20%,
-        40%,
-        60%,
-        80% {
-          transform: translateX(5px);
-        }
-      }
-
-      .input-group {
-        position: relative;
-      }
-    </style>
   </body>
 </html>

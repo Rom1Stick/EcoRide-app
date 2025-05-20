@@ -4,6 +4,8 @@
 
 // Imports
 import { RideService } from '../services/ride-service.js';
+import { LocationService } from '../services/location-service.js';
+import { API } from '../common/api.js';
 
 // URL de l'API Adresse du gouvernement français
 const API_URL = 'https://api-adresse.data.gouv.fr';
@@ -21,12 +23,9 @@ const toAutocompleteContainer = document.getElementById('to-autocomplete');
 const resultsList = document.getElementById('results-list');
 const resultsCount = document.getElementById('results-count');
 
-// Configuration du sélecteur de date avec date minimale = aujourd'hui
+// On attend l'initialisation complète pour configurer la date
+// afin de permettre aux paramètres d'URL d'être prioritaires
 const today = new Date().toISOString().split('T')[0];
-dateInput.setAttribute('min', today);
-if (!dateInput.value) {
-  dateInput.value = today;
-}
 
 /**
  * Initialisation des composants
@@ -43,6 +42,17 @@ function init() {
   ) {
     console.error('Certains éléments du DOM sont manquants.');
     return;
+  }
+
+  // Configuration du sélecteur de date avec date minimale = aujourd'hui
+  dateInput.setAttribute('min', today);
+  
+  // Récupérer les paramètres d'URL pour pré-remplir le formulaire et lancer la recherche
+  const hasUrlParams = setFormFromUrlParams();
+  
+  // Si aucune date n'a été spécifiée dans l'URL, utiliser la date du jour
+  if (!hasUrlParams || !dateInput.value) {
+    dateInput.value = today;
   }
 
   // Initialisation des champs d'autocomplétion
@@ -65,9 +75,6 @@ function init() {
       }
     });
   }
-
-  // Récupérer les paramètres d'URL pour pré-remplir le formulaire et lancer la recherche
-  const hasUrlParams = setFormFromUrlParams();
 
   // Si aucun paramètre d'URL, simuler une recherche avec des villes par défaut
   if (!hasUrlParams) {
@@ -418,16 +425,26 @@ function debounce(func, wait) {
 function handleSearch(e) {
   e.preventDefault();
 
-  // Validation des champs
-  if (!validateSearchForm()) {
+  // Valider les champs de ville
+  const cityFields = ['from', 'to'];
+  const citiesValid = LocationService.validateCityFields(searchForm, cityFields);
+  
+  if (!citiesValid) {
+    // Ne pas soumettre le formulaire si les villes ne sont pas valides
+    console.error('Veuillez sélectionner des villes valides parmi les suggestions proposées');
     return;
   }
-
+  
+  // Récupérer les données du formulaire
+  const fromCity = fromInput.value;
+  const toCity = toInput.value;
+  const date = dateInput.value;
+  
   // Construire l'URL avec les paramètres de recherche
   const searchParams = new URLSearchParams();
-  searchParams.append('from', fromInput.value);
-  searchParams.append('to', toInput.value);
-  searchParams.append('date', dateInput.value);
+  searchParams.append('from', fromCity);
+  searchParams.append('to', toCity);
+  searchParams.append('date', date);
 
   // Mettre à jour l'URL avec les paramètres de recherche
   const url = new URL(window.location.href);
@@ -437,182 +454,119 @@ function handleSearch(e) {
   // Simuler un chargement des résultats
   displayLoadingResults();
 
-  // Dans un cas réel, on ferait un appel API ici
-  // Pour la démo, on simule un délai et on affiche des résultats fictifs
-  setTimeout(() => {
-    const results = getMockResults(fromInput.value, toInput.value, dateInput.value);
-    displayResults(results);
-  }, 1000);
+  // Rechercher d'abord les trajets réels dans la base de données
+  fetchRealRides(fromCity, toCity, date)
+    .then(realRides => {
+      // Si aucun trajet réel n'est trouvé, générer des trajets fictifs
+      if (realRides.length === 0 || realRides.error) {
+        return getMockResults(fromCity, toCity, date, []);
+      }
+      
+      // Sinon, compléter avec des trajets fictifs
+      const mockRides = getMockResults(fromCity, toCity, date, realRides);
+      
+      // Combiner les trajets réels (qui sont déjà marqués comme prioritaires) avec les trajets fictifs
+      return [...realRides, ...mockRides];
+    })
+    .then(results => {
+      // Trier les résultats pour mettre les trajets prioritaires en premier
+      results.sort((a, b) => {
+        // Les trajets prioritaires d'abord
+        if (a.isPriority && !b.isPriority) return -1;
+        if (!a.isPriority && b.isPriority) return 1;
+        
+        // Ensuite, trier par prix croissant
+        return a.price - b.price;
+      });
+      
+      displayResults(results);
+    })
+    .catch(error => {
+      console.error("Erreur lors de la recherche de trajets:", error);
+      // En cas d'erreur, afficher seulement des résultats fictifs
+      const mockResults = getMockResults(fromCity, toCity, date, []);
+      displayResults(mockResults);
+    });
 }
 
 /**
- * Validation du formulaire de recherche
- * @returns {boolean} Vrai si le formulaire est valide
+ * Récupère les trajets réels depuis la base de données
+ * @param {string} from - Ville de départ
+ * @param {string} to - Ville d'arrivée
+ * @param {string} date - Date du trajet
+ * @returns {Promise<Array>} Tableau des trajets trouvés
  */
-function validateSearchForm() {
-  let isValid = true;
-
-  // Vérifier si les champs sont remplis
-  if (!fromInput.value.trim()) {
-    highlightInvalidField(fromInput, 'Ce champ est obligatoire');
-    isValid = false;
-  } else {
-    resetField(fromInput);
-  }
-
-  if (!toInput.value.trim()) {
-    highlightInvalidField(toInput, 'Ce champ est obligatoire');
-    isValid = false;
-  } else {
-    resetField(toInput);
-  }
-
-  // Vérifier si la date est sélectionnée
-  if (!dateInput.value) {
-    highlightInvalidField(dateInput, 'Veuillez sélectionner une date');
-    isValid = false;
-  } else {
-    resetField(dateInput);
-  }
-
-  // Vérifier que les villes existent
-  let fromCity, toCity;
-
+async function fetchRealRides(from, to, date) {
   try {
-    // Récupérer les données de ville depuis les attributs data si disponibles
-    if (fromInput.dataset.cityData) {
-      fromCity = JSON.parse(fromInput.dataset.cityData);
-    }
-
-    if (toInput.dataset.cityData) {
-      toCity = JSON.parse(toInput.dataset.cityData);
-    }
-  } catch (e) {
-    console.error('Erreur lors de la récupération des données de ville:', e);
-  }
-
-  if (!fromCity) {
-    highlightInvalidField(fromInput, 'Veuillez sélectionner une ville dans la liste');
-    isValid = false;
-  }
-
-  if (!toCity) {
-    highlightInvalidField(toInput, 'Veuillez sélectionner une ville dans la liste');
-    isValid = false;
-  }
-
-  // Vérifier que la ville de départ est différente de la ville d'arrivée
-  if (fromCity && toCity && fromCity.name === toCity.name) {
-    highlightInvalidField(toInput, "Les villes de départ et d'arrivée doivent être différentes");
-    isValid = false;
-  }
-
-  return isValid;
-}
-
-/**
- * Met en évidence un champ invalide
- * @param {HTMLElement} field - Le champ à mettre en évidence
- * @param {string} message - Message d'erreur optionnel
- */
-function highlightInvalidField(field, message) {
-  const inputGroup = field.closest('.input-group');
-  inputGroup.style.boxShadow = '0 0 0 2px #ff3d00';
-
-  // Afficher un message d'erreur si fourni
-  if (message) {
-    let errorElement = inputGroup.parentElement.querySelector('.error-message');
-
-    if (!errorElement) {
-      errorElement = document.createElement('div');
-      errorElement.className = 'error-message';
-      inputGroup.parentElement.appendChild(errorElement);
-    }
-
-    errorElement.textContent = message;
-  }
-}
-
-/**
- * Réinitialise l'apparence d'un champ
- * @param {HTMLElement} field - Le champ à réinitialiser
- */
-function resetField(field) {
-  const inputGroup = field.closest('.input-group');
-  inputGroup.style.boxShadow = '';
-
-  // Supprimer le message d'erreur s'il existe
-  const errorElement = inputGroup.parentElement.querySelector('.error-message');
-  if (errorElement) {
-    errorElement.remove();
-  }
-}
-
-/**
- * Pré-remplit le formulaire à partir des paramètres d'URL
- */
-async function setFormFromUrlParams() {
-  const urlParams = new URLSearchParams(window.location.search);
-
-  const from = urlParams.get('from');
-  const to = urlParams.get('to');
-  const date = urlParams.get('date');
-
-  if (from) {
-    fromInput.value = from;
-    // Charger les données de la ville pour la validation
+    console.log("Recherche de trajets avec les paramètres:", { from, to, date });
+    
+    // Simuler un délai pour éviter les erreurs de course (race condition)
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
     try {
-      const fromCities = await fetchCitySuggestions(from);
-      const exactMatch = fromCities.find((city) => city.name === from);
-      if (exactMatch) {
-        fromInput.dataset.cityData = JSON.stringify(exactMatch);
+      // Essayer de récupérer les trajets réels
+      const response = await RideService.searchRides(from, to, date, 1);
+      console.log("Réponse de l'API:", response);
+      
+      // Vérifier si la réponse est valide et contient des trajets
+      if (response && !response.error) {
+        // Extraire les résultats selon la structure de la réponse
+        let results = [];
+        if (Array.isArray(response)) {
+          results = response;
+        } else if (response.rides && Array.isArray(response.rides)) {
+          results = response.rides;
+        } else if (response.data && Array.isArray(response.data.rides)) {
+          results = response.data.rides;
+        } else if (response.data && Array.isArray(response.data)) {
+          results = response.data;
+        }
+        
+        if (results.length > 0) {
+          console.log("Trajets trouvés:", results);
+          
+          // Transformer les résultats dans le format attendu pour l'affichage
+          return results.map(ride => ({
+            id: ride.id,
+            from: ride.departure_city || ride.departure || from,
+            to: ride.arrival_city || ride.destination || to,
+            date: formatDate(ride.departure_date || ride.date),
+            rawDate: ride.departure_date || ride.date,
+            time: ride.departure_time || ride.departureTime || "12h00",
+            price: parseFloat(ride.price) || Math.floor(Math.random() * 33) + 8,
+            driver: {
+              name: ride.driver?.name || 'Conducteur EcoRide',
+              rating: parseFloat(ride.driver?.rating) || (Math.floor(Math.random() * 21) + 30) / 10,
+              trips: ride.driver?.rides_count || Math.floor(Math.random() * 80) + 20,
+              image: ride.driver?.profile_image || '../../assets/images/profile_Marie.svg',
+            },
+            vehicleType: ride.vehicle?.model || ['Citadine', 'Berline', 'SUV', 'Compacte'][Math.floor(Math.random() * 4)],
+            co2Saved: ride.co2_saved || Math.floor(Math.random() * 30) + 10,
+            availableSeats: ride.available_seats || ride.availableSeats || Math.floor(Math.random() * 4) + 1,
+            duration: ride.duration || `${Math.floor(Math.random() * 3) + 1}h${Math.floor(Math.random() * 60)}`,
+            electricVehicle: ride.vehicle?.is_electric || Math.random() > 0.7,
+            nonSmoking: ride.preferences?.non_smoking || Math.random() > 0.4,
+            petsAllowed: ride.preferences?.pets_allowed || Math.random() > 0.6,
+            driverVerified: ride.driver?.is_verified || Math.random() > 0.5,
+            isPriority: true // Marquer comme prioritaire car provient de la base de données
+          }));
+        }
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des données de ville de départ:', error);
+      
+      console.warn("Aucun trajet trouvé dans la base de données ou réponse invalide");
+      return []; // Retourner un tableau vide que getMockResults complétera
+      
+    } catch (apiError) {
+      // Erreur lors de l'appel API - consigner l'erreur et continuer avec les données mockées
+      console.error("Erreur lors de la récupération des trajets API:", apiError);
+      console.warn("Utilisation des trajets fictifs à la place");
+      return []; // Retourner un tableau vide que getMockResults complétera
     }
+  } catch (error) {
+    // Erreur générale - consigner et retourner un tableau vide
+    console.error("Erreur générale lors de la recherche de trajets:", error);
+    return [];
   }
-
-  if (to) {
-    toInput.value = to;
-    // Charger les données de la ville pour la validation
-    try {
-      const toCities = await fetchCitySuggestions(to);
-      const exactMatch = toCities.find((city) => city.name === to);
-      if (exactMatch) {
-        toInput.dataset.cityData = JSON.stringify(exactMatch);
-      }
-    } catch (error) {
-      console.error("Erreur lors du chargement des données de ville d'arrivée:", error);
-    }
-  }
-
-  if (date) {
-    dateInput.value = date;
-  }
-
-  // Si tous les paramètres sont présents, lancer la recherche
-  if (from && to && date) {
-    // Petite temporisation pour permettre le chargement des données de ville
-    setTimeout(() => {
-      handleSearch(new Event('submit'));
-    }, 500);
-  }
-
-  return from && to && date;
-}
-
-/**
- * Affiche un état de chargement des résultats
- */
-function displayLoadingResults() {
-  resultsList.innerHTML = `
-    <div class="result-card result-card--loading">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Recherche des trajets en cours...</p>
-      </div>
-    </div>
-  `;
 }
 
 /**
@@ -620,13 +574,17 @@ function displayLoadingResults() {
  * @param {string} from - Ville de départ
  * @param {string} to - Ville d'arrivée
  * @param {string} date - Date du trajet
+ * @param {Array} existingRides - Trajets déjà trouvés dans la base de données
  * @returns {Array} Tableau de résultats
  */
-function getMockResults(from, to, date) {
+function getMockResults(from, to, date, existingRides = []) {
   // Dans un cas réel, ces données viendraient d'une API
 
-  // Générer un nombre aléatoire de résultats entre 10 et 20
-  const count = Math.floor(Math.random() * 11) + 10;
+  // Générer un nombre aléatoire de résultats entre 5 et 15
+  // Réduire le nombre si des trajets réels ont été trouvés
+  const existingCount = existingRides ? existingRides.length : 0;
+  const maxCount = Math.max(10 - existingCount, 5);
+  const count = Math.floor(Math.random() * (maxCount - 5)) + 5;
 
   const results = [];
   const dateObj = new Date(date);
@@ -708,6 +666,7 @@ function getMockResults(from, to, date) {
       nonSmoking: nonSmoking,
       petsAllowed: petsAllowed,
       driverVerified: driverVerified,
+      isPriority: false // Les trajets fictifs ne sont pas prioritaires
     });
   }
 
@@ -1329,6 +1288,26 @@ function ensureISODate(date) {
 }
 
 /**
+ * Affiche un indicateur de chargement des résultats
+ */
+function displayLoadingResults() {
+  if (!resultsList) return;
+
+  resultsList.innerHTML = `
+    <div class="loading-results">
+      <div class="spinner">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+      </div>
+      <p>Recherche des meilleurs trajets pour vous...</p>
+    </div>
+  `;
+
+  if (resultsCount) {
+    resultsCount.textContent = 'Chargement...';
+  }
+}
+
+/**
  * Simule une recherche avec des valeurs par défaut
  */
 function simulateSearch() {
@@ -1362,6 +1341,108 @@ function simulateSearch() {
     const results = getMockResults('Paris', 'Lyon', today);
     displayResults(results, true);
   }, 1000);
+}
+
+/**
+ * Récupère les paramètres de l'URL et remplit le formulaire avec ces valeurs
+ * @returns {boolean} - Indique si des paramètres d'URL ont été trouvés et appliqués
+ */
+function setFormFromUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  let hasParams = false;
+
+  // Récupérer les paramètres
+  const from = params.get('from');
+  const to = params.get('to');
+  const date = params.get('date');
+
+  // Remplir le formulaire avec les valeurs des paramètres
+  if (from) {
+    fromInput.value = from;
+    hasParams = true;
+  }
+
+  if (to) {
+    toInput.value = to;
+    hasParams = true;
+  }
+
+  if (date) {
+    // Vérifier que la date est au format YYYY-MM-DD et qu'elle est valide
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date) && new Date(date) !== "Invalid Date") {
+      dateInput.value = date;
+      // Assurons-nous que la date minimale permette cette date
+      const dateObj = new Date(date);
+      const today = new Date();
+      if (dateObj < today) {
+        dateInput.value = today.toISOString().split('T')[0];
+      } else {
+        dateInput.value = date;
+      }
+      hasParams = true;
+    } else {
+      // Date invalide, on utilise aujourd'hui
+      dateInput.value = today;
+      console.warn("Date invalide dans les paramètres d'URL, utilisation de la date du jour");
+    }
+  } else if (!hasParams) {
+    // Si aucune date fournie et pas d'autres paramètres, on utilise aujourd'hui
+    dateInput.value = today;
+  }
+
+  // Si des paramètres de recherche existent, lancer la recherche automatiquement
+  if (from && to) {
+    // Utiliser setTimeout pour s'assurer que le DOM est complètement chargé
+    setTimeout(() => {
+      // Récupérer les suggestions pour les villes et stocker les données
+      if (from) {
+        fetchCitySuggestions(from).then(suggestions => {
+          if (suggestions && suggestions.length > 0) {
+            // Trouver la ville par nom (avec ou sans correspondance exacte)
+            let cityData = suggestions.find(city => city.name && city.name.toLowerCase() === from.toLowerCase());
+            
+            // Si pas trouvé, essayer avec le premier résultat
+            if (!cityData && suggestions[0]) {
+              cityData = suggestions[0];
+            }
+            
+            if (cityData) {
+              fromInput.dataset.cityData = JSON.stringify(cityData);
+            }
+          }
+        });
+      }
+
+      if (to) {
+        fetchCitySuggestions(to).then(suggestions => {
+          if (suggestions && suggestions.length > 0) {
+            // Trouver la ville par nom (avec ou sans correspondance exacte)
+            let cityData = suggestions.find(city => city.name && city.name.toLowerCase() === to.toLowerCase());
+            
+            // Si pas trouvé, essayer avec le premier résultat
+            if (!cityData && suggestions[0]) {
+              cityData = suggestions[0];
+            }
+            
+            if (cityData) {
+              toInput.dataset.cityData = JSON.stringify(cityData);
+            }
+          }
+        });
+      }
+
+      // Lancer la recherche après avoir récupéré les données des villes
+      setTimeout(() => {
+        // Évite l'avertissement en appelant directement handleSearch avec un événement simulé
+        handleSearch({
+          preventDefault: () => {},
+          target: searchForm
+        });
+      }, 300);
+    }, 100);
+  }
+
+  return hasParams;
 }
 
 // Initialiser la page au chargement

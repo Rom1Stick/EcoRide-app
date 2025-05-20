@@ -78,7 +78,7 @@ class Request
      */
     private function parseJsonBody(): void
     {
-        if ($this->getHeader('Content-Type') === 'application/json') {
+    /**
             $body = file_get_contents('php://input');
             $this->jsonBody = json_decode($body, true);
         }

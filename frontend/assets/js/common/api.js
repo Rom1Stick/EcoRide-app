@@ -128,6 +128,7 @@ export class API {
     try {
       const headers = {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       };
 
       // Ajouter le token d'authentification s'il existe
@@ -149,8 +150,22 @@ export class API {
       }
 
       const response = await fetch(url, options);
+      
+      // Vérifier si la réponse est vide ou non-JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // Si ce n'est pas du JSON, renvoyer une réponse formatée manuellement
+        const textResponse = await response.text();
+        return {
+          error: !response.ok,
+          status: response.status,
+          message: textResponse || (response.ok ? 'Opération réussie' : 'Erreur lors de l\'opération'),
+          rawResponse: textResponse
+        };
+      }
+      
+      // Pour les réponses JSON valides
       const result = await response.json();
-
       return result;
     } catch (error) {
       console.error(`Erreur lors de la requête ${method} vers ${url}:`, error);

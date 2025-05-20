@@ -145,6 +145,21 @@ class Validator
     }
 
     /**
+     * Vérifie si un champ est un nombre entier
+     *
+     * @param string $field Nom du champ
+     * @param string $message Message d'erreur en cas d'échec
+     * @return self
+     */
+    public function integer(string $field, string $message): self
+    {
+        if (isset($this->data[$field]) && (!is_numeric($this->data[$field]) || floor((float)$this->data[$field]) != $this->data[$field])) {
+            $this->addError($field, $message);
+        }
+        return $this;
+    }
+
+    /**
      * Vérifie si un champ a une valeur minimale
      *
      * @param string $field Nom du champ

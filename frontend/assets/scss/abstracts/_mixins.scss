@@ -1,6 +1,12 @@
 @use 'variables' as *;
 
 // Mixins pour les media queries
+@mixin mobile {
+  @media (max-width: #{$breakpoint-tablet - 1px}) {
+    @content;
+  }
+}
+
 @mixin tablet {
   @media (min-width: $breakpoint-tablet) {
     @content;

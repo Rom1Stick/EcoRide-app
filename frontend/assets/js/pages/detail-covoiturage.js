@@ -224,6 +224,31 @@ function updateRideDetails(ride) {
     tagsContainer.appendChild(tagElement);
   });
   
+  // Ajouter un badge pour les véhicules électriques (si energie_id = 1)
+  if (ride.vehicle.energyId === 1 || ride.vehicle.energy === 'Électrique') {
+    // Création du badge électrique pour desktop
+    const electricBadge = document.createElement('div');
+    electricBadge.className = 'electric-badge';
+    electricBadge.innerHTML = '<i class="fa-solid fa-bolt"></i> Véhicule électrique';
+    
+    const vehicleSection = document.querySelector('.vehicle-section');
+    // Vérifier si le badge existe déjà pour éviter les doublons
+    if (!vehicleSection.querySelector('.electric-badge')) {
+      vehicleSection.appendChild(electricBadge);
+    }
+    
+    // Création du badge électrique pour mobile
+    const mobileElectricBadge = document.createElement('div');
+    mobileElectricBadge.className = 'electric-badge';
+    mobileElectricBadge.innerHTML = '<i class="fa-solid fa-bolt"></i> Véhicule électrique';
+    
+    const mobileVehicleSection = document.querySelector('.mobile-vehicle');
+    // Vérifier si le badge existe déjà pour éviter les doublons
+    if (mobileVehicleSection && !mobileVehicleSection.querySelector('.electric-badge')) {
+      mobileVehicleSection.appendChild(mobileElectricBadge);
+    }
+  }
+  
   // Mettre à jour les préférences
   updatePreferences(ride.preferences);
   

@@ -66,6 +66,7 @@ class RideService
                     u.photo_path,
                     m.nom AS modele,
                     ma.libelle AS marque,
+                    te.energie_id,
                     te.libelle AS type_energie,
                     IFNULL(AVG(a.note), 0) AS note_moyenne,
                     (
@@ -201,7 +202,8 @@ class RideService
                     'vehicle' => [
                         'model' => $ride['modele'],
                         'brand' => $ride['marque'],
-                        'energy' => $ride['type_energie']
+                        'energy' => $ride['type_energie'],
+                        'energyId' => (int) $ride['energie_id']
                     ],
                     'ecologicalImpact' => [
                         'carbonFootprint' => (float) $ride['empreinte_carbone']

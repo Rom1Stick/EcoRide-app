@@ -19,7 +19,7 @@
 // Modules pour la page covoiturages
 @use 'pages/covoiturages/layout';
 @use 'pages/covoiturages/search-section';
-@use 'pages/covoiturages/filters';
+@use 'pages/covoiturages/filters' as covoiturages-filters;
 @use 'pages/covoiturages/results';
 @use 'pages/covoiturages/ride-card';
 @use 'pages/legal';
@@ -30,6 +30,9 @@
 @use 'components/sections';
 @use 'components/form-error';
 @use 'components/overlay-spinner';
+@use 'components/modals';
+@use 'components/autocomplete';
+@use 'components/filters';
 
 // Error
 @use 'error';

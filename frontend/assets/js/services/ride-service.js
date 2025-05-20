@@ -60,30 +60,138 @@ export class RideService {
    * @returns {Promise<Object>} Résultats de la recherche
    */
   static async searchRides(departure, destination, date, passengers = 1) {
+    console.log("RideService.searchRides - Paramètres:", { 
+      departure, 
+      destination, 
+      date, 
+      passengers 
+    });
+    
     // Construire la clé de cache
     const cacheKey = `${departure}-${destination}-${date}-${passengers}`;
     
     // Vérifier le cache
     const cachedData = this.getFromCache(cache.searches, cacheKey);
-    if (cachedData) return cachedData;
-    
-    // Construire l'URL de recherche
-    const queryParams = new URLSearchParams({
-      departure,
-      destination,
-      date,
-      passengers
-    });
-    
-    // Effectuer la requête API
-    const response = await API.get(`/api/rides/search?${queryParams.toString()}`);
-    
-    // Mettre en cache et retourner les données
-    if (!response.error) {
-      this.addToCache(cache.searches, cacheKey, response.data);
+    if (cachedData) {
+      console.log("RideService.searchRides - Données trouvées en cache");
+      return cachedData;
     }
     
-    return response.data;
+    // IMPORTANT: Adapter les noms des paramètres au format du backend
+    // Le backend attend departure_city et arrival_city au lieu de departure et destination
+    const queryParams = new URLSearchParams({
+      departure_city: departure,
+      arrival_city: destination,
+      date: date,
+      passengers: passengers
+    });
+    
+    console.log("RideService.searchRides - URL de requête:", `/api/rides/search?${queryParams.toString()}`);
+    
+    try {
+      // Effectuer la requête API
+      const response = await API.get(`/api/rides/search?${queryParams.toString()}`);
+      console.log("RideService.searchRides - Réponse API:", response);
+      
+      // Vérification des données et mise en cache
+      if (response && !response.error) {
+        let data = response.data;
+        
+        // Si les données sont vides ou invalides, simulons des trajets locaux
+        // C'est temporaire pour montrer les covoiturages publiés pendant le développement
+        if (!data || (Array.isArray(data) && data.length === 0)) {
+          // Vérifier si nous avons des trajets en sessionStorage
+          const localRides = this.getLocalRides();
+          
+          // Filtrer les trajets locaux selon les critères de recherche
+          const matchingRides = localRides.filter(ride => {
+            return (ride.departure_city?.toLowerCase() === departure.toLowerCase() || 
+                    ride.departure?.toLowerCase() === departure.toLowerCase()) && 
+                   (ride.arrival_city?.toLowerCase() === destination.toLowerCase() || 
+                    ride.destination?.toLowerCase() === destination.toLowerCase()) &&
+                   this.isSameDate(ride.departure_date || ride.date, date);
+          });
+          
+          if (matchingRides.length > 0) {
+            console.log("RideService.searchRides - Trajets locaux trouvés:", matchingRides);
+            data = matchingRides;
+          } else {
+            console.log("RideService.searchRides - Aucun trajet local correspondant");
+          }
+        }
+        
+        // Mettre en cache et retourner les données
+        this.addToCache(cache.searches, cacheKey, data);
+        return data;
+      }
+      
+      console.warn("RideService.searchRides - Réponse invalide de l'API:", response);
+      return [];
+    } catch (error) {
+      console.error("RideService.searchRides - Erreur:", error);
+      
+      // Essayer de trouver des trajets locaux en cas d'erreur API
+      const localRides = this.getLocalRides();
+      const matchingRides = localRides.filter(ride => {
+        return (ride.departure_city?.toLowerCase() === departure.toLowerCase() || 
+                ride.departure?.toLowerCase() === departure.toLowerCase()) && 
+               (ride.arrival_city?.toLowerCase() === destination.toLowerCase() || 
+                ride.destination?.toLowerCase() === destination.toLowerCase()) &&
+               this.isSameDate(ride.departure_date || ride.date, date);
+      });
+      
+      if (matchingRides.length > 0) {
+        console.log("RideService.searchRides - Trajets locaux trouvés après erreur API:", matchingRides);
+        return matchingRides;
+      }
+      
+      return [];
+    }
+  }
+  
+  /**
+   * Compare deux dates pour déterminer si elles sont le même jour
+   * @param {string} date1 - Première date
+   * @param {string} date2 - Seconde date
+   * @returns {boolean} Vrai si les dates sont le même jour
+   */
+  static isSameDate(date1, date2) {
+    if (!date1 || !date2) return false;
+    
+    try {
+      // Normaliser les dates
+      const d1 = new Date(date1);
+      const d2 = new Date(date2);
+      
+      // Vérifier si les dates sont valides
+      if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return false;
+      
+      // Comparer année/mois/jour
+      return d1.getFullYear() === d2.getFullYear() &&
+             d1.getMonth() === d2.getMonth() &&
+             d1.getDate() === d2.getDate();
+    } catch (e) {
+      console.error("Erreur lors de la comparaison des dates:", e);
+      return false;
+    }
+  }
+  
+  /**
+   * Récupère les trajets locaux stockés
+   * @returns {Array} Tableau des trajets locaux
+   */
+  static getLocalRides() {
+    try {
+      // Récupérer tous les trajets du localStorage
+      const storedRides = localStorage.getItem('user_rides');
+      if (!storedRides) return [];
+      
+      const rides = JSON.parse(storedRides);
+      return Array.isArray(rides) ? rides : [];
+    } catch (e) {
+      console.error("Erreur lors de la récupération des trajets locaux:", e);
+      return [];
+    }
   }
   
   /**
