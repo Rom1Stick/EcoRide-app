@@ -37,8 +37,11 @@ abstract class Controller
      */
     protected function json($data, int $statusCode = 200): array
     {
-        header('Content-Type: application/json; charset=UTF-8');
-        http_response_code($statusCode);
+        // S'assurer qu'aucun contenu n'a été envoyé avant
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=UTF-8');
+            http_response_code($statusCode);
+        }
         return $data;
     }
 

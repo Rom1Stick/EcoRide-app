@@ -78,10 +78,11 @@ export class API {
    * Effectue une requête GET
    *
    * @param {string} url - URL de l'endpoint
+   * @param {object} customHeaders - En-têtes personnalisés à ajouter à la requête
    * @returns {Promise<object>} Réponse de l'API
    */
-  static async get(url) {
-    return this.request(url, 'GET');
+  static async get(url, data = null, customHeaders = null) {
+    return this.request(url, 'GET', data, customHeaders);
   }
 
   /**
@@ -89,10 +90,11 @@ export class API {
    *
    * @param {string} url - URL de l'endpoint
    * @param {object} data - Données à envoyer
+   * @param {object} customHeaders - En-têtes personnalisés à ajouter à la requête
    * @returns {Promise<object>} Réponse de l'API
    */
-  static async post(url, data) {
-    return this.request(url, 'POST', data);
+  static async post(url, data, customHeaders = null) {
+    return this.request(url, 'POST', data, customHeaders);
   }
 
   /**
@@ -100,20 +102,22 @@ export class API {
    *
    * @param {string} url - URL de l'endpoint
    * @param {object} data - Données à envoyer
+   * @param {object} customHeaders - En-têtes personnalisés à ajouter à la requête
    * @returns {Promise<object>} Réponse de l'API
    */
-  static async put(url, data) {
-    return this.request(url, 'PUT', data);
+  static async put(url, data, customHeaders = null) {
+    return this.request(url, 'PUT', data, customHeaders);
   }
 
   /**
    * Effectue une requête DELETE
    *
    * @param {string} url - URL de l'endpoint
+   * @param {object} customHeaders - En-têtes personnalisés à ajouter à la requête
    * @returns {Promise<object>} Réponse de l'API
    */
-  static async delete(url) {
-    return this.request(url, 'DELETE');
+  static async delete(url, customHeaders = null) {
+    return this.request(url, 'DELETE', null, customHeaders);
   }
 
   /**
@@ -122,18 +126,25 @@ export class API {
    * @param {string} url - URL de l'endpoint
    * @param {string} method - Méthode HTTP
    * @param {object} data - Données à envoyer (pour POST, PUT)
+   * @param {object} customHeaders - En-têtes personnalisés à ajouter à la requête
    * @returns {Promise<object>} Réponse de l'API
    */
-  static async request(url, method, data = null) {
+  static async request(url, method, data = null, customHeaders = null) {
     try {
       const headers = {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       };
 
       // Ajouter le token d'authentification s'il existe
       const token = localStorage.getItem('auth_token');
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      // Ajouter les en-têtes personnalisés si fournis
+      if (customHeaders && typeof customHeaders === 'object') {
+        Object.assign(headers, customHeaders);
       }
 
       // Options de la requête
@@ -149,8 +160,22 @@ export class API {
       }
 
       const response = await fetch(url, options);
+      
+      // Vérifier si la réponse est vide ou non-JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // Si ce n'est pas du JSON, renvoyer une réponse formatée manuellement
+        const textResponse = await response.text();
+        return {
+          error: !response.ok,
+          status: response.status,
+          message: textResponse || (response.ok ? 'Opération réussie' : 'Erreur lors de l\'opération'),
+          rawResponse: textResponse
+        };
+      }
+      
+      // Pour les réponses JSON valides
       const result = await response.json();
-
       return result;
     } catch (error) {
       console.error(`Erreur lors de la requête ${method} vers ${url}:`, error);

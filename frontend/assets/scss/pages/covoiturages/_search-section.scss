@@ -1,0 +1,180 @@
+@use '../../abstracts/variables' as *;
+@use '../../abstracts/mixins' as *;
+
+// Styles pour la section de recherche
+
+.results-page {
+  // Section de recherche - version plus compacte
+  .search-section {
+    background-color: $color-surface-alt;
+    padding: 1rem;
+    border-radius: $radius-md;
+    flex-shrink: 0;
+
+    @include tablet {
+      padding: 1.25rem;
+    }
+
+    @include desktop {
+      padding: 1.5rem;
+      border-radius: $radius-lg;
+    }
+
+    h1 {
+      color: $color-text-primary;
+      margin-bottom: 0.75rem;
+      font-size: 1.25rem;
+      text-align: center;
+
+      @include desktop {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  // Formulaire de recherche amélioré - plus compact
+  .search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    @include desktop {
+      gap: 1rem;
+    }
+
+    &__field {
+      position: relative;
+
+      label {
+        display: block;
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+        color: $color-text-primary;
+
+        @include desktop {
+          font-size: 0.9rem;
+        }
+      }
+
+      .input-group {
+        position: relative;
+        background-color: $color-primary-bg;
+        border-radius: $radius-md;
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        transition: all 0.2s ease-in-out;
+
+        i {
+          color: $color-text-secondary;
+          margin-right: 0.5rem;
+          font-size: 0.9rem;
+        }
+
+        input {
+          flex: 1;
+          background: transparent;
+          border: none;
+          color: $color-text-primary;
+          font-size: 0.9rem;
+          width: 100%;
+
+          &::placeholder {
+            color: $color-text-secondary;
+          }
+
+          &:focus {
+            outline: none;
+          }
+        }
+
+        // Container for autocomplete suggestions
+        .autocomplete-container {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background-color: $color-surface-alt;
+          border-radius: 0 0 $radius-md $radius-md;
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+          transition: all 0.3s ease;
+          z-index: 100;
+
+          &.active {
+            max-height: 200px;
+            overflow-y: auto;
+            opacity: 1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid $color-secondary;
+            border-top: none;
+          }
+        }
+      }
+    }
+
+    .search-button {
+      background-color: $color-accent;
+      color: $color-primary-bg;
+      font-weight: 700;
+      border: none;
+      border-radius: $radius-md;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease-in-out;
+      font-size: 0.9rem;
+
+      i {
+        font-size: 0.85rem;
+      }
+
+      @include desktop {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        width: 100%;
+      }
+
+      &:hover {
+        background-color: $color-primary-bg;
+        color: $color-text-primary;
+      }
+    }
+  }
+}
+
+// Styles pour les suggestions d'autocomplétion - compact
+.suggestion-item {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba($color-text-secondary, 0.2);
+  transition: background-color 0.2s ease;
+  color: $color-text-primary;
+  font-size: 0.9rem;
+
+  &:hover {
+    background-color: $color-primary-bg;
+    color: $color-text-primary;
+  }
+
+  .main-text {
+    font-weight: 600;
+    font-size: 0.9rem;
+
+    strong {
+      color: $color-accent;
+      font-weight: 700;
+    }
+  }
+
+  .sub-text {
+    font-size: 0.75rem;
+    color: $color-text-secondary;
+    margin-top: 0.2rem;
+  }
+}

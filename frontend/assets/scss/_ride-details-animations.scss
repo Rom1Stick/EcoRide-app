@@ -1,0 +1,203 @@
+// Animations et styles dynamiques pour la page détail de covoiturage
+
+// État de chargement
+.loading-spinner {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 2rem 0;
+
+  .spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 0.25rem solid rgba(var(--primary-rgb), 0.2);
+    border-radius: 50%;
+    border-top-color: rgba(var(--primary-rgb), 1);
+    animation: spin 1s ease-in-out infinite;
+  }
+}
+
+// Animation de rotation pour le spinner
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Message d'erreur
+.error-message {
+  display: none;
+  background-color: #fee;
+  color: #c00;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #c00;
+  transform: translateY(-1rem);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+
+  &--show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Toast
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  z-index: 1000;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  
+  &--visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+// Animations d'apparition
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Styles pour le bouton de réservation désactivé
+.btn-book.disabled,
+.mobile-booking-footer__btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #ccc;
+}
+
+// Styles pour les boutons lors du chargement
+.btn-book[disabled],
+.mobile-booking-footer__btn[disabled] {
+  background-image: linear-gradient(to right, rgba(var(--primary-rgb), 0.7), rgba(var(--primary-rgb), 0.9));
+}
+
+// Animation de pulsation pour les éléments importants
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Animation pour surbrillance des préférences au survol
+.pref-item,
+.mobile-prefs__item {
+  transition: background-color 0.2s, transform 0.2s;
+  
+  &:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+// Transition douce pour les éléments de revue
+.review,
+.mobile-review {
+  transition: transform 0.2s;
+  opacity: 0;
+  transform: translateY(1rem);
+  
+  &.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Animation pour la mise en évidence des statistiques
+.stats .stat-item,
+.mobile-stats__item {
+  transition: transform 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Effet de surbrillance lors du clic sur les boutons
+.contact-btn,
+.btn-book,
+.view-all,
+.mobile-driver__contact-btn,
+.mobile-booking-footer__btn,
+.mobile-reviews__view-all {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+  }
+  
+  &:active::after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
+  }
+}
+
+// Classe JS pour activer les animations
+.js-enabled {
+  .trip-content, 
+  .mobile-main {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: 0.2s;
+  }
+  
+  .header, 
+  .mobile-header {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  .mobile-booking-footer {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: 0.4s;
+  }
+} 

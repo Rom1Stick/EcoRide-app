@@ -97,6 +97,7 @@ function renderUsersTable(users, roles) {
     // Colonne Nom
     const tdName = document.createElement('td');
     tdName.textContent = user.name;
+    
     // Colonne Email
     const tdEmail = document.createElement('td');
     tdEmail.textContent = user.email;
@@ -116,10 +117,36 @@ function renderUsersTable(users, roles) {
       tdRoles.appendChild(span);
       tdRoles.appendChild(document.createTextNode(' '));
     });
+    
+    // Colonne Statut
+    const tdStatus = document.createElement('td');
+    const statusSpan = document.createElement('span');
+    statusSpan.className = user.suspended ? 'status status--suspended' : 'status status--active';
+    statusSpan.textContent = user.suspended ? 'Suspendu' : 'Actif';
+    tdStatus.appendChild(statusSpan);
 
-    // Colonne Ajouter un rôle
-    const tdAdd = document.createElement('td');
+    // Colonne Actions
+    const tdActions = document.createElement('td');
+    
+    // Conteneur pour les actions
+    const actionButtons = document.createElement('div');
+    actionButtons.className = 'action-buttons';
+    
+    // Contrôles des rôles
+    const roleControls = document.createElement('div');
+    roleControls.className = 'role-controls';
+    
+    // Select pour les rôles
     const select = document.createElement('select');
+    select.className = 'role-select';
+    
+    // Option par défaut
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Sélectionner un rôle';
+    select.appendChild(defaultOption);
+    
+    // Remplir avec les rôles disponibles
     roles.forEach((r) => {
       if (!user.roles.find((ur) => ur.id === r.id)) {
         const option = document.createElement('option');
@@ -128,17 +155,51 @@ function renderUsersTable(users, roles) {
         select.appendChild(option);
       }
     });
+    
+    // Bouton d'ajout de rôle
     const addBtn = document.createElement('button');
     addBtn.textContent = 'Ajouter';
+    addBtn.className = 'add-role-btn';
     addBtn.dataset.userId = user.id;
     addBtn.addEventListener('click', () => onAddRole(user.id, select.value));
-    tdAdd.appendChild(select);
-    tdAdd.appendChild(addBtn);
+    
+    roleControls.appendChild(select);
+    roleControls.appendChild(addBtn);
+    
+    // Contrôles du compte
+    const accountControls = document.createElement('div');
+    accountControls.className = 'account-controls';
+    
+    // Bouton de suspension
+    const suspendBtn = document.createElement('button');
+    suspendBtn.textContent = 'Suspendre';
+    suspendBtn.className = 'suspend-btn';
+    suspendBtn.dataset.userId = user.id;
+    suspendBtn.addEventListener('click', () => onSuspendAccount(user.id));
+    suspendBtn.style.display = user.suspended ? 'none' : 'inline-block';
+    
+    // Bouton de réactivation
+    const activateBtn = document.createElement('button');
+    activateBtn.textContent = 'Réactiver';
+    activateBtn.className = 'activate-btn';
+    activateBtn.dataset.userId = user.id;
+    activateBtn.addEventListener('click', () => onActivateAccount(user.id));
+    activateBtn.style.display = user.suspended ? 'inline-block' : 'none';
+    
+    accountControls.appendChild(suspendBtn);
+    accountControls.appendChild(activateBtn);
+    
+    // Assembler tous les contrôles
+    actionButtons.appendChild(roleControls);
+    actionButtons.appendChild(accountControls);
+    tdActions.appendChild(actionButtons);
 
+    // Assembler la ligne
     tr.appendChild(tdName);
     tr.appendChild(tdEmail);
     tr.appendChild(tdRoles);
-    tr.appendChild(tdAdd);
+    tr.appendChild(tdStatus);
+    tr.appendChild(tdActions);
     tbody.appendChild(tr);
   });
 }
@@ -194,5 +255,71 @@ async function onRemoveRole(e) {
   } catch (err) {
     console.error(err);
     alert(err.message || 'Erreur lors de la suppression du rôle');
+  }
+}
+
+/**
+ * Gère la suspension d'un compte utilisateur
+ * @param {string} userId - ID de l'utilisateur
+ */
+async function onSuspendAccount(userId) {
+  if (!confirm('Êtes-vous sûr de vouloir suspendre ce compte ?')) return;
+  
+  try {
+    const resp = await fetch(`/api/admin/users/${userId}/suspend`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: headersGlobal,
+    });
+    
+    // Vérifier la réponse
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(text || 'Erreur lors de la suspension du compte');
+    }
+    
+    const result = await resp.json();
+    if (result.error) {
+      throw new Error(result.message || 'Erreur lors de la suspension du compte');
+    }
+    
+    // Recharger la page pour refléter les changements
+    window.location.reload();
+  } catch (err) {
+    console.error('Erreur:', err);
+    alert(err.message || 'Erreur lors de la suspension du compte');
+  }
+}
+
+/**
+ * Gère la réactivation d'un compte utilisateur
+ * @param {string} userId - ID de l'utilisateur
+ */
+async function onActivateAccount(userId) {
+  if (!confirm('Êtes-vous sûr de vouloir réactiver ce compte ?')) return;
+  
+  try {
+    const resp = await fetch(`/api/admin/users/${userId}/activate`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: headersGlobal,
+    });
+    
+    // Vérifier la réponse
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(text || 'Erreur lors de la réactivation du compte');
+    }
+    
+    const result = await resp.json();
+    if (result.error) {
+      throw new Error(result.message || 'Erreur lors de la réactivation du compte');
+    }
+    
+    // Recharger la page pour refléter les changements
+    window.location.reload();
+  } catch (err) {
+    console.error('Erreur:', err);
+    alert(err.message || 'Erreur lors de la réactivation du compte');
   }
 }

@@ -1,0 +1,616 @@
+// Styles pour la section "Mes trajets"
+.trips-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  
+  .filter-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .filter-btn {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: #e9e9e9;
+      }
+      
+      &.active {
+        background-color: #1b5e20;
+        color: white;
+        border-color: #1b5e20;
+      }
+    }
+  }
+}
+
+// Styles pour les différents types de trajets
+.trip-card {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  
+  &.driver-ride {
+    border-left: 4px solid #1b5e20;
+  }
+  
+  &.booking-ride {
+    border-left: 4px solid #0277bd;
+  }
+  
+  .trip-header {
+    padding: 0.75rem 1rem;
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    
+    .trip-date {
+      font-size: 0.875rem;
+      color: #666;
+    }
+    
+    .trip-status {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background-color: #eee;
+      
+      &.driver {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+      }
+      
+      &.booking {
+        background-color: #e1f5fe;
+        color: #0277bd;
+      }
+      
+      &.confirmé {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+      }
+      
+      &.en_attente {
+        background-color: #fff8e1;
+        color: #ff8f00;
+      }
+      
+      &.annulé {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+    }
+  }
+  
+  .trip-body {
+    padding: 1rem;
+    
+    h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    p {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  }
+}
+
+// Styles pour le bouton de déconnexion
+.btn-logout {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  transition: background-color 0.2s ease;
+  
+  i {
+    margin-right: 0.5rem;
+  }
+  
+  &:hover {
+    background-color: #d32f2f;
+  }
+}
+
+// Améliorations du style de la page profil
+
+// Style de l'image de profil
+.profile-image {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 1rem;
+  border: 3px solid #1b5e20;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .edit-profile-image {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #1b5e20;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: #2e7d32;
+    }
+  }
+}
+
+// Amélioration du style de la section "profile-info"
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+    color: #1b5e20;
+  }
+  
+  p {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  .profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .value {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1b5e20;
+      }
+      
+      .label {
+        font-size: 0.875rem;
+        color: #666;
+      }
+    }
+  }
+}
+
+// Amélioration des onglets
+.tabs {
+  display: flex;
+  margin: 1.5rem 0;
+  border-bottom: 2px solid #e0e0e0;
+  overflow-x: auto;
+  
+  .tab-button {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    color: #757575;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    
+    i {
+      margin-right: 0.5rem;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: transparent;
+      transition: background-color 0.2s ease;
+    }
+    
+    &:hover {
+      color: #1b5e20;
+    }
+    
+    &.active {
+      color: #1b5e20;
+      font-weight: 600;
+      
+      &::after {
+        background-color: #1b5e20;
+      }
+    }
+  }
+}
+
+// Amélioration des contenus d'onglets
+.tab-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  
+  &.hidden {
+    display: none;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+    color: #1b5e20;
+  }
+}
+
+// Formulaires dans les onglets
+.profile-form {
+  .form-group {
+    margin-bottom: 1.25rem;
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+      
+      &:focus {
+        border-color: #1b5e20;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(27, 94, 32, 0.1);
+      }
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+  }
+  
+  .btn-primary {
+    background-color: #1b5e20;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: #2e7d32;
+    }
+  }
+}
+
+// Styles pour le bouton de déconnexion
+.btn-logout {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0;
+  transition: background-color 0.2s ease;
+  max-width: 150px;
+  
+  i {
+    margin-right: 0.5rem;
+  }
+  
+  &:hover {
+    background-color: #d32f2f;
+  }
+}
+
+// Style pour la section Véhicule
+.vehicle-info {
+  .empty-state {
+    padding: 2rem;
+    text-align: center;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    color: #757575;
+    margin-bottom: 1.25rem;
+  }
+  
+  .vehicle-details-card {
+    display: flex;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    
+    .vehicle-image {
+      width: 80px;
+      height: 80px;
+      background-color: #1b5e20;
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1.25rem;
+      
+      i {
+        font-size: 2.5rem;
+      }
+    }
+    
+    .vehicle-info-content {
+      h4 {
+        margin: 0 0 0.5rem;
+        font-size: 1.25rem;
+        color: #333;
+      }
+      
+      p {
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+        color: #666;
+        
+        i {
+          width: 20px;
+          color: #1b5e20;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+  
+  .btn-secondary {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+  
+  .btn-primary {
+    background-color: #1b5e20;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+    
+    i {
+      font-size: 0.75rem;
+    }
+    
+    &:hover {
+      background-color: #2e7d32;
+    }
+  }
+}
+
+// Style pour les modals (covoiturage et véhicule)
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  
+  &.active {
+    display: flex;
+  }
+  
+  .modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem;
+      border-bottom: 1px solid #eee;
+      
+      h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #1b5e20;
+      }
+      
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: #757575;
+        cursor: pointer;
+        
+        &:hover {
+          color: #333;
+        }
+      }
+    }
+    
+    .modal-body {
+      padding: 1.25rem;
+      
+      .form-group {
+        margin-bottom: 1.25rem;
+        
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          color: #333;
+        }
+        
+        input, textarea, select {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 1rem;
+          transition: border-color 0.2s ease;
+          
+          &:focus {
+            border-color: #1b5e20;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(27, 94, 32, 0.1);
+          }
+        }
+        
+        select {
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0.75rem center;
+          padding-right: 2.5rem;
+        }
+        
+        textarea {
+          min-height: 100px;
+          resize: vertical;
+        }
+      }
+      
+      .form-row {
+        display: flex;
+        gap: 1rem;
+        
+        .form-group {
+          flex: 1;
+        }
+      }
+      
+      .preferences {
+        h3 {
+          font-size: 1rem;
+          margin-bottom: 1rem;
+        }
+        
+        .checkbox-group {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.75rem;
+          
+          input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+          }
+        }
+      }
+      
+      .form-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        
+        .btn-secondary {
+          background-color: #f5f5f5;
+          color: #333;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          padding: 0.75rem 1.25rem;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          &:hover {
+            background-color: #e0e0e0;
+          }
+        }
+        
+        .btn-primary {
+          background-color: #1b5e20;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 0.75rem 1.25rem;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          
+          &:hover {
+            background-color: #2e7d32;
+          }
+        }
+      }
+    }
+  }
+} 

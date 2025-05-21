@@ -1,0 +1,358 @@
+openapi: 3.0.3
+info:
+  title: EcoRide API
+  description: API de l'application de covoiturage éco-responsable EcoRide
+  version: 1.0.0
+  contact:
+    name: Équipe EcoRide
+servers:
+  - url: /api
+    description: API EcoRide
+tags:
+  - name: Recherche
+    description: Opérations liées à la recherche de trajets
+  - name: Trajets
+    description: Opérations liées aux trajets
+  - name: Utilisateurs
+    description: Opérations liées aux utilisateurs
+  - name: Réservations
+    description: Opérations liées aux réservations
+  - name: Crédits
+    description: Opérations liées au système de crédits
+
+paths:
+  /rides/search:
+    get:
+      tags:
+        - Recherche
+        - Trajets
+      summary: Recherche de trajets disponibles
+      description: Recherche des trajets disponibles selon plusieurs critères (lieux, date, prix, etc.)
+      operationId: searchRides
+      parameters:
+        - name: departureLocation
+          in: query
+          description: Lieu de départ du trajet
+          required: true
+          schema:
+            type: string
+            example: "Paris"
+        - name: arrivalLocation
+          in: query
+          description: Lieu d'arrivée du trajet
+          required: true
+          schema:
+            type: string
+            example: "Lyon"
+        - name: date
+          in: query
+          description: Date du trajet (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-12-01"
+        - name: departureTime
+          in: query
+          description: Heure de départ minimale (HH:MM)
+          required: false
+          schema:
+            type: string
+            format: time
+            example: "08:00"
+        - name: maxPrice
+          in: query
+          description: Prix maximum par personne
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            example: 30
+        - name: sortBy
+          in: query
+          description: Critère de tri
+          required: false
+          schema:
+            type: string
+            enum: [departureTime, price]
+            default: departureTime
+        - name: page
+          in: query
+          description: Numéro de page pour la pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Nombre d'éléments par page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Liste des trajets correspondant aux critères
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      rides:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Ride'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+        '400':
+          description: Paramètres de requête invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /trips/search:
+    get:
+      tags:
+        - Recherche
+        - Trajets
+      summary: Recherche de trajets disponibles (Endpoint alternatif)
+      description: Alias pour /rides/search - Recherche des trajets disponibles selon plusieurs critères (lieux, date, prix, etc.)
+      operationId: searchTrips
+      parameters:
+        - name: departureLocation
+          in: query
+          description: Lieu de départ du trajet
+          required: true
+          schema:
+            type: string
+            example: "Paris"
+        - name: arrivalLocation
+          in: query
+          description: Lieu d'arrivée du trajet
+          required: true
+          schema:
+            type: string
+            example: "Lyon"
+        - name: date
+          in: query
+          description: Date du trajet (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-12-01"
+        - name: departureTime
+          in: query
+          description: Heure de départ minimale (HH:MM)
+          required: false
+          schema:
+            type: string
+            format: time
+            example: "08:00"
+        - name: maxPrice
+          in: query
+          description: Prix maximum par personne
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            example: 30
+        - name: sortBy
+          in: query
+          description: Critère de tri
+          required: false
+          schema:
+            type: string
+            enum: [departureTime, price]
+            default: departureTime
+        - name: page
+          in: query
+          description: Numéro de page pour la pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Nombre d'éléments par page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Liste des trajets correspondant aux critères
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      rides:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Ride'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+        '400':
+          description: Paramètres de requête invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Ride:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        departure:
+          type: object
+          properties:
+            location:
+              type: string
+              example: "Paris"
+            date:
+              type: string
+              format: date
+              example: "2023-12-01"
+            time:
+              type: string
+              format: time
+              example: "08:00:00"
+        arrival:
+          type: object
+          properties:
+            location:
+              type: string
+              example: "Lyon"
+            date:
+              type: string
+              format: date
+              example: "2023-12-01"
+            time:
+              type: string
+              format: time
+              example: "12:00:00"
+        price:
+          type: number
+          format: float
+          example: 25.50
+        seats:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 4
+            available:
+              type: integer
+              example: 2
+        driver:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 456
+            username:
+              type: string
+              example: "john_doe"
+            profilePicture:
+              type: string
+              example: "/uploads/profiles/john_doe.jpg"
+            rating:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 5
+              example: 4.5
+        vehicle:
+          type: object
+          properties:
+            model:
+              type: string
+              example: "Model 3"
+            brand:
+              type: string
+              example: "Tesla"
+            energy:
+              type: string
+              example: "Électrique"
+        ecologicalImpact:
+          type: object
+          properties:
+            carbonFootprint:
+              type: number
+              format: float
+              example: 2.5
+              
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Nombre total d'éléments
+          example: 42
+        page:
+          type: integer
+          description: Page actuelle
+          example: 1
+        limit:
+          type: integer
+          description: Éléments par page
+          example: 10
+        pages:
+          type: integer
+          description: Nombre total de pages
+          example: 5
+          
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Paramètres de recherche invalides"
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            departureLocation: "La localité de départ est obligatoire"
+            date: "Le format de date doit être YYYY-MM-DD" 

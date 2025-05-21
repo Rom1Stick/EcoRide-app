@@ -2,6 +2,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
+    # Permettre l'accès direct à la documentation API
+    RewriteRule ^docs/api/openapi.yaml$ ../docs/api/openapi.yaml [L]
+    
     # Rediriger toutes les requêtes vers index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

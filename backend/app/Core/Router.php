@@ -115,6 +115,11 @@ class Router
      */
     public function dispatch(string $method, string $uri)
     {
+        // Débogage: Enregistrer dans un fichier que le routeur est exécuté
+        $logPath = dirname(__DIR__, 2) . '/logs/router_debug.log';
+        file_put_contents($logPath, "Router::dispatch exécuté à " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+        file_put_contents($logPath, "Méthode: $method, URI: $uri\n", FILE_APPEND);
+
         // Nettoyer l'URI
         $uri = parse_url($uri, PHP_URL_PATH);
 
@@ -125,12 +130,15 @@ class Router
 
         if ($route === null) {
             // Route non trouvée
+            file_put_contents($logPath, "Route non trouvée pour $method $uri\n\n", FILE_APPEND);
             http_response_code(404);
             return [
                 'error' => 'Not Found',
                 'message' => 'La route demandée n\'existe pas'
             ];
         }
+
+        file_put_contents($logPath, "Route trouvée: " . $route->getHandler() . "\n", FILE_APPEND);
 
         // Extraire le contrôleur et la méthode
         list($controllerName, $methodName) = explode('@', $route->getHandler());
@@ -141,6 +149,7 @@ class Router
         // Vérifier si le contrôleur existe
         if (!class_exists($controllerClass)) {
             // Contrôleur non trouvé
+            file_put_contents($logPath, "Contrôleur non trouvé: $controllerClass\n\n", FILE_APPEND);
             http_response_code(500);
             return [
                 'error' => 'Server Error',
@@ -154,6 +163,7 @@ class Router
         // Vérifier si la méthode existe
         if (!method_exists($controller, $methodName)) {
             // Méthode non trouvée
+            file_put_contents($logPath, "Méthode non trouvée: $methodName dans $controllerClass\n\n", FILE_APPEND);
             http_response_code(500);
             return [
                 'error' => 'Server Error',
@@ -163,20 +173,39 @@ class Router
 
         // Exécuter les middlewares
         $middlewares = array_merge($this->middlewares, $route->getMiddlewares());
+        file_put_contents($logPath, "Middlewares à exécuter: " . json_encode($middlewares) . "\n", FILE_APPEND);
+        
         foreach ($middlewares as $middleware) {
-            $middlewareClass = "\\App\\Middlewares\\$middleware";
+            // Convertir auth -> AuthMiddleware, cors -> CorsMiddleware, etc.
+            $middlewareClassname = ucfirst($middleware) . 'Middleware'; 
+            $middlewareClass = "\\App\\Middlewares\\$middlewareClassname";
+            
+            file_put_contents($logPath, "Tentative de chargement du middleware: $middlewareClass\n", FILE_APPEND);
 
             if (!class_exists($middlewareClass)) {
+                // Log ou gérer l'erreur de middleware non trouvé
+                file_put_contents($logPath, "ERREUR: Middleware non trouvé: $middlewareClass\n", FILE_APPEND);
                 continue;
             }
 
             $middlewareInstance = new $middlewareClass();
+            file_put_contents($logPath, "Middleware instancié: $middlewareClass\n", FILE_APPEND);
+            
             $result = $middlewareInstance->handle();
+            
+            if (is_array($result) && isset($result['error']) && $result['error'] === true) {
+                file_put_contents($logPath, "Middleware a retourné une erreur: " . json_encode($result) . "\n\n", FILE_APPEND);
+            } else {
+                file_put_contents($logPath, "Middleware exécuté avec succès\n", FILE_APPEND);
+            }
 
             if ($result !== true) {
                 return $result;
             }
         }
+
+        file_put_contents($logPath, "Tous les middlewares ont été exécutés avec succès\n", FILE_APPEND);
+        file_put_contents($logPath, "Appel du contrôleur: $controllerClass->$methodName\n\n", FILE_APPEND);
 
         // Appeler la méthode du contrôleur avec les paramètres extraits
         return $controller->$methodName(...array_values($params));

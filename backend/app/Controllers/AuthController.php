@@ -165,7 +165,7 @@ class AuthController extends Controller
         $password = '';
         // Limiter les tentatives de connexion pour prévenir les attaques par force brute
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        if (!Security::rateLimit("login_$ip", 5, 300)) {
+        if (!Security::rateLimit("login_$ip", 10, 300)) {
             return $this->error('Trop de tentatives de connexion. Veuillez réessayer plus tard.', 429);
         }
 
@@ -419,18 +419,18 @@ class AuthController extends Controller
         $issuedAt = time();
         $expiresAt = $issuedAt + (int) env('JWT_EXPIRATION', 3600);
 
-        // Récupérer le rôle de l'utilisateur
+        // Récupérer tous les rôles de l'utilisateur
         $db = $this->app->getDatabase()->getMysqlConnection();
-        $stmt = $db->prepare('SELECT r.libelle FROM Role r JOIN Possede p ON r.role_id = p.role_id WHERE p.utilisateur_id = ? LIMIT 1');
+        $stmt = $db->prepare('SELECT r.libelle FROM Role r JOIN Possede p ON r.role_id = p.role_id WHERE p.utilisateur_id = ?');
         $stmt->execute([$userId]);
-        $role = $stmt->fetchColumn() ?: 'visiteur';
+        $roles = $stmt->fetchAll(\PDO::FETCH_COLUMN) ?: ['visiteur'];
 
         $payload = [
-            'sub'  => $userId,
-            'role' => $role,
-            'iat'  => $issuedAt,
-            'exp'  => $expiresAt,
-            'jti'  => bin2hex(random_bytes(16)) // ID unique pour le token
+            'sub'   => $userId,
+            'roles' => $roles,      // Stockage de tous les rôles dans un tableau
+            'iat'   => $issuedAt,
+            'exp'   => $expiresAt,
+            'jti'   => bin2hex(random_bytes(16)) // ID unique pour le token
         ];
 
         $base64Header = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($header)));
@@ -537,11 +537,11 @@ class AuthController extends Controller
         $userId = (int)$confirmation['utilisateur_id'];
         $stmtRole = $db->prepare('SELECT role_id FROM Role WHERE libelle = ?');
         $stmtInsert = $db->prepare('INSERT IGNORE INTO Possede (utilisateur_id, role_id) VALUES (?, ?)');
-        foreach (['passager', 'chauffeur'] as $libelle) {
-            $stmtRole->execute([$libelle]);
-            if ($rid = $stmtRole->fetchColumn()) {
-                $stmtInsert->execute([$userId, $rid]);
-            }
+        
+        // N'attribuer que le rôle passager à la confirmation
+        $stmtRole->execute(['passager']);
+        if ($rid = $stmtRole->fetchColumn()) {
+            $stmtInsert->execute([$userId, $rid]);
         }
         
         return $this->success(null, 'Compte confirmé');
