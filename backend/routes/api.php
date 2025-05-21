@@ -79,4 +79,12 @@ $router->post('/api/admin/role-requests/{requestId}/reject', 'AdminController@re
 
 // Routes supplémentaires
 $router->get('/api/admin/users/pending', 'AdminController@listPendingUsers')->middleware('auth');
-$router->post('/api/admin/users/{userId}/confirm', 'AdminController@confirmUser')->middleware('auth'); 
+$router->post('/api/admin/users/{userId}/confirm', 'AdminController@confirmUser')->middleware('auth');
+
+// Routes pour la suspension et réactivation de comptes
+$router->post('/api/admin/users/{userId}/suspend', 'AdminController@suspendUser')->middleware('auth');
+$router->post('/api/admin/users/{userId}/activate', 'AdminController@activateUser')->middleware('auth');
+
+// Routes pour les statistiques
+$router->get('/api/admin/stats/rides', 'AdminController@getRideStats')->middleware('auth');
+$router->get('/api/admin/stats/credits', 'AdminController@getCreditStats')->middleware('auth'); 

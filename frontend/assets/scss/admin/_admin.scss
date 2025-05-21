@@ -193,6 +193,15 @@
     border: 1px solid $color-text-secondary;
     text-align: center;
     border-left: 4px solid $color-primary-bg;
+    
+    &--highlight {
+      border-left: 4px solid $color-accent;
+      
+      .dashboard__card-value {
+        color: $color-accent;
+        font-size: 1.7rem;
+      }
+    }
   }
 
   &__card-title {
@@ -219,6 +228,42 @@
       content: '↑';
       margin-right: 3px;
     }
+  }
+  
+  /* Styles pour les graphiques */
+  &__charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing;
+    margin-bottom: $spacing;
+    
+    @media (min-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  &__chart-container {
+    background-color: $color-text-primary;
+    padding: $spacing;
+    border-radius: $radius-md;
+    border: 1px solid $color-text-secondary;
+    height: 100%;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  &__chart-title {
+    font-size: 1rem;
+    margin-bottom: $spacing;
+    color: $color-primary-bg;
+    text-align: center;
+  }
+  
+  canvas {
+    flex-grow: 1;
+    width: 100% !important;
+    height: auto !important;
   }
 }
 
@@ -391,6 +436,86 @@
     text-align: center;
     color: $color-text-secondary;
     font-style: italic;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .role-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-bottom: 0.5rem;
+      
+      .role-select {
+        flex: 1;
+        min-width: 120px;
+        font-size: 0.85rem;
+        padding: 0.25rem;
+        border-radius: $radius-sm;
+        border: 1px solid $color-secondary;
+      }
+      
+      .add-role-btn {
+        @include button-base($color-primary-bg, $color-text-primary);
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+    
+    .account-controls {
+      display: flex;
+      gap: 0.5rem;
+      
+      .suspend-btn, .activate-btn {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: $radius-sm;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+      }
+      
+      .suspend-btn {
+        background-color: #ffcccc;
+        color: #cc0000;
+        border: 1px solid #cc0000;
+        
+        &:hover {
+          background-color: #cc0000;
+          color: #ffffff;
+        }
+      }
+      
+      .activate-btn {
+        background-color: #ccffcc;
+        color: #006600;
+        border: 1px solid #006600;
+        
+        &:hover {
+          background-color: #006600;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+  
+  .status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    
+    &--active {
+      background-color: #ccffcc;
+      color: #006600;
+    }
+    
+    &--suspended {
+      background-color: #ffcccc;
+      color: #cc0000;
+    }
   }
 }
 

@@ -66,7 +66,8 @@
               <th>Nom</th>
               <th>Email</th>
               <th>Rôles</th>
-              <th>Ajouter un rôle</th>
+              <th>Statut</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="users-tbody">
@@ -76,13 +77,22 @@
               <td data-label="Nom" class="user-name"></td>
               <td data-label="Email" class="user-email"></td>
               <td data-label="Rôles" class="user-roles"></td>
-              <td data-label="Ajouter un rôle" class="user-actions">
-                <select class="role-select">
-                  <option value="">Sélectionner un rôle</option>
-                  <option value="admin">Administrateur</option>
-                  <option value="user">Utilisateur</option>
-                </select>
-                <button class="add-role-btn">Ajouter</button>
+              <td data-label="Statut" class="user-status"></td>
+              <td data-label="Actions" class="user-actions">
+                <div class="action-buttons">
+                  <div class="role-controls">
+                    <select class="role-select">
+                      <option value="">Sélectionner un rôle</option>
+                      <option value="admin">Administrateur</option>
+                      <option value="user">Utilisateur</option>
+                    </select>
+                    <button class="add-role-btn">Ajouter</button>
+                  </div>
+                  <div class="account-controls">
+                    <button class="suspend-btn">Suspendre</button>
+                    <button class="activate-btn" style="display: none;">Réactiver</button>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
