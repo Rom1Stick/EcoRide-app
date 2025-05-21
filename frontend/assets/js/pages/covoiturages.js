@@ -7,6 +7,32 @@ import { RideService } from '../services/ride-service.js';
 import { LocationService } from '../services/location-service.js';
 import { API } from '../common/api.js';
 
+// Ajout des styles pour le toast d'information
+const toastStyles = document.createElement('style');
+toastStyles.textContent = `
+  .toast--info {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    border-left: 4px solid var(--color-primary);
+  }
+  
+  .toast--visible {
+    animation: slideIn 0.3s ease-out forwards;
+  }
+  
+  @keyframes slideIn {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+`;
+document.head.appendChild(toastStyles);
+
 // URL de l'API Adresse du gouvernement français
 const API_URL = 'https://api-adresse.data.gouv.fr';
 
@@ -465,6 +491,24 @@ function handleSearch(e) {
       // Sinon, compléter avec des trajets fictifs
       const mockRides = getMockResults(fromCity, toCity, date, realRides);
       
+      // Compter les trajets prioritaires (provenant de notre base de données)
+      const priorityRidesCount = realRides.filter(ride => ride.isPriority).length;
+      
+      // Afficher un message si des trajets prioritaires sont trouvés
+      if (priorityRidesCount > 0) {
+        const toast = document.createElement('div');
+        toast.className = 'toast toast--info toast--visible';
+        toast.textContent = `${priorityRidesCount} trajet(s) EcoRide disponible(s) pour tester la réservation!`;
+        document.body.appendChild(toast);
+        
+        // Cacher le message après 5 secondes
+        setTimeout(() => {
+          toast.classList.remove('toast--visible');
+          // Supprimer après la fin de l'animation
+          setTimeout(() => toast.remove(), 300);
+        }, 5000);
+      }
+      
       // Combiner les trajets réels (qui sont déjà marqués comme prioritaires) avec les trajets fictifs
       return [...realRides, ...mockRides];
     })
@@ -490,11 +534,11 @@ function handleSearch(e) {
 }
 
 /**
- * Récupère les trajets réels depuis la base de données
+ * Récupère les covoiturages réels depuis l'API
  * @param {string} from - Ville de départ
  * @param {string} to - Ville d'arrivée
  * @param {string} date - Date du trajet
- * @returns {Promise<Array>} Tableau des trajets trouvés
+ * @returns {Array} Tableau des trajets formatés
  */
 async function fetchRealRides(from, to, date) {
   try {
@@ -505,52 +549,78 @@ async function fetchRealRides(from, to, date) {
     
     try {
       // Essayer de récupérer les trajets réels
+      console.log("Appel à RideService.searchRides avec:", from, to, date);
       const response = await RideService.searchRides(from, to, date, 1);
-      console.log("Réponse de l'API:", response);
+      console.log("Réponse complète de l'API:", response);
       
-      // Vérifier si la réponse est valide et contient des trajets
-      if (response && !response.error) {
-        // Extraire les résultats selon la structure de la réponse
-        let results = [];
-        if (Array.isArray(response)) {
-          results = response;
-        } else if (response.rides && Array.isArray(response.rides)) {
-          results = response.rides;
-        } else if (response.data && Array.isArray(response.data.rides)) {
-          results = response.data.rides;
-        } else if (response.data && Array.isArray(response.data)) {
-          results = response.data;
+      // Vérifier si la réponse est valide
+      if (!response) {
+        console.warn("La réponse de l'API est null ou undefined");
+        return [];
+      }
+      
+      // Extraire les résultats selon la structure de la réponse
+      let results = [];
+      
+      if (Array.isArray(response)) {
+        console.log("Réponse est un tableau de longueur:", response.length);
+        results = response;
+      } else if (response.rides && Array.isArray(response.rides)) {
+        console.log("Réponse contient un tableau 'rides' de longueur:", response.rides.length);
+        results = response.rides;
+      } else if (response.data && Array.isArray(response.data.rides)) {
+        console.log("Réponse contient data.rides de longueur:", response.data.rides.length);
+        results = response.data.rides;
+      } else if (response.data && Array.isArray(response.data)) {
+        console.log("Réponse contient data[] de longueur:", response.data.length);
+        results = response.data;
+      } else {
+        console.warn("Structure de réponse inconnue:", response);
+        // Tenter de traiter comme un objet unique
+        if (response.id) {
+          console.log("La réponse semble être un objet unique avec un ID");
+          results = [response];
+        } else {
+          return [];
         }
+      }
+      
+      if (results.length > 0) {
+        console.log("Trajets trouvés:", results);
         
-        if (results.length > 0) {
-          console.log("Trajets trouvés:", results);
+        // Transformer les résultats dans le format attendu pour l'affichage
+        return results.map(ride => {
+          console.log("Traitement du covoiturage:", ride);
           
-          // Transformer les résultats dans le format attendu pour l'affichage
-          return results.map(ride => ({
-            id: ride.id,
-            from: ride.departure_city || ride.departure || from,
-            to: ride.arrival_city || ride.destination || to,
-            date: formatDate(ride.departure_date || ride.date),
-            rawDate: ride.departure_date || ride.date,
-            time: ride.departure_time || ride.departureTime || "12h00",
+          // Structure de données normalisée pour l'affichage
+          const formattedRide = {
+            id: ride.id || '',
+            from: ride.departure?.location || ride.departure_city || ride.departure || from,
+            to: ride.arrival?.location || ride.arrival_city || ride.destination || to,
+            date: formatDate(ride.departure?.date || ride.departure_date || ride.date),
+            rawDate: ride.departure?.date || ride.departure_date || ride.date,
+            time: ride.departure?.time || ride.departure_time || ride.departureTime || "12h00",
             price: parseFloat(ride.price) || Math.floor(Math.random() * 33) + 8,
             driver: {
-              name: ride.driver?.name || 'Conducteur EcoRide',
+              name: ride.driver?.name || ride.driver?.username || 'Conducteur EcoRide',
               rating: parseFloat(ride.driver?.rating) || (Math.floor(Math.random() * 21) + 30) / 10,
               trips: ride.driver?.rides_count || Math.floor(Math.random() * 80) + 20,
-              image: ride.driver?.profile_image || '../../assets/images/profile_Marie.svg',
+              image: ride.driver?.profile_image || ride.driver?.profilePicture || '../../assets/images/profile_Marie.svg',
             },
-            vehicleType: ride.vehicle?.model || ['Citadine', 'Berline', 'SUV', 'Compacte'][Math.floor(Math.random() * 4)],
-            co2Saved: ride.co2_saved || Math.floor(Math.random() * 30) + 10,
-            availableSeats: ride.available_seats || ride.availableSeats || Math.floor(Math.random() * 4) + 1,
+            vehicleType: ride.vehicle?.model || ride.vehicle?.brand || ['Citadine', 'Berline', 'SUV', 'Compacte'][Math.floor(Math.random() * 4)],
+            co2Saved: ride.ecologicalImpact?.carbonFootprint || ride.co2_saved || Math.floor(Math.random() * 30) + 10,
+            availableSeats: ride.seats?.available || ride.available_seats || ride.availableSeats || Math.floor(Math.random() * 4) + 1,
             duration: ride.duration || `${Math.floor(Math.random() * 3) + 1}h${Math.floor(Math.random() * 60)}`,
-            electricVehicle: ride.vehicle?.is_electric || Math.random() > 0.7,
+            electricVehicle: ride.vehicle?.energyId === 2 || ride.vehicle?.energy === 'Électrique' || ride.vehicle?.is_electric || Math.random() > 0.7,
             nonSmoking: ride.preferences?.non_smoking || Math.random() > 0.4,
             petsAllowed: ride.preferences?.pets_allowed || Math.random() > 0.6,
             driverVerified: ride.driver?.is_verified || Math.random() > 0.5,
             isPriority: true // Marquer comme prioritaire car provient de la base de données
-          }));
-        }
+          };
+          
+          console.log("Covoiturage formaté:", formattedRide);
+          return formattedRide;
+        });
       }
       
       console.warn("Aucun trajet trouvé dans la base de données ou réponse invalide");

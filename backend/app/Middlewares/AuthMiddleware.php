@@ -39,7 +39,7 @@ class AuthMiddleware
 
         // Limiter les tentatives d'authentification pour prévenir les attaques par force brute
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        if (!Security::rateLimit("auth_$ip", 10, 60)) {
+        if (!Security::rateLimit("auth_$ip", 20, 60)) {
             http_response_code(429);
             return [
                 'error' => true,

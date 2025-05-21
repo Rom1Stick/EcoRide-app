@@ -123,4 +123,85 @@ class UserController extends Controller
         $stmt->execute([$userId, $roleId]);
         return $this->success(null, 'Demande de changement de rôle soumise');
     }
+    
+    /**
+     * Ajoute le rôle spécifié à l'utilisateur connecté
+     * 
+     * @return array
+     */
+    public function addRole(): array 
+    {
+        // Récupérer l'ID de l'utilisateur authentifié
+        $userId = $_SERVER['AUTH_USER_ID'] ?? null;
+        if (!$userId) {
+            return $this->error('Non authentifié', 401);
+        }
+        
+        // Récupérer les données de la requête
+        $data = $this->getJsonData();
+        $roleName = $data['role'] ?? null;
+        
+        if (!$roleName) {
+            return $this->error('Nom du rôle manquant', 400);
+        }
+        
+        // Normaliser le nom du rôle (le mettre en minuscule)
+        $roleName = strtolower($roleName);
+        
+        // Vérifier si le rôle demandé est "passager" (seul rôle autorisé pour l'auto-attribution)
+        if ($roleName !== 'passager') {
+            return $this->error('Seul le rôle "passager" peut être ajouté automatiquement', 403);
+        }
+        
+        $db = $this->app->getDatabase()->getMysqlConnection();
+        
+        // Vérifier si l'utilisateur a déjà ce rôle
+        $checkStmt = $db->prepare(
+            'SELECT COUNT(*) 
+             FROM Possede p
+             JOIN Role r ON p.role_id = r.role_id
+             WHERE p.utilisateur_id = ? AND LOWER(r.libelle) = ?'
+        );
+        $checkStmt->execute([$userId, $roleName]);
+        
+        if ((int)$checkStmt->fetchColumn() > 0) {
+            return $this->success(null, 'Vous avez déjà ce rôle');
+        }
+        
+        // Récupérer l'ID du rôle
+        $roleStmt = $db->prepare('SELECT role_id FROM Role WHERE LOWER(libelle) = ?');
+        $roleStmt->execute([$roleName]);
+        $roleId = $roleStmt->fetchColumn();
+        
+        if (!$roleId) {
+            // Si le rôle n'existe pas dans la base de données, le créer
+            try {
+                $db->beginTransaction();
+                
+                $createRoleStmt = $db->prepare('INSERT INTO Role (libelle) VALUES (?)');
+                $createRoleStmt->execute(['Passager']);
+                $roleId = $db->lastInsertId();
+                
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                return $this->error('Erreur lors de la création du rôle: ' . $e->getMessage(), 500);
+            }
+        }
+        
+        // Ajouter le rôle à l'utilisateur
+        try {
+            $db->beginTransaction();
+            
+            $addRoleStmt = $db->prepare('INSERT INTO Possede (utilisateur_id, role_id) VALUES (?, ?)');
+            $addRoleStmt->execute([$userId, $roleId]);
+            
+            $db->commit();
+            
+            return $this->success(null, 'Rôle ajouté avec succès');
+        } catch (\Exception $e) {
+            $db->rollBack();
+            return $this->error('Erreur lors de l\'ajout du rôle: ' . $e->getMessage(), 500);
+        }
+    }
 } 

@@ -292,6 +292,15 @@ function updateRideDetails(ride) {
   // Vérifier si des places sont disponibles
   updateBookingButton(ride.availableSeats);
   
+  // Récupérer et stocker le solde puis mettre à jour l'état du bouton
+  if (Auth.isLoggedIn()) {
+    fetchUserBalance().then(balance => {
+      if (balance !== null) {
+        updateBookingButton(ride.availableSeats);
+      }
+    });
+  }
+  
   // Ajouter une animation de transition
   document.querySelector('.trip-content').classList.add('fade-in');
 }
@@ -532,9 +541,17 @@ function updateBookingButton(availableSeats) {
   const bookingButtons = document.querySelectorAll('.btn-book, .mobile-booking-footer__btn');
   
   bookingButtons.forEach(button => {
+    const price = parseFloat(document.getElementById('trip-price').textContent) || 0;
+    const isLogged = Auth.isLoggedIn();
+    // Si plus de place
     if (availableSeats <= 0) {
       button.disabled = true;
       button.textContent = 'Complet';
+      button.classList.add('disabled');
+    // Si connecté et crédits insuffisants
+    } else if (isLogged && window._userBalance != null && window._userBalance < price) {
+      button.disabled = true;
+      button.textContent = 'Crédits insuffisants';
       button.classList.add('disabled');
     } else {
       button.disabled = false;
@@ -702,26 +719,112 @@ function setupBookingButton() {
       });
       
       try {
-        // Appel à l'API pour effectuer la réservation
-        const response = await API.post(`/api/rides/${rideId}/book`, {
-          seats: 1  // Par défaut 1 place
-        });
+        // Vérifier s'il s'agit d'un trajet local
+        const isLocalRide = rideId.startsWith('local-');
+        let verifyRes;
         
-        if (response.error) {
-          throw new Error(response.message || 'Erreur lors de la réservation');
+        try {
+          if (isLocalRide) {
+            console.log('Traitement d\'un trajet local avec ID:', rideId);
+            // Pour les trajets locaux, utiliser la méthode spéciale
+            verifyRes = await RideService.bookLocalRide(rideId, 1);
+          } else {
+            // Pour les trajets du serveur, utiliser la méthode standard
+            verifyRes = await API.post(`/api/rides/${rideId}/book`, { seats: 1 });
+          }
+        } catch (bookError) {
+          // Vérifier si l'erreur est liée au rôle manquant
+          if (bookError.message && (
+              bookError.message.includes('passager') || 
+              bookError.message.includes('Seuls les passagers peuvent') ||
+              bookError.message.includes('role'))) {
+            
+            // Demander à l'utilisateur s'il veut ajouter le rôle de passager
+            if (confirm('Vous avez besoin du rôle "passager" pour réserver un trajet. Voulez-vous ajouter ce rôle à votre compte ?')) {
+              try {
+                // Appel API pour ajouter le rôle de passager
+                const addRoleRes = await API.post('/api/users/add-role', { role: 'passager' });
+                
+                if (addRoleRes.error) {
+                  throw new Error(addRoleRes.message || 'Erreur lors de l\'ajout du rôle de passager');
+                }
+                
+                // Si le rôle a été ajouté avec succès, réessayer la réservation
+                showToast('Rôle de passager ajouté avec succès. Réessayez de réserver.');
+                
+                // Réactiver les boutons
+                bookingButtons.forEach(btn => {
+                  btn.disabled = false;
+                  btn.textContent = 'Réserver';
+                });
+                
+                return;
+              } catch (roleError) {
+                console.error('Erreur lors de l\'ajout du rôle:', roleError);
+                throw new Error('Impossible d\'ajouter le rôle de passager. Contactez l\'administrateur.');
+              }
+            } else {
+              throw new Error('Vous avez besoin du rôle "passager" pour réserver un trajet.');
+            }
+          } else {
+            // Si ce n'est pas une erreur de rôle, la renvoyer
+            throw bookError;
+          }
         }
         
-        // Réservation réussie
-        showToast('Réservation effectuée avec succès !');
+        if (verifyRes.error) {
+          throw new Error(verifyRes.message || 'Erreur de vérification');
+        }
         
-        // Mettre à jour les places disponibles
+        // Amélioration de la vérification de la réponse du serveur
+        if (!verifyRes.data && typeof verifyRes !== 'object') {
+          throw new Error('Réponse du serveur invalide');
+        }
+        
+        // Utiliser soit verifyRes.data s'il existe, soit verifyRes directement
+        const responseData = verifyRes.data || verifyRes;
+        const needConfirmation = responseData.needConfirmation && !isLocalRide; // Pas de confirmation pour trajets locaux
+        const price = responseData.price;
+        const balance = responseData.balance || responseData.new_balance;
+        
+        // Récupérer les détails du trajet
         const rideData = await fetchRideDetails(rideId);
-        updateRideDetails(rideData);
-      } catch (error) {
-        console.error('Erreur lors de la réservation:', error);
-        showErrorMessage(error.message || 'Erreur lors de la réservation');
         
-        // Réactiver le bouton
+        if (needConfirmation) {
+          // Ouvrir la modale de confirmation
+          openReservationModal(rideData, price, balance);
+        } else {
+          // Pas de confirmation nécessaire
+          showToast('Réservation effectuée avec succès !');
+          
+          // Si c'était un trajet local, mettre à jour le solde et rediriger directement
+          if (isLocalRide) {
+            setTimeout(() => {
+              if (confirm('Réservation confirmée ! Souhaitez-vous consulter vos réservations dans votre profil ?')) {
+                // Rediriger vers la page de profil avec le paramètre de rafraîchissement
+                window.location.href = './profile.html?refresh=true&tab=trips&timestamp=' + Date.now();
+              } else {
+                showToast('Consultez votre profil pour voir vos réservations');
+                // Réactiver les boutons
+                bookingButtons.forEach(btn => {
+                  btn.disabled = false;
+                  btn.textContent = 'Réserver';
+                });
+              }
+            }, 1000);
+          } else {
+            updateRideDetails(rideData);
+            // Réactiver les boutons
+            bookingButtons.forEach(btn => {
+              btn.disabled = false;
+              btn.textContent = 'Réserver';
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Erreur lors de la réservation:', err);
+        showErrorMessage(err.message || 'Erreur lors de la réservation');
+        // Réactiver les boutons
         bookingButtons.forEach(btn => {
           btn.disabled = false;
           btn.textContent = 'Réserver';
@@ -885,6 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupBookingButton();
   setupContactButton();
   setupReviewsButton();
+  setupReservationModal();
   
   // Ajouter une classe CSS pour les animations
   document.body.classList.add('js-enabled');
@@ -1055,4 +1159,102 @@ function generateRandomReviews(count = 0) {
     pages: Math.ceil(totalReviews / REVIEWS_PER_PAGE),
     averageRating: parseFloat(averageRating.toFixed(1))
   };
+}
+
+/**
+ * Récupère le solde de crédits de l'utilisateur
+ * @returns {Promise<number|null>} Solde ou null en cas d'erreur
+ */
+async function fetchUserBalance() {
+  try {
+    const res = await API.get('/api/credits/balance');
+    if (!res.error && res.data && typeof res.data.balance === 'number') {
+      window._userBalance = res.data.balance;
+      return res.data.balance;
+    }
+  } catch (err) {
+    console.error('Erreur lors de la récupération du solde de crédits:', err);
+  }
+  window._userBalance = null;
+  return null;
+}
+
+/**
+ * Ouvre la modale de confirmation de réservation
+ * @param {object} ride - Données du trajet
+ * @param {number} price - Coût en crédits
+ * @param {number} balance - Solde actuel de l'utilisateur
+ */
+function openReservationModal(ride, price, balance) {
+  const modal = document.getElementById('reservation-modal');
+  document.getElementById('modal-ride-route').textContent = `${ride.departure} → ${ride.destination}`;
+  document.getElementById('modal-ride-date').textContent = formatDate(ride.date);
+  document.getElementById('modal-price').textContent = price;
+  document.getElementById('modal-current-balance').textContent = balance;
+  document.getElementById('modal-new-balance').textContent = balance - price;
+  modal.classList.add('active');
+}
+
+// Handlers pour la modale de confirmation
+function setupReservationModal() {
+  const modal = document.getElementById('reservation-modal');
+  // Fermer la modale
+  modal.querySelectorAll('.close-modal').forEach(btn =>
+    btn.addEventListener('click', () => modal.classList.remove('active'))
+  );
+  // Confirmer la réservation
+  const confirmBtn = document.getElementById('confirm-reservation-btn');
+  confirmBtn.addEventListener('click', async () => {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Traitement...';
+    try {
+      const rideId = getRideId();
+      
+      // Utiliser la nouvelle méthode du RideService pour confirmer la réservation
+      const res = await RideService.confirmRide(rideId);
+      
+      // Afficher les détails de la transaction pour débogage
+      console.log('Détails de la transaction:', {
+        soldeAvant: res.balance_before,
+        soldeAprès: res.new_balance,
+        prix: res.price
+      });
+      
+      // Forcer le rafraîchissement du solde des crédits après une courte pause
+      // pour laisser le temps à la base de données de se mettre à jour
+      setTimeout(async () => {
+        try {
+          const creditsResponse = await API.get('/api/credits/balance');
+          console.log('Solde de crédits mis à jour:', creditsResponse);
+        } catch (e) {
+          console.warn('Impossible de rafraîchir le solde:', e);
+        }
+      }, 500);
+      
+      // Afficher le message de succès
+      showToast(res.message || 'Réservation confirmée !');
+      modal.classList.remove('active');
+      
+      // Rafraîchir les données du trajet
+      const rideData = await fetchRideDetails(rideId);
+      updateRideDetails(rideData);
+      
+      // Suggérer à l'utilisateur de vérifier son profil avec un délai
+      setTimeout(() => {
+        // Demander à l'utilisateur s'il souhaite voir ses réservations
+        if (confirm('Réservation confirmée ! Souhaitez-vous consulter vos réservations dans votre profil ?')) {
+          // Rediriger vers la page de profil avec le paramètre de rafraîchissement
+          window.location.href = './profile.html?refresh=true&tab=trips&timestamp=' + Date.now();
+        } else {
+          showToast('Consultez votre profil pour voir vos réservations');
+        }
+      }, 1500);
+    } catch (err) {
+      console.error('Erreur confirmation réservation:', err);
+      showErrorMessage(err.message || 'Erreur lors de la confirmation');
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirmer ma réservation';
+    }
+  });
 }

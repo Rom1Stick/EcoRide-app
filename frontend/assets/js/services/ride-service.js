@@ -77,6 +77,18 @@ export class RideService {
       return cachedData;
     }
     
+    // Récupérer d'abord les trajets locaux pour afficher en priorité
+    const localRides = this.getLocalRides();
+    const matchingLocalRides = localRides.filter(ride => {
+      return (ride.departure_city?.toLowerCase() === departure.toLowerCase() || 
+              ride.departure?.toLowerCase() === departure.toLowerCase()) && 
+             (ride.arrival_city?.toLowerCase() === destination.toLowerCase() || 
+              ride.destination?.toLowerCase() === destination.toLowerCase()) &&
+             this.isSameDate(ride.departure_date || ride.date, date);
+    });
+    
+    console.log("RideService.searchRides - Trajets locaux correspondants:", matchingLocalRides);
+    
     // IMPORTANT: Adapter les noms des paramètres au format du backend
     // Le backend attend departure_city et arrival_city au lieu de departure et destination
     const queryParams = new URLSearchParams({
@@ -95,34 +107,28 @@ export class RideService {
       
       // Vérification des données et mise en cache
       if (response && !response.error) {
-        let data = response.data;
+        let apiData = response.data || [];
         
-        // Si les données sont vides ou invalides, simulons des trajets locaux
-        // C'est temporaire pour montrer les covoiturages publiés pendant le développement
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-          // Vérifier si nous avons des trajets en sessionStorage
-          const localRides = this.getLocalRides();
-          
-          // Filtrer les trajets locaux selon les critères de recherche
-          const matchingRides = localRides.filter(ride => {
-            return (ride.departure_city?.toLowerCase() === departure.toLowerCase() || 
-                    ride.departure?.toLowerCase() === departure.toLowerCase()) && 
-                   (ride.arrival_city?.toLowerCase() === destination.toLowerCase() || 
-                    ride.destination?.toLowerCase() === destination.toLowerCase()) &&
-                   this.isSameDate(ride.departure_date || ride.date, date);
-          });
-          
-          if (matchingRides.length > 0) {
-            console.log("RideService.searchRides - Trajets locaux trouvés:", matchingRides);
-            data = matchingRides;
-          } else {
-            console.log("RideService.searchRides - Aucun trajet local correspondant");
-          }
+        // S'assurer que apiData est un tableau
+        if (!Array.isArray(apiData)) {
+          apiData = [];
         }
         
-        // Mettre en cache et retourner les données
-        this.addToCache(cache.searches, cacheKey, data);
-        return data;
+        // Combiner les trajets locaux avec ceux de l'API
+        // Les trajets locaux sont déjà marqués comme prioritaires
+        const combinedData = [...matchingLocalRides, ...apiData];
+        
+        console.log("RideService.searchRides - Données combinées:", combinedData);
+        
+        // Mettre en cache et retourner les données combinées
+        this.addToCache(cache.searches, cacheKey, combinedData);
+        return combinedData;
+      }
+      
+      // Si la requête API échoue, retourner au moins les trajets locaux
+      if (matchingLocalRides.length > 0) {
+        this.addToCache(cache.searches, cacheKey, matchingLocalRides);
+        return matchingLocalRides;
       }
       
       console.warn("RideService.searchRides - Réponse invalide de l'API:", response);
@@ -130,19 +136,10 @@ export class RideService {
     } catch (error) {
       console.error("RideService.searchRides - Erreur:", error);
       
-      // Essayer de trouver des trajets locaux en cas d'erreur API
-      const localRides = this.getLocalRides();
-      const matchingRides = localRides.filter(ride => {
-        return (ride.departure_city?.toLowerCase() === departure.toLowerCase() || 
-                ride.departure?.toLowerCase() === departure.toLowerCase()) && 
-               (ride.arrival_city?.toLowerCase() === destination.toLowerCase() || 
-                ride.destination?.toLowerCase() === destination.toLowerCase()) &&
-               this.isSameDate(ride.departure_date || ride.date, date);
-      });
-      
-      if (matchingRides.length > 0) {
-        console.log("RideService.searchRides - Trajets locaux trouvés après erreur API:", matchingRides);
-        return matchingRides;
+      // En cas d'erreur API, retourner au moins les trajets locaux correspondants
+      if (matchingLocalRides.length > 0) {
+        console.log("RideService.searchRides - Retour des trajets locaux suite à erreur API");
+        return matchingLocalRides;
       }
       
       return [];
@@ -187,7 +184,23 @@ export class RideService {
       if (!storedRides) return [];
       
       const rides = JSON.parse(storedRides);
-      return Array.isArray(rides) ? rides : [];
+      
+      // Modification : Définir isPriority à true pour tous les trajets locaux
+      // afin qu'ils apparaissent en premier dans les résultats
+      const prioritizedRides = Array.isArray(rides) ? rides.map(ride => ({
+        ...ride,
+        isPriority: true,
+        // Assurer que les places disponibles soient définies correctement
+        availableSeats: ride.availableSeats || ride.available_seats || 2,
+        // Normaliser les données du conducteur
+        driver: {
+          ...ride.driver,
+          name: ride.driver?.name || ride.driver?.username || 'Conducteur EcoRide',
+          rating: parseFloat(ride.driver?.rating) || 4.5
+        }
+      })) : [];
+      
+      return prioritizedRides;
     } catch (e) {
       console.error("Erreur lors de la récupération des trajets locaux:", e);
       return [];
@@ -200,27 +213,31 @@ export class RideService {
    * @returns {Promise<Object>} Détails du trajet
    */
   static async getRideDetails(rideId) {
-    // Vérifier si on a des données dans le sessionStorage (données passées depuis la liste)
-    const sessionData = this.getFromSession(rideId);
-    if (sessionData) {
-      // Mettre en cache et retourner les données de session
-      this.addToCache(cache.rideDetails, rideId, sessionData);
-      return sessionData;
-    }
-    
     // Vérifier le cache
     const cachedData = this.getFromCache(cache.rideDetails, rideId);
     if (cachedData) return cachedData;
     
-    // Effectuer la requête API
-    const response = await API.get(`/api/rides/${rideId}`);
+    // Vérifier s'il y a des données en sessionStorage
+    const sessionData = this.getFromSession(rideId);
+    if (sessionData) return sessionData;
     
-    // Mettre en cache et retourner les données
-    if (!response.error) {
+    try {
+      // Effectuer la requête API
+      const response = await API.get(`/api/rides/${rideId}`);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de la récupération des détails du trajet');
+      }
+      
+      // Mettre en cache et retourner les données
       this.addToCache(cache.rideDetails, rideId, response.data);
+      this.saveToSession(rideId, response.data);
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Erreur lors de la récupération du trajet ${rideId}:`, error);
+      throw error;
     }
-    
-    return response.data;
   }
   
   /**
@@ -228,7 +245,7 @@ export class RideService {
    * @param {string} driverId - ID du conducteur
    * @param {number} page - Numéro de la page
    * @param {number} limit - Nombre d'avis par page
-   * @returns {Promise<Object>} Avis sur le conducteur
+   * @returns {Promise<Object>} Liste des avis
    */
   static async getDriverReviews(driverId, page = 1, limit = 3) {
     // Construire la clé de cache
@@ -238,126 +255,186 @@ export class RideService {
     const cachedData = this.getFromCache(cache.reviews, cacheKey);
     if (cachedData) return cachedData;
     
-    // Effectuer la requête API
-    const response = await API.get(`/api/users/${driverId}/reviews?page=${page}&limit=${limit}`);
-    
-    // Mettre en cache et retourner les données
-    if (!response.error) {
+    try {
+      // Effectuer la requête API
+      const response = await API.get(`/api/drivers/${driverId}/reviews?page=${page}&limit=${limit}`);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de la récupération des avis');
+      }
+      
+      // Mettre en cache et retourner les données
       this.addToCache(cache.reviews, cacheKey, response.data);
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Erreur lors de la récupération des avis du conducteur ${driverId}:`, error);
+      throw error;
     }
-    
-    return response.data;
   }
   
   /**
-   * Réserve une place sur un trajet
+   * Effectue une réservation sur un trajet
    * @param {string} rideId - ID du trajet
    * @param {number} seats - Nombre de places à réserver
-   * @returns {Promise<Object>} Confirmation de réservation
+   * @returns {Promise<Object>} Détails de la réservation
    */
   static async bookRide(rideId, seats = 1) {
-    const response = await API.post(`/api/rides/${rideId}/book`, { seats });
-    
-    // Si la réservation est réussie, invalider le cache pour ce trajet
-    if (!response.error) {
+    try {
+      // Effectuer la requête API
+      const response = await API.post(`/api/rides/${rideId}/book`, { seats });
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de la réservation');
+      }
+      
+      // Invalider le cache pour forcer un rechargement des données
       this.invalidateCache(cache.rideDetails, rideId);
-      // Supprimer aussi du sessionStorage
-      this.removeFromSession(rideId);
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Erreur lors de la réservation du trajet ${rideId}:`, error);
+      throw error;
     }
-    
-    return response;
   }
   
   /**
    * Annule une réservation
    * @param {string} bookingId - ID de la réservation
-   * @returns {Promise<Object>} Confirmation d'annulation
+   * @returns {Promise<Object>} Résultat de l'annulation
    */
   static async cancelBooking(bookingId) {
-    return await API.delete(`/api/bookings/${bookingId}`);
+    try {
+      // Effectuer la requête API
+      const response = await API.delete(`/api/bookings/${bookingId}`);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de l\'annulation de la réservation');
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Erreur lors de l'annulation de la réservation ${bookingId}:`, error);
+      throw error;
+    }
   }
   
   /**
    * Crée un nouveau trajet
    * @param {Object} rideData - Données du trajet
-   * @returns {Promise<Object>} Confirmation de création
+   * @returns {Promise<Object>} Résultat de la création
    */
   static async createRide(rideData) {
-    return await API.post('/api/rides', rideData);
+    try {
+      // Effectuer la requête API
+      const response = await API.post('/api/rides', rideData);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de la création du trajet');
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la création du trajet:', error);
+      throw error;
+    }
   }
   
   /**
    * Met à jour un trajet existant
    * @param {string} rideId - ID du trajet
    * @param {Object} rideData - Nouvelles données du trajet
-   * @returns {Promise<Object>} Confirmation de mise à jour
+   * @returns {Promise<Object>} Résultat de la mise à jour
    */
   static async updateRide(rideId, rideData) {
-    const response = await API.put(`/api/rides/${rideId}`, rideData);
-    
-    // Si la mise à jour est réussie, invalider le cache pour ce trajet
-    if (!response.error) {
+    try {
+      // Effectuer la requête API
+      const response = await API.put(`/api/rides/${rideId}`, rideData);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de la mise à jour du trajet');
+      }
+      
+      // Invalider le cache pour forcer un rechargement des données
       this.invalidateCache(cache.rideDetails, rideId);
-      // Supprimer aussi du sessionStorage
-      this.removeFromSession(rideId);
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Erreur lors de la mise à jour du trajet ${rideId}:`, error);
+      throw error;
     }
-    
-    return response;
   }
   
   /**
    * Supprime un trajet
    * @param {string} rideId - ID du trajet
-   * @returns {Promise<Object>} Confirmation de suppression
+   * @returns {Promise<Object>} Résultat de la suppression
    */
   static async deleteRide(rideId) {
-    return await API.delete(`/api/rides/${rideId}`);
+    try {
+      // Effectuer la requête API
+      const response = await API.delete(`/api/rides/${rideId}`);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de la suppression du trajet');
+      }
+      
+      // Invalider les caches
+      this.invalidateCache(cache.rideDetails, rideId);
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Erreur lors de la suppression du trajet ${rideId}:`, error);
+      throw error;
+    }
   }
   
   /**
-   * Ajoute des données au cache avec une date d'expiration
+   * Ajoute des données au cache
    * @param {Map} cacheMap - Cache à utiliser
-   * @param {string} key - Clé de cache
+   * @param {string} key - Clé du cache
    * @param {*} data - Données à mettre en cache
    */
   static addToCache(cacheMap, key, data) {
     cacheMap.set(key, {
       data,
-      expiry: Date.now() + CACHE_DURATION
+      timestamp: Date.now()
     });
   }
   
   /**
-   * Récupère des données du cache si elles sont valides
+   * Récupère des données depuis le cache si elles sont valides
    * @param {Map} cacheMap - Cache à utiliser
-   * @param {string} key - Clé de cache
-   * @returns {*|null} Données en cache ou null si expirées/inexistantes
+   * @param {string} key - Clé du cache
+   * @returns {*|null} Données du cache ou null si non trouvées/expirées
    */
   static getFromCache(cacheMap, key) {
-    const cachedItem = cacheMap.get(key);
+    const cached = cacheMap.get(key);
     
-    if (!cachedItem) return null;
+    if (!cached) return null;
     
     // Vérifier si les données sont expirées
-    if (Date.now() > cachedItem.expiry) {
+    const isExpired = Date.now() - cached.timestamp > CACHE_DURATION;
+    
+    if (isExpired) {
       cacheMap.delete(key);
       return null;
     }
     
-    return cachedItem.data;
+    return cached.data;
   }
   
   /**
    * Invalide une entrée spécifique du cache
    * @param {Map} cacheMap - Cache à utiliser
-   * @param {string} key - Clé de cache à invalider
+   * @param {string} key - Clé du cache à invalider
    */
   static invalidateCache(cacheMap, key) {
     cacheMap.delete(key);
   }
   
   /**
-   * Vide complètement un cache spécifique
+   * Vide un cache spécifique
    * @param {Map} cacheMap - Cache à vider
    */
   static clearCache(cacheMap) {
@@ -368,51 +445,230 @@ export class RideService {
    * Vide tous les caches
    */
   static clearAllCaches() {
-    Object.values(cache).forEach(cacheMap => cacheMap.clear());
+    this.clearCache(cache.rides);
+    this.clearCache(cache.rideDetails);
+    this.clearCache(cache.reviews);
+    this.clearCache(cache.searches);
   }
-
+  
   /**
-   * Sauvegarde les données d'un trajet dans la sessionStorage
+   * Enregistre les données d'un trajet dans la session
    * @param {string} rideId - ID du trajet
    * @param {Object} rideData - Données du trajet
    */
   static saveToSession(rideId, rideData) {
     try {
-      sessionStorage.setItem(`ride_${rideId}`, JSON.stringify(rideData));
-      console.log('Données du trajet sauvegardées dans la session:', rideId);
-      return true;
+      // Créer une clé pour sessionStorage
+      const storageKey = `ride_${rideId}`;
+      
+      // Stocker les données converties en JSON
+      sessionStorage.setItem(storageKey, JSON.stringify({
+        data: rideData,
+        timestamp: Date.now()
+      }));
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des données du trajet dans la session:', error);
-      return false;
+      console.error('Erreur lors de l\'enregistrement dans sessionStorage:', error);
     }
   }
-
+  
   /**
-   * Récupère les données d'un trajet depuis la sessionStorage
+   * Récupère les données d'un trajet depuis la session
    * @param {string} rideId - ID du trajet
-   * @returns {Object|null} Données du trajet ou null si non trouvées
+   * @returns {Object|null} Données du trajet ou null si non trouvées/expirées
    */
   static getFromSession(rideId) {
     try {
-      const data = sessionStorage.getItem(`ride_${rideId}`);
-      if (!data) return null;
+      // Récupérer les données
+      const storageKey = `ride_${rideId}`;
+      const storedData = sessionStorage.getItem(storageKey);
       
-      return JSON.parse(data);
+      if (!storedData) return null;
+      
+      const { data, timestamp } = JSON.parse(storedData);
+      
+      // Vérifier si les données sont expirées
+      const isExpired = Date.now() - timestamp > CACHE_DURATION;
+      
+      if (isExpired) {
+        sessionStorage.removeItem(storageKey);
+        return null;
+      }
+      
+      return data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des données du trajet depuis la session:', error);
+      console.error('Erreur lors de la récupération depuis sessionStorage:', error);
       return null;
     }
   }
-
+  
   /**
-   * Supprime les données d'un trajet du sessionStorage
+   * Supprime les données d'un trajet de la session
    * @param {string} rideId - ID du trajet
    */
   static removeFromSession(rideId) {
     try {
-      sessionStorage.removeItem(`ride_${rideId}`);
+      const storageKey = `ride_${rideId}`;
+      sessionStorage.removeItem(storageKey);
     } catch (error) {
-      console.warn('Impossible de supprimer les données du sessionStorage', error);
+      console.error('Erreur lors de la suppression depuis sessionStorage:', error);
+    }
+  }
+  
+  /**
+   * Confirme une réservation de trajet après vérification préalable
+   * @param {string} rideId - ID du trajet
+   * @returns {Promise<Object>} Détails de la confirmation
+   */
+  static async confirmRide(rideId) {
+    try {
+      // Effectuer la requête API
+      const response = await API.post(`/api/rides/${rideId}/confirm`);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de la confirmation de la réservation');
+      }
+      
+      // Invalider le cache pour forcer un rechargement des données
+      this.invalidateCache(cache.rideDetails, rideId);
+      
+      // Également invalider les caches de recherche puisque les places disponibles ont changé
+      this.clearCache(cache.searches);
+      
+      // Forcer la mise à jour du solde de crédits dans la session
+      if (response.data && typeof response.data.new_balance === 'number') {
+        // Stocker le nouveau solde dans une variable globale window
+        window._userBalance = response.data.new_balance;
+        
+        // Mettre à jour le sessionStorage
+        try {
+          const userInfo = JSON.parse(sessionStorage.getItem('user_info') || '{}');
+          userInfo.credits = response.data.new_balance;
+          sessionStorage.setItem('user_info', JSON.stringify(userInfo));
+        } catch (e) {
+          console.warn('Impossible de mettre à jour les informations utilisateur en session:', e);
+        }
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Erreur lors de la confirmation du trajet ${rideId}:`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Gère la réservation d'un trajet local (stocké en localStorage)
+   * @param {string} rideId - ID du trajet local
+   * @param {number} seats - Nombre de places à réserver
+   * @returns {Promise<Object>} Résultat de la réservation locale
+   */
+  static async bookLocalRide(rideId, seats = 1) {
+    try {
+      console.log(`Traitement d'une réservation locale pour le trajet ${rideId}`);
+      
+      // Vérifier si l'ID est bien un ID local
+      if (!rideId.startsWith('local-')) {
+        throw new Error('Ce n\'est pas un trajet local');
+      }
+      
+      // Récupérer les trajets locaux
+      const storedRides = localStorage.getItem('user_rides');
+      if (!storedRides) {
+        throw new Error('Aucun trajet local trouvé');
+      }
+      
+      let rides = JSON.parse(storedRides);
+      const rideIndex = rides.findIndex(ride => ride.id === rideId);
+      
+      if (rideIndex === -1) {
+        throw new Error('Trajet local non trouvé');
+      }
+      
+      // Vérifier les places disponibles
+      const ride = rides[rideIndex];
+      const availableSeats = ride.availableSeats || ride.available_seats || 0;
+      
+      if (availableSeats < seats) {
+        throw new Error(`Places insuffisantes: ${availableSeats} disponibles, ${seats} demandées`);
+      }
+      
+      // Vérifier les crédits de l'utilisateur
+      const balanceResponse = await API.get('/api/credits/balance');
+      if (balanceResponse.error || typeof balanceResponse.data?.balance !== 'number') {
+        throw new Error('Impossible de vérifier votre solde de crédits');
+      }
+      
+      const userBalance = balanceResponse.data.balance;
+      const price = ride.price || 0;
+      
+      if (userBalance < price) {
+        throw new Error(`Crédits insuffisants: ${userBalance} disponibles, ${price} nécessaires`);
+      }
+      
+      // Créer une réservation locale et l'enregistrer sur le serveur
+      const bookingData = {
+        ride_id: rideId,
+        seats: seats,
+        price: price,
+        departure: ride.departure || ride.departure_city,
+        destination: ride.destination || ride.arrival_city,
+        date_depart: ride.date || ride.departure_date,
+        departureTime: ride.departureTime || ride.departure_time
+      };
+      
+      // Soumettre la réservation au serveur
+      const response = await API.post('/api/bookings/create', bookingData);
+      
+      if (response.error) {
+        throw new Error(response.message || 'Erreur lors de l\'enregistrement de la réservation');
+      }
+      
+      // Mettre à jour le nombre de places disponibles localement
+      rides[rideIndex].availableSeats = availableSeats - seats;
+      rides[rideIndex].available_seats = availableSeats - seats; // Assurer la compatibilité
+      
+      // Sauvegarder les modifications
+      localStorage.setItem('user_rides', JSON.stringify(rides));
+      
+      // Enregistrer la réservation localement aussi
+      let localBookings = JSON.parse(localStorage.getItem('user_bookings') || '[]');
+      localBookings.push({
+        ...bookingData,
+        id: `booking-${Date.now()}`,
+        status: 'Confirmé',
+        reserved_at: new Date().toISOString()
+      });
+      localStorage.setItem('user_bookings', JSON.stringify(localBookings));
+      
+      // Enlever le montant du prix des crédits de l'utilisateur
+      const debitResponse = await API.post('/api/credits/debit', { amount: price });
+      
+      if (debitResponse.error) {
+        console.warn('La déduction des crédits a échoué:', debitResponse.message);
+      }
+      
+      // Mettre à jour le solde en session
+      if (debitResponse.data && typeof debitResponse.data.balance === 'number') {
+        window._userBalance = debitResponse.data.balance;
+        
+        try {
+          const userInfo = JSON.parse(sessionStorage.getItem('user_info') || '{}');
+          userInfo.credits = debitResponse.data.balance;
+          sessionStorage.setItem('user_info', JSON.stringify(userInfo));
+        } catch (e) {
+          console.warn('Impossible de mettre à jour les informations utilisateur en session:', e);
+        }
+      }
+      
+      return {
+        success: true,
+        message: 'Réservation effectuée avec succès',
+        booking: response.data,
+        new_balance: debitResponse.data?.balance || userBalance - price
+      };
+    } catch (error) {
+      console.error(`Erreur lors de la réservation du trajet local ${rideId}:`, error);
+      throw error;
     }
   }
 } 

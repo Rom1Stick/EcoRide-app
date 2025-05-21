@@ -49,22 +49,31 @@ function setupTabs() {
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
 
+  // Vérifier s'il y a un paramètre tab dans l'URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabToActivate = urlParams.get('tab');
+
   tabButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      // Retirer la classe active de tous les boutons
+      // Retirer la classe 'active' de tous les boutons
       tabButtons.forEach((btn) => btn.classList.remove('active'));
 
-      // Ajouter la classe active au bouton cliqué
+      // Ajouter la classe 'active' au bouton cliqué
       button.classList.add('active');
 
-      // Masquer tous les contenus d'onglets
+      // Cacher tous les contenus d'onglet
       tabContents.forEach((content) => content.classList.add('hidden'));
 
       // Afficher le contenu de l'onglet correspondant
       const tabId = button.getAttribute('data-tab');
-      const tabContent = document.getElementById(`${tabId}-tab`);
-      if (tabContent) tabContent.classList.remove('hidden');
+      document.getElementById(`${tabId}-tab`).classList.remove('hidden');
     });
+    
+    // Si l'onglet correspond à celui spécifié dans l'URL, l'activer
+    if (tabToActivate && button.getAttribute('data-tab') === tabToActivate) {
+      // Déclencher un clic sur cet onglet
+      setTimeout(() => button.click(), 100);
+    }
   });
 }
 
@@ -130,8 +139,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Vérifier si l'utilisateur vient de faire une réservation
+  const comingFromReservation = checkIfComingFromReservation();
+
   // Initialiser les onglets
-  initTabs();
+  setupTabs();
 
   // Charger les données du profil
   await loadProfileData();
@@ -139,8 +151,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Charger le solde de crédits
   await loadCreditsBalance();
 
-  // Charger les trajets
-  await loadTrips();
+  // Charger les trajets en forçant le rafraîchissement si on vient de la page de réservation
+  await loadTrips(comingFromReservation);
 
   // Charger les informations du véhicule
   await loadVehicleInfo();
@@ -153,28 +165,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * Initialisation des onglets
+ * Vérifie si l'utilisateur vient de faire une réservation
+ * @returns {boolean} Vrai si l'utilisateur vient de faire une réservation
  */
-function initTabs() {
-  const tabButtons = document.querySelectorAll('.tab-button');
-  const tabContents = document.querySelectorAll('.tab-content');
-
-  tabButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      // Retirer la classe 'active' de tous les boutons
-      tabButtons.forEach((btn) => btn.classList.remove('active'));
-
-      // Ajouter la classe 'active' au bouton cliqué
-      button.classList.add('active');
-
-      // Cacher tous les contenus d'onglet
-      tabContents.forEach((content) => content.classList.add('hidden'));
-
-      // Afficher le contenu de l'onglet correspondant
-      const tabId = button.getAttribute('data-tab');
-      document.getElementById(`${tabId}-tab`).classList.remove('hidden');
-    });
-  });
+function checkIfComingFromReservation() {
+  // Vérifier si le referrer est la page de détail d'un covoiturage
+  if (document.referrer && document.referrer.includes('/detail-covoiturage.html')) {
+    console.log('Utilisateur venant de la page de réservation, forçage du rafraîchissement...');
+    return true;
+  }
+  
+  // Vérifier s'il y a un paramètre refresh dans l'URL
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('refresh') === 'true';
 }
 
 /**
@@ -213,35 +216,152 @@ async function loadProfileData() {
 /**
  * Chargement du solde de crédits
  */
-async function loadCreditsBalance() {
+async function loadCreditsBalance(forceRefresh = false) {
   try {
-    const response = await API.get('/api/credits/balance');
+    // En-têtes spécifiques pour éviter le cache
+    const headers = forceRefresh ? {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'X-Refresh-Cache': Date.now()
+    } : null;
+
+    const response = await API.get('/api/credits/balance', null, headers);
 
     if (response.error) {
       console.error('Erreur lors du chargement du solde de crédits:', response.message);
+      
+      // En cas d'erreur, vérifier si nous avons une valeur en mémoire
+      if (window._userBalance !== undefined && window._userBalance !== null) {
+        document.getElementById('creditsBalance').textContent = window._userBalance.toFixed(0);
+        return;
+      }
+      
+      // Sinon, vérifier dans sessionStorage
+      try {
+        const userInfo = JSON.parse(sessionStorage.getItem('user_info') || '{}');
+        if (userInfo.credits !== undefined) {
+          document.getElementById('creditsBalance').textContent = userInfo.credits.toFixed(0);
+          return;
+        }
+      } catch (e) {
+        console.warn('Erreur lors de la lecture des informations utilisateur:', e);
+      }
+      
       return;
     }
 
     // Mettre à jour l'affichage du solde de crédits
     const creditsBalance = response.data.balance || 0;
     document.getElementById('creditsBalance').textContent = creditsBalance.toFixed(0);
+    
+    // Stocker le solde pour une utilisation ultérieure
+    window._userBalance = creditsBalance;
+    
+    // Mettre à jour userInfo dans sessionStorage
+    try {
+      const userInfo = JSON.parse(sessionStorage.getItem('user_info') || '{}');
+      userInfo.credits = creditsBalance;
+      sessionStorage.setItem('user_info', JSON.stringify(userInfo));
+    } catch (e) {
+      console.warn('Erreur lors de la mise à jour des informations utilisateur:', e);
+    }
   } catch (error) {
     console.error('Erreur lors du chargement du solde de crédits:', error);
   }
 }
 
 /**
- * Chargement des trajets
+ * Chargement des trajets avec option de forcer le rafraîchissement
+ * @param {boolean} forceRefresh - Indique s'il faut forcer un rafraîchissement des données
  */
-async function loadTrips() {
+async function loadTrips(forceRefresh = false) {
   try {
-    // Récupérer les réservations
-    const bookingsResponse = await API.get('/api/bookings');
-    const bookings = bookingsResponse.error ? [] : (bookingsResponse.data.bookings || []);
+    // Variables pour stocker les en-têtes spécifiques
+    let headers = {};
+    
+    // Si on force le rafraîchissement, ajouter des en-têtes pour éviter le cache
+    if (forceRefresh) {
+      headers = {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'X-Refresh-Cache': Date.now() // Un en-tête avec timestamp unique pour éviter le cache
+      };
+      console.log('Forçage du rafraîchissement des données avec en-têtes:', headers);
+    }
+    
+    // Récupérer les réservations avec les en-têtes appropriés
+    const bookingsResponse = await API.get('/api/bookings', null, headers);
+    console.log('Réponse des réservations (forceRefresh=' + forceRefresh + '):', bookingsResponse);
+    
+    // Traitement plus robuste de la réponse
+    let bookings = [];
+    if (!bookingsResponse.error) {
+      // Si la structure est bookingsResponse.data.bookings
+      if (bookingsResponse.data && Array.isArray(bookingsResponse.data.bookings)) {
+        bookings = bookingsResponse.data.bookings;
+      } 
+      // Si la structure est bookingsResponse.bookings
+      else if (bookingsResponse.bookings && Array.isArray(bookingsResponse.bookings)) {
+        bookings = bookingsResponse.bookings;
+      }
+      // Si la structure est directement un tableau
+      else if (Array.isArray(bookingsResponse.data)) {
+        bookings = bookingsResponse.data;
+      }
+      // Si la structure est autre chose
+      else if (typeof bookingsResponse === 'object') {
+        // Chercher une propriété qui pourrait contenir des réservations
+        for (const key in bookingsResponse) {
+          if (Array.isArray(bookingsResponse[key])) {
+            bookings = bookingsResponse[key];
+            break;
+          }
+        }
+      }
+    } else {
+      console.error('Erreur lors de la récupération des réservations:', bookingsResponse.message);
+    }
+
+    // Récupérer les réservations locales depuis localStorage
+    try {
+      const localBookingsStr = localStorage.getItem('user_bookings');
+      if (localBookingsStr) {
+        const localBookings = JSON.parse(localBookingsStr);
+        if (Array.isArray(localBookings) && localBookings.length > 0) {
+          console.log(`Ajout de ${localBookings.length} réservations locales`);
+          bookings = [...bookings, ...localBookings];
+        }
+      }
+    } catch (e) {
+      console.error('Erreur lors de la récupération des réservations locales:', e);
+    }
     
     // Récupérer les covoiturages proposés (en tant que chauffeur)
-    const ridesResponse = await API.get('/api/rides/my');
-    const myRides = ridesResponse.error ? [] : (ridesResponse.data.rides || []);
+    const ridesResponse = await API.get('/api/rides/my', null, headers);
+    console.log('Réponse des trajets proposés:', ridesResponse);
+    
+    // Traitement similaire pour les trajets proposés
+    let myRides = [];
+    if (!ridesResponse.error) {
+      if (ridesResponse.data && Array.isArray(ridesResponse.data.rides)) {
+        myRides = ridesResponse.data.rides;
+      } else if (ridesResponse.rides && Array.isArray(ridesResponse.rides)) {
+        myRides = ridesResponse.rides;
+      } else if (Array.isArray(ridesResponse.data)) {
+        myRides = ridesResponse.data;
+      } else if (typeof ridesResponse === 'object') {
+        for (const key in ridesResponse) {
+          if (Array.isArray(ridesResponse[key])) {
+            myRides = ridesResponse[key];
+            break;
+          }
+        }
+      }
+    } else {
+      console.error('Erreur lors de la récupération des trajets proposés:', ridesResponse.message);
+    }
     
     // Combiner les deux types de trajets
     const allTrips = [...bookings, ...myRides];
@@ -272,10 +392,14 @@ async function loadTrips() {
             <button id="filterBookings" class="filter-btn" data-filter="booking">Réservations</button>
             <button id="filterMyRides" class="filter-btn" data-filter="driver">Mes propositions</button>
           </div>
+          <button id="refreshTripsBtn" class="btn-secondary" title="Rafraîchir les données">
+            <i class="fa-solid fa-sync-alt"></i> Rafraîchir
+          </button>
         </div>
         <p class="empty-state">Vous n'avez pas encore effectué de trajets.</p>
       `;
       document.getElementById('addRideBtn').addEventListener('click', showRideModal);
+      document.getElementById('refreshTripsBtn').addEventListener('click', () => loadTrips(true));
       setupTripFilters();
       return;
     }
@@ -292,37 +416,63 @@ async function loadTrips() {
           <button id="filterBookings" class="filter-btn" data-filter="booking">Réservations</button>
           <button id="filterMyRides" class="filter-btn" data-filter="driver">Mes propositions</button>
         </div>
+        <button id="refreshTripsBtn" class="btn-secondary" title="Rafraîchir les données">
+          <i class="fa-solid fa-sync-alt"></i> Rafraîchir
+        </button>
       </div>
       <div class="trips-list">
     `;
 
     // Afficher les réservations
-    bookings.forEach((booking) => {
+    if (bookings.length > 0) {
+      bookings.forEach((booking) => {
+        // Formater la date
+        const reservedDate = booking.reserved_at ? new Date(booking.reserved_at).toLocaleDateString('fr-FR') : 'Date inconnue';
+        const tripDate = booking.date_depart ? new Date(booking.date_depart).toLocaleDateString('fr-FR') : 
+                        (booking.date ? new Date(booking.date).toLocaleDateString('fr-FR') : reservedDate);
+        
+        tripsHTML += `
+          <div class="trip-card booking-ride" data-type="booking">
+            <div class="trip-header">
+              <span class="trip-date">Réservé le ${reservedDate}</span>
+              <span class="trip-status booking">${booking.status || 'Réservation'}</span>
+            </div>
+            <div class="trip-body">
+              <h3>${booking.departure ? `De ${booking.departure} à ${booking.destination}` : 
+                 (booking.departure_city ? `De ${booking.departure_city} à ${booking.arrival_city}` : 
+                 `Trajet #${booking.ride_id || booking.id}`)}</h3>
+              ${booking.date_depart || booking.date ? `<p>Le ${tripDate} à ${booking.departureTime || booking.departure_time || ''}</p>` : ''}
+              ${booking.price ? `<p>Prix: ${booking.price}€</p>` : ''}
+              <div class="trip-actions">
+                <a href="./detail-covoiturage.html?id=${booking.ride_id || booking.id}" class="btn-view-ride" title="Voir ce trajet">
+                  <i class="fa-solid fa-eye"></i> Voir le trajet
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    } else {
+      // Message si aucune réservation
       tripsHTML += `
-        <div class="trip-card booking-ride" data-type="booking">
-          <div class="trip-header">
-            <span class="trip-date">${new Date(booking.reserved_at).toLocaleDateString()}</span>
-            <span class="trip-status booking">${booking.status || 'Réservation'}</span>
-          </div>
-          <div class="trip-body">
-            <h3>Trajet #${booking.ride_id}</h3>
-          </div>
+        <div class="no-bookings-message" data-type="booking">
+          <p>Vous n'avez pas encore de réservations.</p>
         </div>
       `;
-    });
+    }
     
     // Afficher les covoiturages proposés
     myRides.forEach((ride) => {
       tripsHTML += `
         <div class="trip-card driver-ride" data-type="driver" data-id="${ride.id || ride.covoiturage_id}">
           <div class="trip-header">
-            <span class="trip-date">${new Date(ride.date_depart).toLocaleDateString()}</span>
+            <span class="trip-date">${new Date(ride.date_depart || ride.date).toLocaleDateString()}</span>
             <span class="trip-status driver">Conducteur</span>
           </div>
           <div class="trip-body">
-            <h3>De ${ride.departure} à ${ride.destination}</h3>
-            <p>Le ${new Date(ride.date_depart).toLocaleDateString()} à ${ride.departureTime}</p>
-            <p>${ride.availableSeats}/${ride.totalSeats} places disponibles</p>
+            <h3>De ${ride.departure || ride.departure_city} à ${ride.destination || ride.arrival_city}</h3>
+            <p>Le ${new Date(ride.date_depart || ride.date).toLocaleDateString()} à ${ride.departureTime || ride.departure_time}</p>
+            <p>${ride.availableSeats || ride.available_seats}/${ride.totalSeats || ride.total_seats} places disponibles</p>
             <p>${ride.price}€ par personne</p>
             <div class="trip-actions">
               <button class="btn-edit-ride" data-id="${ride.id || ride.covoiturage_id}" title="Modifier ce trajet">
@@ -342,6 +492,22 @@ async function loadTrips() {
     
     // Réattacher les événements après avoir recréé le bouton
     document.getElementById('addRideBtn').addEventListener('click', showRideModal);
+    document.getElementById('refreshTripsBtn').addEventListener('click', async () => {
+      // Afficher un indicateur de chargement sur le bouton
+      const btn = document.getElementById('refreshTripsBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chargement...';
+      btn.disabled = true;
+      
+      // Forcer le rafraîchissement des données
+      await loadTrips(true);
+      
+      // Restaurer le bouton
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }, 500);
+    });
     
     // Ajouter les écouteurs d'événements pour les boutons d'édition et de suppression
     document.querySelectorAll('.btn-edit-ride').forEach(button => {
@@ -356,6 +522,26 @@ async function loadTrips() {
     setupTripFilters();
   } catch (error) {
     console.error('Erreur lors du chargement des trajets:', error);
+    document.getElementById('trips-tab').innerHTML = `
+      <div class="trips-actions">
+        <button id="addRideBtn" class="btn-primary">
+          <i class="fa-solid fa-plus"></i>
+          Proposer un covoiturage
+        </button>
+        <div class="filter-buttons">
+          <button id="filterAllTrips" class="filter-btn active" data-filter="all">Tous</button>
+          <button id="filterBookings" class="filter-btn" data-filter="booking">Réservations</button>
+          <button id="filterMyRides" class="filter-btn" data-filter="driver">Mes propositions</button>
+        </div>
+        <button id="refreshTripsBtn" class="btn-secondary" title="Rafraîchir les données">
+          <i class="fa-solid fa-sync-alt"></i> Rafraîchir
+        </button>
+      </div>
+      <p class="error-message">Une erreur est survenue lors du chargement des trajets. Veuillez réessayer.</p>
+    `;
+    
+    document.getElementById('addRideBtn').addEventListener('click', showRideModal);
+    document.getElementById('refreshTripsBtn').addEventListener('click', () => loadTrips(true));
   }
 }
 
@@ -777,6 +963,35 @@ function initEventListeners() {
       } catch (error) {
         console.error('Erreur:', error);
         alert(`Erreur: ${error.message}`);
+      }
+    });
+  }
+  
+  // Bouton de rafraîchissement des trajets
+  const refreshTripsBtn = document.getElementById('refreshTripsBtn');
+  if (refreshTripsBtn) {
+    refreshTripsBtn.addEventListener('click', async () => {
+      // Afficher un indicateur de chargement sur le bouton
+      const originalText = refreshTripsBtn.innerHTML;
+      refreshTripsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chargement...';
+      refreshTripsBtn.disabled = true;
+      
+      try {
+        // Forcer le rafraîchissement du solde de crédits d'abord
+        await loadCreditsBalance(true);
+        
+        // Puis recharger les trajets en forçant le rafraîchissement
+        await loadTrips(true);
+        
+        // Afficher un message de succès
+        alert('Données rafraîchies avec succès !');
+      } catch (error) {
+        console.error('Erreur lors du rafraîchissement des données:', error);
+        alert('Une erreur est survenue lors du rafraîchissement des données.');
+      } finally {
+        // Restaurer l'état du bouton
+        refreshTripsBtn.innerHTML = originalText;
+        refreshTripsBtn.disabled = false;
       }
     });
   }

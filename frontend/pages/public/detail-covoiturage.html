@@ -328,6 +328,25 @@
         </div>
       </div>
     </div>
+    <!-- Modal de confirmation de réservation -->
+    <div class="modal" id="reservation-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Confirmer la réservation</h2>
+          <button class="close-modal" aria-label="Fermer">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Trajet : <span id="modal-ride-route"></span> le <span id="modal-ride-date"></span></p>
+          <p>Coût : <span id="modal-price"></span> crédits</p>
+          <p>Solde actuel : <span id="modal-current-balance"></span> crédits</p>
+          <p>Solde après réservation : <span id="modal-new-balance"></span> crédits</p>
+        </div>
+        <div class="form-buttons">
+          <button class="btn-secondary close-modal">Annuler</button>
+          <button class="btn-primary" id="confirm-reservation-btn">Confirmer ma réservation</button>
+        </div>
+      </div>
+    </div>
     <!-- Scripts -->
     <script type="module" src="../../assets/js/common/api.js"></script>
     <script type="module" src="../../assets/js/common/auth.js"></script>

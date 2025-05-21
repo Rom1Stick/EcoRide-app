@@ -35,11 +35,14 @@ $router->get('/api/trips/search', 'SearchController@search');
 // Routes des utilisateurs
 $router->get('/api/users/me', 'UserController@me');
 $router->post('/api/users/me/role-requests', 'UserController@requestRole')->middleware('auth');
+$router->post('/api/users/add-role', 'UserController@addRole')->middleware('auth');
 $router->put('/api/users/me', 'UserController@update')->middleware('auth');
 
 // Routes des réservations
 $router->get('/api/bookings', 'BookingController@index')->middleware('auth');
+$router->post('/api/bookings/create', 'BookingController@create')->middleware('auth');
 $router->post('/api/rides/{id}/book', 'BookingController@store')->middleware('auth');
+$router->post('/api/rides/{id}/confirm', 'BookingController@confirm')->middleware('auth');
 $router->delete('/api/bookings/{id}', 'BookingController@destroy')->middleware('auth');
 
 // Routes des véhicules

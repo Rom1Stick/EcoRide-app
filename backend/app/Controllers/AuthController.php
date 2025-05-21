@@ -165,7 +165,7 @@ class AuthController extends Controller
         $password = '';
         // Limiter les tentatives de connexion pour prévenir les attaques par force brute
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        if (!Security::rateLimit("login_$ip", 5, 300)) {
+        if (!Security::rateLimit("login_$ip", 10, 300)) {
             return $this->error('Trop de tentatives de connexion. Veuillez réessayer plus tard.', 429);
         }
 
