@@ -1,0 +1,57 @@
+daemon off;
+worker_processes auto;
+
+events {
+  use epoll;
+  worker_connections 1024;
+}
+
+http {
+  include mime.types;
+  default_type application/octet-stream;
+  server_tokens off;
+  
+  client_max_body_size 10M;
+  sendfile on;
+  tcp_nopush on;
+  tcp_nodelay on;
+  keepalive_timeout 65;
+  gzip on;
+  gzip_comp_level 6;
+  gzip_min_length 1000;
+  gzip_types text/plain text/css application/json application/javascript application/xml;
+  
+  log_format heroku '$http_x_forwarded_for - $http_referer - [$time_local] '
+                   '"$request" $status $body_bytes_sent '
+                   '"$http_referer" "$http_user_agent"';
+  
+  server {
+    listen <%= ENV['PORT'] %>;
+    
+    root /app/frontend;
+    index pages/public/index.html;
+    
+    access_log /dev/stdout heroku;
+    error_log /dev/stderr;
+    
+    # Redirection de / vers index.html
+    location = / {
+      return 301 /pages/public/index.html;
+    }
+    
+    # Servir les fichiers statiques
+    location /assets/ {
+      access_log off;
+      expires 30d;
+      add_header Cache-Control "public, max-age=2592000";
+    }
+    
+    # Gestion des pages HTML - PAS de fallback vers index.html
+    location /pages/ {
+      try_files $uri $uri.html $uri/ =404;
+    }
+    
+    # Gestion des erreurs
+    error_page 404 /pages/public/error.html;
+  }
+} 
