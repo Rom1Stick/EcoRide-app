@@ -1,1 +1,1 @@
-web: npx serve -p $PORT frontend --single 
+web: npx serve -p $PORT frontend -l 0 

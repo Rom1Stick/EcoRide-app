@@ -1,9 +1,11 @@
 {
   "root": "frontend",
+  "clean_urls": false,
   "routes": {
     "/": "/pages/public/index.html",
-    "/pages/public/*": "/pages/public/$1",
-    "/assets/*": "/assets/$1"
+    "/pages/public": "/pages/public/index.html",
+    "/pages/public/": "/pages/public/index.html",
+    "/pages/public/*": "/pages/public/$1"
   },
   "headers": {
     "/**": {
@@ -13,7 +15,6 @@
       "X-XSS-Protection": "1; mode=block"
     }
   },
-  "clean_urls": false,
   "https_only": true,
   "error_page": "/pages/public/error.html"
 } 
