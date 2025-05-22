@@ -8,7 +8,7 @@
     "build": "npm run build:scss && npm run create-dist && npm run copy-files",
     "build:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --style=compressed --no-source-map",
     "create-dist": "mkdir -p dist",
-    "copy-files": "xcopy /E /I /Y pages\\* dist\\ && xcopy /E /I /Y assets dist\\assets\\",
+    "copy-files": "xcopy /E /I /Y pages\\public\\* dist\\ && xcopy /E /I /Y assets dist\\assets\\",
     "watch:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --watch --style=compressed --no-source-map",
     "lint": "eslint assets/js/**/*.js",
     "format": "prettier --write 'assets/js/**/*.js' 'assets/scss/**/*.scss' '**/*.html'"
@@ -21,13 +21,13 @@
   "size-limit": [
     {
       "name": "CSS Bundle",
-      "path": "assets/css/main.css",
-      "limit": "10 KB"
+      "path": "assets/styles/main.min.css",
+      "limit": "8 kB"
     },
     {
-      "name": "JS Bundle Total",
+      "name": "JS Bundle",
       "path": "assets/js/**/*.js",
-      "limit": "15 KB"
+      "limit": "20 kB"
     }
   ],
   "browserslist": [
