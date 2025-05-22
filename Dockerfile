@@ -130,14 +130,24 @@ EOL\n\
   chmod -R 755 /var/www/html/backend\n\
 }\n\
 \n\
+# Configurer Apache pour utiliser le port fourni par Heroku\n\
+setup_apache_port() {\n\
+  # Remplacer la configuration du port dans les fichiers Apache\n\
+  sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf\n\
+  sed -i "s/VirtualHost \\*:80/VirtualHost \\*:${PORT}/g" /etc/apache2/sites-available/000-default.conf\n\
+}\n\
+\n\
 if [ "$SERVE_FRONTEND_ONLY" = "true" ]; then\n\
   serve -c /var/www/html/serve.json -l $PORT\n\
 else\n\
   # Configurer le backend avant de démarrer Apache\n\
   setup_backend_env\n\
-  # S'assurer qu'un seul MPM est chargé\n\
+  # Configurer le port Apache\n\
+  setup_apache_port\n\
+  # S\'assurer qu\'un seul MPM est chargé\n\
   a2dismod mpm_event\n\
   a2enmod mpm_prefork\n\
+  # Démarrer Apache en mode foreground\n\
   apache2-foreground\n\
 fi' > /usr/local/bin/start-server.sh && \
 chmod +x /usr/local/bin/start-server.sh
