@@ -53,5 +53,10 @@ EOL
 # Créer un lien symbolique pour les assets frontend dans le dossier public
 ln -sf /var/www/html/frontend /var/www/html/backend/public/frontend
 
+# Correction du problème MPM d'Apache
+echo "Désactivation des modules MPM en conflit..."
+a2dismod mpm_event
+a2enmod mpm_prefork
+
 # Démarrer Apache en avant-plan
 apache2-foreground 
