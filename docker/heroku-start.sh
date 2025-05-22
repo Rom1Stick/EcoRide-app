@@ -8,7 +8,7 @@ cat /var/www/html/backend/.env
 # Récupérer les variables d'environnement de Heroku et configurer le fichier .env
 if [ -n "$JAWSDB_URL" ]; then
   # Format de JAWSDB_URL: mysql://username:password@hostname:port/database_name
-  echo "Configuration de la base de données à partir de JAWSDB_URL"
+  echo "Configuration de la base de données à partir de JAWSDB_URL: $JAWSDB_URL"
   regex="^mysql://([^:]+):([^@]+)@([^:]+):([0-9]+)/(.+)$"
   if [[ $JAWSDB_URL =~ $regex ]]; then
     echo "Correspondance trouvée pour JAWSDB_URL, mise à jour des paramètres DB_*"
@@ -19,6 +19,78 @@ if [ -n "$JAWSDB_URL" ]; then
     sed -i "s|DB_USERNAME=.*|DB_USERNAME=${BASH_REMATCH[1]}|" /var/www/html/backend/.env
     sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${BASH_REMATCH[2]}|" /var/www/html/backend/.env
     echo "Base de données MySQL configurée avec succès à partir de JAWSDB_URL"
+    
+    # Initialisation de la base de données
+    DB_HOST=${BASH_REMATCH[3]}
+    DB_PORT=${BASH_REMATCH[4]}
+    DB_DATABASE=${BASH_REMATCH[5]}
+    DB_USERNAME=${BASH_REMATCH[1]}
+    DB_PASSWORD=${BASH_REMATCH[2]}
+    
+    echo "Tentative de connexion à la base de données et création des tables..."
+    php -r "
+    try {
+        \$dsn = 'mysql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_DATABASE';
+        \$pdo = new PDO(\$dsn, '$DB_USERNAME', '$DB_PASSWORD');
+        \$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        echo \"Connexion à la base de données réussie!\\n\";
+        
+        // Créer la table users si elle n'existe pas
+        \$pdo->exec('CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )');
+        echo \"Table 'users' créée avec succès!\\n\";
+        
+        // Créer la table bookings si elle n'existe pas
+        \$pdo->exec('CREATE TABLE IF NOT EXISTS bookings (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            vehicle_id INT NOT NULL,
+            start_date DATETIME NOT NULL,
+            end_date DATETIME NOT NULL,
+            status VARCHAR(20) DEFAULT \"pending\",
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )');
+        echo \"Table 'bookings' créée avec succès!\\n\";
+        
+        // Créer la table vehicles si elle n'existe pas
+        \$pdo->exec('CREATE TABLE IF NOT EXISTS vehicles (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            type VARCHAR(50) NOT NULL,
+            description TEXT,
+            price_per_day DECIMAL(10,2) NOT NULL,
+            available BOOLEAN DEFAULT true,
+            image_url VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )');
+        echo \"Table 'vehicles' créée avec succès!\\n\";
+        
+        // Ajouter quelques véhicules de démonstration si aucun n'existe
+        \$count = \$pdo->query('SELECT COUNT(*) FROM vehicles')->fetchColumn();
+        if (\$count == 0) {
+            \$stmt = \$pdo->prepare('INSERT INTO vehicles (name, type, description, price_per_day, available, image_url) VALUES (?, ?, ?, ?, ?, ?)');
+            \$stmt->execute(['Tesla Model 3', 'electric', 'Berline électrique avec une autonomie de 500km', 85.00, true, '/assets/images/tesla-model-3.jpg']);
+            \$stmt->execute(['Renault Zoe', 'electric', 'Citadine électrique idéale pour la ville', 45.00, true, '/assets/images/renault-zoe.jpg']);
+            \$stmt->execute(['Vélo électrique Decathlon', 'ebike', 'Vélo à assistance électrique pour vos déplacements urbains', 15.00, true, '/assets/images/ebike.jpg']);
+            echo \"Véhicules de démonstration ajoutés!\\n\";
+        }
+        
+        // Afficher les tables existantes
+        \$tables = \$pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+        echo \"Tables existantes dans la base de données: \" . implode(', ', \$tables) . \"\\n\";
+    } catch (PDOException \$e) {
+        echo \"Erreur de connexion à la base de données: \" . \$e->getMessage() . \"\\n\";
+    }
+    "
   else
     echo "AVERTISSEMENT: JAWSDB_URL ne correspond pas au format attendu: $JAWSDB_URL"
   fi
@@ -133,47 +205,6 @@ cat > /var/www/html/backend/public/.htaccess << 'EOF'
 </IfModule>
 EOF
 
-# Vérification de la base de données et du fichier .env
-echo "Vérification de l'accès à la base de données..."
-cd /var/www/html/backend
-php -r "
-\$host = getenv('DB_HOST') ?: 'localhost';
-\$port = getenv('DB_PORT') ?: '3306';
-\$database = getenv('DB_DATABASE') ?: 'ecoride';
-\$username = getenv('DB_USERNAME') ?: 'root';
-\$password = getenv('DB_PASSWORD') ?: '';
-
-echo \"Trying to connect to MySQL: host=\$host, port=\$port, db=\$database, user=\$username\\n\";
-
-\$dsn = \"mysql:host=\$host;port=\$port;dbname=\$database\";
-try {
-    \$pdo = new PDO(\$dsn, \$username, \$password);
-    echo \"Connexion à la base de données réussie!\\n\";
-    
-    // Vérifier si les tables existent
-    \$tables = \$pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-    echo \"Tables trouvées: \" . implode(', ', \$tables) . \"\\n\";
-    
-    // Vérifier si la table users existe
-    \$userTableExists = in_array('users', \$tables);
-    if (!\$userTableExists) {
-        echo \"La table 'users' n'existe pas. Création...\\n\";
-        \$sql = 'CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )';
-        \$pdo->exec(\$sql);
-        echo \"Table 'users' créée avec succès!\\n\";
-    }
-} catch (PDOException \$e) {
-    echo \"Erreur de connexion à la base de données: \" . \$e->getMessage() . \"\\n\";
-}
-"
-
 # Lister les répertoires et fichiers pour comprendre la structure
 echo "Structure des répertoires:"
 ls -la /var/www/html
@@ -255,20 +286,6 @@ echo "Structure des assets:"
 ls -la /var/www/html/frontend/assets || echo "Dossier assets non trouvé"
 ls -la /var/www/html/frontend/assets/styles || echo "Dossier styles non trouvé"
 ls -la /var/www/html/frontend/assets/js || echo "Dossier js non trouvé"
-
-# Création des tables de base de données si nécessaires
-echo "Vérification et création des tables de base de données..."
-cd /var/www/html/backend
-php artisan migrate --force || echo "Erreur lors de la migration de la base de données"
-
-# Créer un fichier index.php de redirection si besoin
-echo "Création d'un fichier index.php de redirection..."
-cat > /var/www/html/backend/public/redirect.php << 'EOF'
-<?php
-// Redirection simple vers index.html si on accède directement à index.php
-header('Location: /index.html');
-exit;
-EOF
 
 # Démarrer Apache avec la configuration corrigée
 echo "Démarrage d'Apache..."
