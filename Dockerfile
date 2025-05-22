@@ -42,3 +42,22 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 CMD [ "npm", "run", "start" ]
+
+FROM nginx:alpine
+
+# Copier les fichiers frontend dans le répertoire de service Nginx
+COPY frontend/dist /usr/share/nginx/html
+
+# Copier une configuration Nginx personnalisée si nécessaire
+RUN mkdir -p /etc/nginx/templates
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+
+# Définir le port comme variable d'environnement (requis par Heroku)
+ENV PORT=8080
+
+# Script d'entrée pour utiliser le PORT dynamique attribué par Heroku
+COPY docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+
+# Commande de démarrage
+CMD ["/docker-entrypoint.sh"]

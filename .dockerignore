@@ -1,5 +1,13 @@
 fly.toml
-Dockerfile
-.dockerignore
-node_modules
+heroku.yml
 .git
+.github
+node_modules
+**/node_modules
+backend
+**/.env*
+**/.DS_Store
+**/README.md
+**/npm-debug.log
+**/yarn-debug.log
+**/yarn-error.log
