@@ -35,6 +35,7 @@ if [ -n "$APP_DEBUG" ]; then
 fi
 
 # Créer un fichier .htaccess pour le routage frontend/backend
+echo "Création du fichier .htaccess pour le routage..."
 cat > /var/www/html/backend/public/.htaccess <<EOL
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -54,8 +55,25 @@ cat > /var/www/html/backend/public/.htaccess <<EOL
 </IfModule>
 EOL
 
-# Créer un lien symbolique pour les assets frontend dans le dossier public
+# Créer un lien symbolique pour les assets frontend dans le dossier public et vérifier qu'il a été créé
+echo "Création du lien symbolique pour les assets frontend..."
 ln -sf /var/www/html/frontend /var/www/html/backend/public/frontend
+
+# Vérifier si le lien symbolique a été créé et afficher le contenu du répertoire public
+echo "Contenu du répertoire public après création du lien symbolique :"
+ls -la /var/www/html/backend/public/
+
+# Vérifier si le contenu du frontend est accessible
+echo "Contenu du répertoire frontend :"
+ls -la /var/www/html/frontend/
+
+# Créer un lien symbolique pour index.html et les autres fichiers HTML à la racine du répertoire public
+echo "Copie des fichiers HTML du frontend vers le dossier public..."
+cp /var/www/html/frontend/*.html /var/www/html/backend/public/
+
+# Vérifier si les fichiers HTML ont été copiés
+echo "Contenu du répertoire public après copie des fichiers HTML :"
+ls -la /var/www/html/backend/public/
 
 # Correction du problème MPM d'Apache
 echo "Désactivation des modules MPM en conflit..."
@@ -68,6 +86,10 @@ a2dismod mpm_itk || true
 # Ensuite activer seulement mpm_prefork
 echo "Activation du module mpm_prefork uniquement..."
 a2enmod mpm_prefork
+
+# Activer le module rewrite pour le .htaccess
+echo "Activation du module rewrite..."
+a2enmod rewrite
 
 # Vérifier que seul mpm_prefork est activé
 echo "Modules Apache chargés après reconfiguration :"
