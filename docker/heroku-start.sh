@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# Afficher les modules Apache chargés pour le débogage
+echo "Modules Apache chargés avant désactivation :"
+apache2ctl -M | grep mpm || true
+
 # Récupérer les variables d'environnement de Heroku et configurer le fichier .env
 if [ -n "$DATABASE_URL" ]; then
   # Format de DATABASE_URL: mysql://username:password@hostname:port/database_name
@@ -55,8 +59,20 @@ ln -sf /var/www/html/frontend /var/www/html/backend/public/frontend
 
 # Correction du problème MPM d'Apache
 echo "Désactivation des modules MPM en conflit..."
-a2dismod mpm_event
+# Désactiver tous les modules MPM possibles
+a2dismod mpm_event || true
+a2dismod mpm_worker || true
+a2dismod mpm_prefork || true
+a2dismod mpm_itk || true
+
+# Ensuite activer seulement mpm_prefork
+echo "Activation du module mpm_prefork uniquement..."
 a2enmod mpm_prefork
 
+# Vérifier que seul mpm_prefork est activé
+echo "Modules Apache chargés après reconfiguration :"
+apache2ctl -M | grep mpm || true
+
 # Démarrer Apache en avant-plan
+echo "Démarrage d'Apache..."
 apache2-foreground 
