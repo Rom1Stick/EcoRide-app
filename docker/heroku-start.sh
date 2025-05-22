@@ -126,6 +126,42 @@ class MockCollection {
 }
 EOF
 
+# Créer le fichier bootstrap.php manquant dans le dossier app
+echo "Création du fichier bootstrap.php manquant..."
+mkdir -p /var/www/html/backend/app
+cat > /var/www/html/backend/app/bootstrap.php << 'EOF'
+<?php
+// Ce fichier est créé automatiquement par le script de démarrage
+// pour remplacer le fichier manquant référencé dans index.php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Charger les variables d'environnement
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
+
+// Initialiser les composants de base de l'application
+date_default_timezone_set($_ENV['APP_TIMEZONE'] ?? 'UTC');
+
+// Définir les constantes de base
+define('APP_ROOT', __DIR__ . '/..');
+define('APP_DEBUG', $_ENV['APP_DEBUG'] === 'true');
+
+// Configuration des erreurs
+if (APP_DEBUG) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+} else {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+}
+
+// Inclure les routes API
+require_once __DIR__ . '/../routes/api.php';
+EOF
+
 # Activer l'affichage des erreurs PHP
 echo "Activation de l'affichage des erreurs PHP..."
 cat > /var/www/html/backend/public/index.php << 'EOF'
