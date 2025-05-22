@@ -41,7 +41,7 @@ RUN echo '#!/bin/sh\necho "server { \n\
 \n\
     # Règle fallback pour les routes frontend\n\
     location /pages/ {\n\
-        try_files \$uri \$uri/ /pages/public/index.html;\n\
+        try_files \$uri \$uri.html \$uri/ =404;\n\
     }\n\
 \n\
     # Gestion des erreurs\n\

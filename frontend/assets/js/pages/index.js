@@ -81,7 +81,7 @@ function handleSearch(e) {
   console.log('Recherche de covoiturage:', { from: fromCity, to: toCity, date });
   
   // Rediriger vers la page de résultats avec les paramètres
-  window.location.href = `./covoiturages.html?from=${encodeURIComponent(fromCity)}&to=${encodeURIComponent(toCity)}&date=${encodeURIComponent(date)}`;
+  window.location.href = `/pages/public/covoiturages.html?from=${encodeURIComponent(fromCity)}&to=${encodeURIComponent(toCity)}&date=${encodeURIComponent(date)}`;
 }
 
 /**
