@@ -2,6 +2,7 @@ FROM nginx:alpine
 
 # Créer une structure de répertoires basique pour l'application
 RUN mkdir -p /usr/share/nginx/html
+RUN mkdir -p /etc/nginx/templates
 
 # Copier le fichier index.html directement à la racine
 COPY frontend/pages/public/index.html /usr/share/nginx/html/index.html
