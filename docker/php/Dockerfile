@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+# Désactiver le MPM event pour éviter le chargement de plusieurs modules MPM
+RUN a2dismod mpm_event mpm_worker && a2enmod mpm_prefork
+
 # Installation des dépendances système
 RUN apt-get update && apt-get install -y \
     git \
@@ -26,6 +29,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Configuration du répertoire de travail
 WORKDIR /var/www/html
 
+# Copie du code backend
+COPY backend/ /var/www/html/
+
 # Générer un fichier .env par défaut si absent
 RUN { \
     echo 'APP_ENV=development'; \
@@ -43,6 +49,11 @@ RUN { \
 
 # Copie des fichiers de configuration
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/local.ini
+
+# Copier et configurer l'entrypoint pour Apache dynamiquement
+COPY ./docker/php/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Définition des permissions
 RUN chown -R www-data:www-data /var/www/html 
