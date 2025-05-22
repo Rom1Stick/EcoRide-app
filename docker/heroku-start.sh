@@ -126,7 +126,7 @@ class MockCollection {
 }
 EOF
 
-# Modifier directement le fichier index.php pour ne pas dépendre de bootstrap.php
+# Modifier directement le fichier index.php pour utiliser les helpers existants
 echo "Modification du fichier index.php..."
 cat > /var/www/html/backend/public/index.php << 'EOF'
 <?php
@@ -135,32 +135,20 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Définir le chemin de base pour l'application
+define('BASE_PATH', dirname(__DIR__));
+
 // Charger l'autoloader
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once BASE_PATH . '/vendor/autoload.php';
+
+// Charger les helpers
+require_once BASE_PATH . '/app/Core/helpers.php';
 
 // Configuration de base
 date_default_timezone_set('Europe/Paris');
 
-// Fonction pour récupérer les variables d'environnement du fichier .env
-function env($key, $default = null) {
-    static $env = null;
-    if ($env === null) {
-        $env = [];
-        if (file_exists(__DIR__ . '/../.env')) {
-            $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($lines as $line) {
-                if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
-                    list($name, $value) = explode('=', $line, 2);
-                    $env[trim($name)] = trim($value);
-                }
-            }
-        }
-    }
-    return isset($env[$key]) ? $env[$key] : $default;
-}
-
 // Inclure les routes API directement
-require_once __DIR__ . '/../routes/api.php';
+require_once BASE_PATH . '/routes/api.php';
 EOF
 
 # Vérifier si le dossier routes existe
