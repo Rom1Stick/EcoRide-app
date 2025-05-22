@@ -1,1 +1,1 @@
-web: cp -f frontend/nginx_app.conf /app/nginx.conf && sed -i "s/\$PORT/$PORT/g" /app/nginx.conf && bin/nginx -c /app/nginx.conf 
+web: bin/start-nginx-static 
