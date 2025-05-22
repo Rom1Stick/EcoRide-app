@@ -1,0 +1,11 @@
+{
+  "root": "frontend",
+  "clean_urls": true,
+  "routes": {
+    "/pages/public/*.html": "/pages/public/$1.html",
+    "/assets/*": "/assets/$1",
+    "/": "/pages/public/index.html"
+  },
+  "https_only": true,
+  "error_page": "/pages/public/error.html"
+} 
