@@ -1,1 +1,1 @@
-web: cp -f frontend/nginx_app.conf /tmp/ && sed -i "s/\$PORT/$PORT/g" /tmp/nginx_app.conf && nginx -c /tmp/nginx_app.conf -p . -g "daemon off;" 
+web: cp -f frontend/nginx_app.conf /tmp/ && sed -i "s/\$PORT/$PORT/g" /tmp/nginx_app.conf && bin/start-nginx-static 
