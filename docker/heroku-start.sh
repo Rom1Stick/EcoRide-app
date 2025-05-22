@@ -27,70 +27,161 @@ if [ -n "$JAWSDB_URL" ]; then
     DB_USERNAME=${BASH_REMATCH[1]}
     DB_PASSWORD=${BASH_REMATCH[2]}
     
-    echo "Tentative de connexion à la base de données et création des tables..."
-    php -r "
-    try {
-        \$dsn = 'mysql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_DATABASE';
-        \$pdo = new PDO(\$dsn, '$DB_USERNAME', '$DB_PASSWORD');
-        \$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        echo \"Connexion à la base de données réussie!\\n\";
-        
-        // Créer la table users si elle n'existe pas
-        \$pdo->exec('CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )');
-        echo \"Table 'users' créée avec succès!\\n\";
-        
-        // Créer la table bookings si elle n'existe pas
-        \$pdo->exec('CREATE TABLE IF NOT EXISTS bookings (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            vehicle_id INT NOT NULL,
-            start_date DATETIME NOT NULL,
-            end_date DATETIME NOT NULL,
-            status VARCHAR(20) DEFAULT \"pending\",
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )');
-        echo \"Table 'bookings' créée avec succès!\\n\";
-        
-        // Créer la table vehicles si elle n'existe pas
-        \$pdo->exec('CREATE TABLE IF NOT EXISTS vehicles (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            type VARCHAR(50) NOT NULL,
-            description TEXT,
-            price_per_day DECIMAL(10,2) NOT NULL,
-            available BOOLEAN DEFAULT true,
-            image_url VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )');
-        echo \"Table 'vehicles' créée avec succès!\\n\";
-        
-        // Ajouter quelques véhicules de démonstration si aucun n'existe
-        \$count = \$pdo->query('SELECT COUNT(*) FROM vehicles')->fetchColumn();
-        if (\$count == 0) {
-            \$stmt = \$pdo->prepare('INSERT INTO vehicles (name, type, description, price_per_day, available, image_url) VALUES (?, ?, ?, ?, ?, ?)');
-            \$stmt->execute(['Tesla Model 3', 'electric', 'Berline électrique avec une autonomie de 500km', 85.00, true, '/assets/images/tesla-model-3.jpg']);
-            \$stmt->execute(['Renault Zoe', 'electric', 'Citadine électrique idéale pour la ville', 45.00, true, '/assets/images/renault-zoe.jpg']);
-            \$stmt->execute(['Vélo électrique Decathlon', 'ebike', 'Vélo à assistance électrique pour vos déplacements urbains', 15.00, true, '/assets/images/ebike.jpg']);
-            echo \"Véhicules de démonstration ajoutés!\\n\";
-        }
-        
-        // Afficher les tables existantes
-        \$tables = \$pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-        echo \"Tables existantes dans la base de données: \" . implode(', ', \$tables) . \"\\n\";
-    } catch (PDOException \$e) {
-        echo \"Erreur de connexion à la base de données: \" . \$e->getMessage() . \"\\n\";
+    # Créer un fichier PHP pour initialiser la base de données
+    cat > /tmp/init_db.php << 'EOL'
+<?php
+// Récupérer les variables d'environnement
+$host = getenv('DB_HOST');
+$port = getenv('DB_PORT');
+$database = getenv('DB_DATABASE');
+$username = getenv('DB_USERNAME');
+$password = getenv('DB_PASSWORD');
+
+// Connexion à la base de données
+try {
+    $dsn = "mysql:host=$host;port=$port;dbname=$database";
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "Connexion à la base de données réussie!\n";
+    
+    // Créer les tables nécessaires au fonctionnement de base
+    // Adresse
+    $pdo->exec('CREATE TABLE IF NOT EXISTS Adresse (
+        adresse_id INT AUTO_INCREMENT PRIMARY KEY,
+        rue VARCHAR(100) NOT NULL,
+        ville VARCHAR(50) NOT NULL,
+        code_postal VARCHAR(10) NOT NULL,
+        pays VARCHAR(50) DEFAULT "France",
+        coordonnees_gps VARCHAR(50)
+    )');
+    echo "Table 'Adresse' créée avec succès!\n";
+    
+    // Role
+    $pdo->exec('CREATE TABLE IF NOT EXISTS Role (
+        role_id INT AUTO_INCREMENT PRIMARY KEY,
+        libelle VARCHAR(50) NOT NULL UNIQUE
+    )');
+    echo "Table 'Role' créée avec succès!\n";
+    
+    // Insertion des rôles de base s'ils n'existent pas déjà
+    $roles = ['visiteur', 'passager', 'chauffeur', 'admin'];
+    $stmt = $pdo->prepare('INSERT IGNORE INTO Role (libelle) VALUES (?)');
+    foreach ($roles as $role) {
+        $stmt->execute([$role]);
     }
-    "
+    echo "Rôles ajoutés avec succès!\n";
+    
+    // Utilisateur
+    $pdo->exec('CREATE TABLE IF NOT EXISTS Utilisateur (
+        utilisateur_id INT AUTO_INCREMENT PRIMARY KEY,
+        nom VARCHAR(50) NOT NULL,
+        prenom VARCHAR(50) NOT NULL,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        mot_passe VARCHAR(255) NOT NULL,
+        telephone VARCHAR(20),
+        adresse_id INT,
+        date_naissance DATE,
+        photo_path VARCHAR(255),
+        pseudo VARCHAR(50) UNIQUE,
+        date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+        derniere_connexion DATETIME,
+        FOREIGN KEY (adresse_id) REFERENCES Adresse(adresse_id)
+    )');
+    echo "Table 'Utilisateur' créée avec succès!\n";
+    
+    // Index pour la table Utilisateur
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_utilisateur_email ON Utilisateur(email)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_utilisateur_pseudo ON Utilisateur(pseudo)');
+    echo "Index ajoutés avec succès!\n";
+    
+    // Association Utilisateur-Rôle
+    $pdo->exec('CREATE TABLE IF NOT EXISTS Possede (
+        utilisateur_id INT NOT NULL,
+        role_id INT NOT NULL,
+        PRIMARY KEY (utilisateur_id, role_id),
+        FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(utilisateur_id) ON DELETE CASCADE,
+        FOREIGN KEY (role_id) REFERENCES Role(role_id)
+    )');
+    echo "Table 'Possede' créée avec succès!\n";
+    
+    // Table pour les tokens de confirmation
+    $pdo->exec('CREATE TABLE IF NOT EXISTS user_confirmations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        utilisateur_id INT NOT NULL,
+        token VARCHAR(100) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(utilisateur_id) ON DELETE CASCADE
+    )');
+    echo "Table 'user_confirmations' créée avec succès!\n";
+    
+    // Balance de crédits
+    $pdo->exec('CREATE TABLE IF NOT EXISTS CreditBalance (
+        utilisateur_id INT PRIMARY KEY,
+        solde DECIMAL(8,2) NOT NULL DEFAULT 0 CHECK (solde >= 0),
+        FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(utilisateur_id) ON DELETE CASCADE
+    )');
+    echo "Table 'CreditBalance' créée avec succès!\n";
+    
+    // Types de transaction (normalisation des valeurs)
+    $pdo->exec('CREATE TABLE IF NOT EXISTS TypeTransaction (
+        type_id INT AUTO_INCREMENT PRIMARY KEY,
+        libelle VARCHAR(30) NOT NULL UNIQUE
+    )');
+    echo "Table 'TypeTransaction' créée avec succès!\n";
+    
+    // Insertion des types de transaction de base s'ils n'existent pas déjà
+    $types = ['initial', 'achat', 'vente', 'remboursement', 'correction'];
+    $stmt = $pdo->prepare('INSERT IGNORE INTO TypeTransaction (libelle) VALUES (?)');
+    foreach ($types as $type) {
+        $stmt->execute([$type]);
+    }
+    echo "Types de transaction ajoutés avec succès!\n";
+    
+    // Transactions de crédits
+    $pdo->exec('CREATE TABLE IF NOT EXISTS CreditTransaction (
+        transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+        utilisateur_id INT NOT NULL,
+        montant DECIMAL(8,2) NOT NULL,
+        type_id INT NOT NULL,
+        date_transaction DATETIME DEFAULT CURRENT_TIMESTAMP,
+        description VARCHAR(255),
+        FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(utilisateur_id) ON DELETE CASCADE,
+        FOREIGN KEY (type_id) REFERENCES TypeTransaction(type_id)
+    )');
+    echo "Table 'CreditTransaction' créée avec succès!\n";
+    
+    // Créer la table auth_logs pour le suivi des tentatives d'authentification
+    $pdo->exec('CREATE TABLE IF NOT EXISTS auth_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        action VARCHAR(50) NOT NULL,
+        success TINYINT(1) NOT NULL,
+        email VARCHAR(255),
+        ip_address VARCHAR(45),
+        user_agent TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX (user_id),
+        INDEX (ip_address),
+        INDEX (created_at)
+    )');
+    echo "Table 'auth_logs' créée avec succès!\n";
+    
+    // Afficher les tables existantes
+    $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    echo "Tables existantes dans la base de données: " . implode(', ', $tables) . "\n";
+    
+} catch (PDOException $e) {
+    echo "ERREUR: " . $e->getMessage() . "\n";
+    exit(1);
+}
+?>
+EOL
+
+    # Exécuter le script PHP d'initialisation
+    echo "Exécution du script d'initialisation de la base de données..."
+    cd /var/www/html/backend
+    php /tmp/init_db.php
+    
   else
     echo "AVERTISSEMENT: JAWSDB_URL ne correspond pas au format attendu: $JAWSDB_URL"
   fi
