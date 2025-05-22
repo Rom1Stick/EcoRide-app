@@ -30,24 +30,23 @@ if [ -n "$APP_DEBUG" ]; then
   sed -i "s/APP_DEBUG=.*/APP_DEBUG=$APP_DEBUG/" /var/www/html/backend/.env
 fi
 
-# Afficher les modules Apache chargés
-echo "Modules Apache chargés avant désactivation :"
-apache2ctl -M | grep mpm
+# Correction des conflits de modules MPM d'Apache
+echo "Correction des conflits de modules MPM..."
+# Stopper Apache pour pouvoir modifier les modules
+service apache2 stop || true
 
-# Désactiver tous les modules MPM
-echo "Désactivation des modules MPM en conflit..."
-a2dismod mpm_event
-a2dismod mpm_worker
-a2dismod mpm_prefork
-a2dismod mpm_itk 2>/dev/null || true
+# Supprimer les fichiers de configuration des modules MPM qui pourraient être en conflit
+rm -f /etc/apache2/mods-enabled/mpm_*.conf
+rm -f /etc/apache2/mods-enabled/mpm_*.load
 
 # Activer uniquement mpm_prefork
 echo "Activation du module mpm_prefork uniquement..."
-a2enmod mpm_prefork
+ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/
+ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/
 
-# Vérifier les modules chargés après reconfiguration
-echo "Modules Apache chargés après reconfiguration :"
-apache2ctl -M | grep mpm
+# Vérifier les modules chargés
+echo "Modules Apache après reconfiguration :"
+ls -la /etc/apache2/mods-enabled/mpm_*
 
 # Créer le fichier .htaccess pour le routage
 echo "Création du fichier .htaccess pour le routage..."
@@ -106,6 +105,6 @@ header('Location: /index.html');
 exit;
 EOF
 
-# Démarrer Apache
+# Démarrer Apache avec la configuration corrigée
 echo "Démarrage d'Apache..."
 apache2-foreground 
