@@ -1,1 +1,1 @@
-web: /usr/local/bin/start-server.sh 
+web: serve frontend -l $PORT 

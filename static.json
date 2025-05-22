@@ -1,0 +1,34 @@
+{
+  "root": "frontend",
+  "clean_urls": true,
+  "routes": {
+    "/": "pages/public/index.html",
+    "/login": "pages/public/login.html",
+    "/covoiturages": "pages/public/covoiturages.html",
+    "/contact": "pages/public/contact.html",
+    "/profil": "pages/public/profil.html", 
+    "/register": "pages/public/register.html",
+    "/**": "pages/public/index.html"
+  },
+  "https_only": true,
+  "headers": {
+    "/**": {
+      "Cache-Control": "public, max-age=0, must-revalidate"
+    },
+    "/assets/**": {
+      "Cache-Control": "public, max-age=31536000, immutable"
+    },
+    "/*.js": {
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Type": "application/javascript"
+    },
+    "/*.css": {
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Type": "text/css"
+    },
+    "/*.svg": {
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Type": "image/svg+xml"
+    }
+  }
+} 
