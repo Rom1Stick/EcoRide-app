@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="EcoRide - Trouvez les covoiturages disponibles pour votre trajet et réduisez votre empreinte carbone"
+    />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>EcoRide – Recherche de covoiturages</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body class="results-page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <a href="/">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="EcoRide" class="icon" />
+        </a>
+      </div>
+      <!-- Menu de navigation desktop -->
+      <nav class="header__nav">
+        <a href="/">Accueil</a>
+        <a href="./covoiturages.html" class="active" aria-current="page">Covoiturages</a>
+        <a href="./contact.html">Contact</a>
+        <div class="auth-container">
+          <!-- Contenu remplacé dynamiquement par JavaScript -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <!-- Bouton de profil (caché par défaut) -->
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img src="../../assets/images/Logo_EcoRide.svg" alt="" class="avatar" id="userAvatar" />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </a>
+        </div>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="grid-layout">
+          <!-- Colonne de gauche : Recherche et filtres avancés -->
+          <div class="search-column">
+            <!-- Formulaire de recherche -->
+            <section class="search-section">
+              <h1>Rechercher un covoiturage</h1>
+              <form
+                class="search-form"
+                id="search-form"
+                aria-label="Formulaire de recherche de covoiturage"
+              >
+                <div class="search-form__field">
+                  <label for="from">Départ</label>
+                  <div class="input-group">
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                    <input
+                      type="text"
+                      id="from"
+                      placeholder="Ville de départ"
+                      autocomplete="off"
+                      required
+                      aria-required="true"
+                      maxlength="25"
+                      data-valid-city="false"
+                      aria-describedby="from-error"
+                    />
+                    <div
+                      class="autocomplete-container"
+                      id="from-autocomplete"
+                      aria-live="polite"
+                      role="listbox"
+                    ></div>
+                    <span
+                      id="from-error"
+                      class="error-message"
+                      role="alert"
+                      aria-live="assertive"
+                      style="display: none"
+                    >
+                      <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                      Veuillez sélectionner une ville dans la liste
+                    </span>
+                  </div>
+                </div>
+
+                <div class="search-form__field">
+                  <label for="to">Arrivée</label>
+                  <div class="input-group">
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                    <input
+                      type="text"
+                      id="to"
+                      placeholder="Ville d'arrivée"
+                      autocomplete="off"
+                      required
+                      aria-required="true"
+                      maxlength="25"
+                      data-valid-city="false"
+                      aria-describedby="to-error"
+                    />
+                    <div
+                      class="autocomplete-container"
+                      id="to-autocomplete"
+                      aria-live="polite"
+                      role="listbox"
+                    ></div>
+                    <span
+                      id="to-error"
+                      class="error-message"
+                      role="alert"
+                      aria-live="assertive"
+                      style="display: none"
+                    >
+                      <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                      Veuillez sélectionner une ville dans la liste
+                    </span>
+                  </div>
+                </div>
+
+                <div class="search-form__field">
+                  <label for="date">Date</label>
+                  <div class="input-group">
+                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                    <input
+                      type="date"
+                      id="date"
+                      required
+                      aria-required="true"
+                      aria-label="Date du trajet"
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" class="search-button">
+                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                  Rechercher
+                </button>
+              </form>
+            </section>
+
+            <!-- Filtres avancés -->
+            <section class="advanced-filters-section" aria-labelledby="advanced-filters-title">
+              <h2 id="advanced-filters-title">Filtres avancés</h2>
+              <div id="advanced-filters">
+                <button
+                  type="button"
+                  id="toggle-filters"
+                  aria-expanded="false"
+                  aria-controls="filters-content"
+                  class="toggle-filters-btn"
+                >
+                  <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                  Filtres avancés
+                  <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </button>
+
+                <div
+                  id="filters-content"
+                  aria-labelledby="toggle-filters"
+                  role="region"
+                  class="filters-content"
+                >
+                  <div class="filter-group">
+                    <h3>Type de véhicule</h3>
+                    <label for="electric-only" class="checkbox-label">
+                      <input type="checkbox" id="electric-only" name="electric-only" />
+                      <span class="checkbox-text">Véhicules électriques uniquement</span>
+                      <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                    </label>
+                  </div>
+
+                  <div class="filter-group">
+                    <h3 id="price-label">Prix maximum: 50€</h3>
+                    <div class="range-slider">
+                      <input
+                        type="range"
+                        id="max-price"
+                        name="max-price"
+                        min="0"
+                        max="100"
+                        value="50"
+                        aria-labelledby="price-label"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="50"
+                        aria-valuetext="50€"
+                      />
+                      <div class="range-values">
+                        <span>0€</span>
+                        <span>100€</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="filter-group">
+                    <h3 id="trust-filters">Filtres de confiance</h3>
+                    <div class="rating-filter" role="group" aria-labelledby="rating-label">
+                      <span id="rating-label">Note minimale</span>
+                      <div class="star-rating" role="img" aria-label="4 étoiles et plus">
+                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                        <i class="fa-regular fa-star" aria-hidden="true"></i>
+                        <span>4 étoiles et plus</span>
+                      </div>
+                    </div>
+
+                    <label for="verified-only" class="checkbox-label">
+                      <input type="checkbox" id="verified-only" name="verified-only" />
+                      <span class="checkbox-text">Conducteur vérifié uniquement</span>
+                      <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    </label>
+                  </div>
+
+                  <div class="filter-group">
+                    <h3 id="preferences">Préférences</h3>
+                    <div class="preferences-group" role="group" aria-labelledby="preferences">
+                      <label for="non-smoking" class="checkbox-label">
+                        <input type="checkbox" id="non-smoking" name="non-smoking" />
+                        <span class="checkbox-text">Non-fumeur</span>
+                        <i class="fa-solid fa-smoking-ban" aria-hidden="true"></i>
+                      </label>
+                      <label for="pets-allowed" class="checkbox-label">
+                        <input type="checkbox" id="pets-allowed" name="pets-allowed" />
+                        <span class="checkbox-text">Animaux acceptés</span>
+                        <i class="fa-solid fa-paw" aria-hidden="true"></i>
+                      </label>
+                    </div>
+                  </div>
+
+                  <button type="button" class="reset-filters-btn" id="reset-filters">
+                    <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                    Réinitialiser les filtres
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Colonne de droite : Résultats de recherche -->
+          <div class="results-column">
+            <div class="results-header">
+              <div class="results-count" id="results-count" aria-live="polite">
+                0 trajet(s) trouvé(s)
+              </div>
+
+              <div class="results-filters">
+                <div class="filter-dropdown">
+                  <label for="sort-filter" class="visually-hidden">Trier les résultats</label>
+                  <select id="sort-filter" aria-label="Trier les résultats">
+                    <option value="">Trier par</option>
+                    <option value="price-asc">Prix croissant</option>
+                    <option value="price-desc">Prix décroissant</option>
+                    <option value="time">Heure de départ</option>
+                    <option value="rating">Note du conducteur</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="results-list"
+              id="results-list"
+              aria-live="polite"
+              role="region"
+              aria-label="Résultats de recherche"
+            >
+              <!-- Les résultats de recherche seront insérés ici par JavaScript -->
+            </div>
+
+            <!-- Boutons supplémentaires -->
+            <div class="results-actions">
+              <button class="load-more" id="load-more-btn" aria-label="Charger plus de résultats">
+                <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
+                Charger plus de résultats
+              </button>
+
+              <button class="create-alert" id="create-alert-btn">
+                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                Créer une alerte pour ce trajet
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__top">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+            contact@ecoride.com
+          </p>
+          <p>
+            <i class="fa-solid fa-phone" aria-hidden="true"></i>
+            01 23 45 67 89
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="https://facebook.com" aria-label="Facebook">
+            <i class="fa-brands fa-facebook"></i>
+          </a>
+          <a href="https://twitter.com" aria-label="Twitter">
+            <i class="fa-brands fa-twitter"></i>
+          </a>
+          <a href="https://instagram.com" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><a href="./index.html">Accueil</a></li>
+              <li><a href="./index.html#about">À propos</a></li>
+              <li><a href="./covoiturages.html">Services</a></li>
+              <li><a href="./contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><a href="./conditions.html">Conditions</a></li>
+              <li><a href="./confidentialite.html">Confidentialité</a></li>
+              <li><a href="./cookies.html">Cookies</a></li>
+              <li><a href="./mentions-legales.html">Mentions légales</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+    <script type="module" src="../../assets/js/pages/covoiturages.js"></script>
+  </body>
+</html>

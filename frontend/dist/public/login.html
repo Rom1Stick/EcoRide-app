@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion – EcoRide</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="login-page">
+      <div class="login-modal" role="dialog" aria-labelledby="login-title">
+        <button class="login-modal__close" aria-label="Fermer" onclick="window.history.back();">
+          ✕
+        </button>
+
+        <div class="login-modal__logo">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+        </div>
+
+        <form class="login-form" novalidate>
+          <div class="login-form__group">
+            <label for="email">Adresse e-mail</label>
+            <input type="email" id="email" name="email" placeholder="nom@exemple.com" required />
+
+            <label for="password">Mot de passe</label>
+            <div class="input-wrapper">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-visibility"
+                aria-label="Afficher/masquer le mot de passe"
+              >
+                👁
+              </button>
+            </div>
+          </div>
+
+          <div class="login-form__options">
+            <label>
+              <input type="checkbox" name="remember" />
+              Se souvenir de moi
+            </label>
+            <a href="#">Mot de passe oublié ?</a>
+          </div>
+
+          <button type="submit" class="login-form__submit">Se connecter</button>
+        </form>
+
+        <div class="login-form__alt">
+          <p>Pas encore de compte ?</p>
+          <a href="./register.html" class="alt-btn">S'inscrire</a>
+        </div>
+      </div>
+      <a href="/" class="login-modal__back">Retour à l'accueil</a>
+    </div>
+    <script>
+      // Initialiser le token CSRF en appelant l'API health
+      (async () => {
+        try {
+          await fetch('/api/health', { credentials: 'include' });
+        } catch {}
+      })();
+      document.querySelector('.login-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const identifier = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        try {
+          // Récupérer le token CSRF depuis le cookie
+          const csrfToken =
+            document.cookie
+              .split('; ')
+              .find((row) => row.startsWith('XSRF-TOKEN='))
+              ?.split('=')[1] || '';
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': csrfToken,
+            },
+            credentials: 'include',
+            body: JSON.stringify({ email: identifier, password }),
+          });
+          const result = await response.json();
+          if (response.ok && !result.error) {
+            // Sauvegarder le token JWT pour les appels ultérieurs
+            localStorage.setItem('auth_token', result.data.token);
+            // Redirection selon le rôle
+            window.location.href = result.data.redirect_url;
+          } else {
+            // Afficher le message d'erreur
+            alert(result.message || 'Erreur lors de la connexion');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Erreur réseau, veuillez réessayer');
+        }
+      });
+      // Gestion du toggle de visibilité du mot de passe
+      document.querySelectorAll('.input-wrapper').forEach((wrapper) => {
+        const input = wrapper.querySelector('input');
+        const btn = wrapper.querySelector('.toggle-visibility');
+        if (input && btn) {
+          btn.addEventListener('click', () => {
+            if (input.type === 'password') {
+              input.type = 'text';
+              btn.textContent = '🙈';
+            } else {
+              input.type = 'password';
+              btn.textContent = '👁';
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -5,7 +5,10 @@
   "description": "Frontend éco-conçu pour l'application EcoRide",
   "type": "module",
   "scripts": {
+    "build": "npm run build:scss && npm run create-dist && npm run copy-files",
     "build:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --style=compressed --no-source-map",
+    "create-dist": "mkdir -p dist",
+    "copy-files": "xcopy /E /I /Y pages\\* dist\\ && xcopy /E /I /Y assets dist\\assets\\",
     "watch:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --watch --style=compressed --no-source-map",
     "lint": "eslint assets/js/**/*.js",
     "format": "prettier --write 'assets/js/**/*.js' 'assets/scss/**/*.scss' '**/*.html'"

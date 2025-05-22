@@ -1,0 +1,81 @@
+@use '../abstracts/variables' as *;
+
+// Styles du formulaire d'inscription
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing;
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    position: relative;
+
+    label {
+      font-size: 0.9rem;
+      color: $color-surface-alt;
+    }
+
+    input {
+      background-color: $color-surface-alt;
+      color: $color-text-primary;
+      border: none;
+      border-radius: $radius-md;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+
+      &::placeholder {
+        color: $color-text-secondary;
+      }
+    }
+
+    .toggle-visibility {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $color-text-secondary;
+      background: none;
+      border: none;
+    }
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    input {
+      margin-top: 0.2rem;
+      width: 1rem;
+      height: 1rem;
+      accent-color: $color-secondary;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: $color-surface-alt;
+
+      a {
+        color: $color-secondary;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__submit {
+    margin-top: $spacing;
+    background-color: $color-accent;
+    color: $color-primary-bg;
+    padding: 0.75rem;
+    border-radius: $radius-md;
+    text-align: center;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $color-secondary;
+      color: $color-text-primary;
+    }
+  }
+}

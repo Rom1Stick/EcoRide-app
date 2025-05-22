@@ -1,0 +1,1014 @@
+@use 'sass:math';
+@use 'sass:color';
+@use '../abstracts/variables' as *;
+
+/* Page de profil - Mobile first */
+.profile-page {
+  background-color: $color-primary-bg;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-section {
+  padding: $spacing;
+  flex: 1;
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: $spacing;
+    color: $color-text-primary;
+  }
+}
+
+/* Container principal du profil */
+.profile-container {
+  background-color: $color-surface-alt;
+  border-radius: $radius-md;
+  border: 1px solid $color-text-secondary;
+  overflow: hidden;
+}
+
+/* En-tête du profil avec avatar */
+.profile-header {
+  padding: $spacing;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $color-surface-alt;
+  border-bottom: 1px solid $color-text-secondary;
+
+  .profile-image {
+    position: relative;
+    margin-bottom: $spacing;
+
+    img {
+      width: 6rem;
+      height: 6rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid $color-accent;
+    }
+
+    .edit-profile-image {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background-color: $color-accent;
+      color: $color-primary-bg;
+      border: none;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid $color-text-secondary;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: $color-secondary;
+      }
+    }
+  }
+
+  .profile-info {
+    text-align: center;
+    width: 100%;
+
+    h2 {
+      margin: 0 0 $spacing * 0.25;
+      font-size: 1.25rem;
+      color: $color-text-primary;
+    }
+
+    p {
+      color: $color-text-primary;
+      font-size: 0.9rem;
+      margin-bottom: $spacing * 0.75;
+    }
+  }
+}
+
+/* Statistiques du profil */
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: $spacing;
+  margin-top: $spacing * 0.5;
+
+  .stat {
+    text-align: center;
+
+    .value {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: $color-accent;
+    }
+
+    .label {
+      font-size: 0.8rem;
+      color: $color-text-primary;
+    }
+  }
+}
+
+/* Onglets du profil */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid $color-text-secondary;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  .tab-button {
+    flex: 1;
+    min-width: fit-content;
+    padding: $spacing * 0.75 $spacing * 0.5;
+    background-color: transparent;
+    border: none;
+    color: $color-text-primary;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    white-space: nowrap;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: transparent;
+      transition: background-color 0.2s;
+    }
+
+    &.active {
+      color: $color-accent;
+      font-weight: 600;
+
+      &:after {
+        background-color: $color-accent;
+      }
+    }
+
+    &:hover:not(.active) {
+      color: $color-secondary;
+
+      &:after {
+        background-color: $color-secondary;
+      }
+    }
+  }
+}
+
+/* Contenu des onglets */
+.tab-content {
+  padding: $spacing;
+  background-color: $color-surface-alt;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+/* Formulaire du profil */
+.profile-form {
+  .form-group {
+    margin-bottom: $spacing;
+
+    label {
+      display: block;
+      margin-bottom: $spacing * 0.25;
+      font-size: 0.9rem;
+      color: $color-text-primary;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: $spacing * 0.75;
+      border: 1px solid $color-text-secondary;
+      border-radius: $radius-md;
+      font-size: 1rem;
+      background-color: $color-primary-bg;
+      color: $color-text-primary;
+
+      &:focus {
+        outline: none;
+        border-color: $color-accent;
+        border-width: 2px;
+      }
+    }
+
+    textarea {
+      min-height: $spacing * 5;
+      resize: vertical;
+    }
+  }
+
+  .btn-primary {
+    background-color: $color-accent;
+    color: $color-primary-bg;
+    border: none;
+    border-radius: $radius-md;
+    padding: $spacing * 0.75 $spacing * 1.5;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    font-weight: bold;
+
+    &:hover {
+      background-color: $color-secondary;
+      color: $color-text-primary;
+    }
+  }
+}
+
+/* Options de paramètres */
+.settings-options {
+  .setting-group {
+    margin-bottom: $spacing * 1.5;
+    padding-bottom: $spacing;
+    border-bottom: 1px solid $color-text-secondary;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: $spacing * 0.75;
+      color: $color-text-primary;
+    }
+  }
+
+  .switch-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing * 0.5;
+
+    label {
+      font-size: 0.9rem;
+      color: $color-text-primary;
+    }
+
+    /* Switch toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 3rem;
+      height: 1.5rem;
+
+      input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+
+        &:checked + .slider {
+          background-color: $color-accent;
+
+          &:before {
+            transform: translateX(1.5rem);
+          }
+        }
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: $color-text-secondary;
+        border-radius: 1.5rem;
+        transition: 0.3s;
+
+        &:before {
+          position: absolute;
+          content: '';
+          height: 1.1rem;
+          width: 1.1rem;
+          left: 0.2rem;
+          bottom: 0.2rem;
+          background-color: $color-primary-bg;
+          border-radius: 50%;
+          transition: 0.3s;
+        }
+      }
+    }
+  }
+
+  /* Boutons de paramètres */
+  .btn-secondary,
+  .btn-danger {
+    width: 100%;
+    padding: $spacing * 0.75;
+    border: none;
+    border-radius: $radius-md;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: $spacing * 0.5;
+    transition: background-color 0.2s;
+  }
+
+  .btn-secondary {
+    background-color: $color-secondary;
+    color: $color-text-primary;
+
+    &:hover {
+      background-color: $color-accent;
+      color: $color-primary-bg;
+    }
+  }
+
+  .btn-danger {
+    background-color: $color-surface-alt;
+    color: $color-text-primary;
+    border: 1px solid $color-text-secondary;
+
+    &:hover {
+      background-color: $color-secondary;
+    }
+  }
+
+  .danger-zone {
+    background-color: $color-primary-bg;
+    padding: $spacing;
+    border-radius: $radius-md;
+    border: 1px solid $color-surface-alt;
+  }
+}
+
+/* État vide */
+.empty-state {
+  text-align: center;
+  padding: $spacing * 2;
+  color: $color-text-primary;
+  font-style: italic;
+}
+
+/* Responsive - Tablette */
+@media (min-width: $breakpoint-tablet) {
+  .profile-section {
+    padding: $spacing * 1.5;
+  }
+
+  .profile-header {
+    flex-direction: row;
+    align-items: flex-start;
+
+    .profile-image {
+      margin-right: $spacing * 1.5;
+      margin-bottom: 0;
+    }
+
+    .profile-info {
+      text-align: left;
+    }
+  }
+
+  .profile-stats {
+    justify-content: flex-start;
+  }
+
+  .profile-tabs {
+    .tab-button {
+      padding: $spacing $spacing * 1.25;
+    }
+  }
+
+  .profile-form {
+    .btn-primary {
+      width: auto;
+      padding: $spacing * 0.75 $spacing * 2;
+    }
+  }
+
+  .settings-options {
+    .btn-secondary,
+    .btn-danger {
+      width: auto;
+      padding: $spacing * 0.75 $spacing * 1.5;
+    }
+  }
+}
+
+/* Responsive - Desktop */
+@media (min-width: $breakpoint-desktop) {
+  .profile-section {
+    padding: $spacing * 2;
+
+    h1 {
+      font-size: 1.8rem;
+    }
+  }
+
+  .profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .profile-header {
+    padding: $spacing * 1.5;
+
+    .profile-image img {
+      width: 8rem;
+      height: 8rem;
+    }
+
+    .profile-info h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .profile-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing;
+
+    .form-group:last-of-type {
+      grid-column: span 2;
+    }
+  }
+}
+
+/* Styles pour l'onglet Mes trajets */
+.trips-actions {
+  margin-bottom: $spacing;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .filter-buttons {
+    display: flex;
+    gap: $spacing * 0.5;
+    
+    .filter-btn {
+      background-color: $color-primary-bg;
+      border: 1px solid $color-text-secondary;
+      border-radius: $radius-sm;
+      padding: $spacing * 0.5 $spacing * 0.75;
+      font-size: 0.875rem;
+      color: $color-text-primary;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: $color-secondary;
+      }
+      
+      &.active {
+        background-color: $color-accent;
+        color: $color-primary-bg;
+        border-color: $color-accent;
+      }
+    }
+  }
+  
+  .btn-primary {
+    background-color: $color-accent;
+    color: $color-primary-bg;
+    border: none;
+    border-radius: $radius-md;
+    padding: $spacing * 0.5 $spacing;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    
+    i {
+      margin-right: $spacing * 0.5;
+    }
+    
+    &:hover {
+      background-color: $color-secondary;
+    }
+  }
+}
+
+/* Liste des trajets */
+.trips-list {
+  margin-top: $spacing;
+  
+  .trip-card {
+    background-color: $color-primary-bg;
+    border-radius: $radius-md;
+    padding: $spacing;
+    margin-bottom: $spacing;
+    border: 1px solid $color-text-secondary;
+    
+    .trip-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: $spacing * 0.5;
+      
+      .trip-date {
+        font-size: 0.8rem;
+        color: $color-text-primary;
+      }
+      
+      .trip-status {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: $radius-sm;
+        
+        &.confirmed {
+          background-color: $color-accent;
+          color: $color-primary-bg;
+        }
+        
+        &.pending {
+          background-color: $color-accent;
+          color: $color-primary-bg;
+        }
+        
+        &.cancelled {
+          background-color: $color-text-secondary;
+          color: $color-primary-bg;
+        }
+      }
+    }
+    
+    .trip-body {
+      h3 {
+        font-size: 1rem;
+        margin-bottom: $spacing * 0.5;
+        color: $color-text-primary;
+      }
+      
+      p {
+        font-size: 0.9rem;
+        color: $color-text-primary;
+        margin-bottom: $spacing * 0.5;
+      }
+      
+      .trip-actions {
+        display: flex;
+        gap: $spacing * 0.5;
+        margin-top: $spacing * 0.75;
+        
+        button {
+          background-color: $color-primary-bg;
+          color: $color-text-primary;
+          border: 1px solid $color-text-secondary;
+          border-radius: $radius-sm;
+          padding: $spacing * 0.3 $spacing * 0.5;
+          font-size: 0.75rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: all 0.2s ease;
+          
+          i {
+            margin-right: $spacing * 0.3;
+            font-size: 0.8rem;
+          }
+          
+          &:hover {
+            background-color: $color-secondary;
+          }
+          
+          &.btn-edit-ride {
+            &:hover {
+              background-color: $color-accent;
+              color: $color-primary-bg;
+            }
+          }
+          
+          &.btn-delete-ride {
+            border-color: $color-secondary;
+            
+            &:hover {
+              background-color: $color-secondary;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Adaptations pour les tablettes et desktop */
+@media (min-width: 768px) {
+  .profile-header {
+    flex-direction: row;
+    align-items: flex-start;
+
+    .profile-image {
+      margin-right: $spacing * 1.5;
+      margin-bottom: 0;
+    }
+
+    .profile-info {
+      text-align: left;
+    }
+
+    .profile-stats {
+      justify-content: flex-start;
+    }
+  }
+
+  .profile-form {
+    max-width: 600px;
+
+    .btn-primary {
+      width: auto;
+    }
+  }
+
+  .danger-zone {
+    .btn-danger {
+      width: auto;
+    }
+  }
+}
+
+/* Boutons de danger */
+.danger-zone {
+  .btn-danger {
+    background-color: $color-text-primary;
+    color: $color-primary-bg;
+    border: none;
+    border-radius: $radius-md;
+    padding: $spacing * 0.75 $spacing * 1.5;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-bottom: $spacing * 0.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      margin-right: $spacing * 0.5;
+    }
+
+    &:hover {
+      background-color: $color-secondary;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+/* Styles pour le bouton de déconnexion */
+.btn-logout {
+  background-color: $color-secondary;
+  color: $color-text-primary;
+  border: none;
+  border-radius: $radius-md;
+  padding: $spacing * 0.5 $spacing;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: $spacing * 0.25 auto;
+  margin-bottom: $spacing * 0.5;
+  transition: background-color 0.2s ease;
+  max-width: 150px;
+  
+  i {
+    margin-right: $spacing * 0.5;
+  }
+  
+  &:hover {
+    background-color: $color-accent;
+    color: $color-primary-bg;
+  }
+}
+
+/* Onglets du profil avec icônes */
+.tabs {
+  display: flex;
+  margin: $spacing 0;
+  border-bottom: 1px solid $color-text-secondary;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  .tab-button {
+    flex: 1;
+    min-width: fit-content;
+    padding: $spacing * 0.75 $spacing * 0.5;
+    background-color: transparent;
+    border: none;
+    color: $color-text-primary;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    i {
+      margin-right: $spacing * 0.25;
+    }
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: transparent;
+      transition: background-color 0.2s;
+    }
+
+    &.active {
+      color: $color-accent;
+      font-weight: 600;
+
+      &:after {
+        background-color: $color-accent;
+      }
+    }
+
+    &:hover:not(.active) {
+      color: $color-secondary;
+
+      &:after {
+        background-color: $color-secondary;
+      }
+    }
+  }
+}
+
+/* Style pour la section Véhicule */
+.vehicle-info {
+  h3 {
+    font-size: 1.25rem;
+    margin-bottom: $spacing;
+    color: $color-text-primary;
+  }
+  
+  .empty-state {
+    padding: $spacing * 2;
+    text-align: center;
+    background-color: $color-primary-bg;
+    border-radius: $radius-md;
+    color: $color-text-secondary;
+    margin-bottom: $spacing;
+  }
+  
+  .vehicle-details-card {
+    display: flex;
+    background-color: $color-primary-bg;
+    border-radius: $radius-md;
+    padding: $spacing;
+    margin-bottom: $spacing;
+    
+    .vehicle-image {
+      width: 80px;
+      height: 80px;
+      background-color: $color-accent;
+      color: $color-primary-bg;
+      border-radius: $radius-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: $spacing;
+      
+      i {
+        font-size: 2.5rem;
+      }
+    }
+    
+    .vehicle-info-content {
+      h4 {
+        margin: 0 0 $spacing * 0.5;
+        font-size: 1.25rem;
+        color: $color-text-primary;
+      }
+      
+      p {
+        margin: $spacing * 0.25 0;
+        font-size: 0.9rem;
+        color: $color-text-primary;
+        
+        i {
+          width: 20px;
+          color: $color-accent;
+          margin-right: $spacing * 0.5;
+        }
+      }
+    }
+  }
+  
+  .btn-secondary {
+    background-color: $color-primary-bg;
+    color: $color-text-primary;
+    border: 1px solid $color-text-secondary;
+    border-radius: $radius-md;
+    padding: $spacing * 0.75 $spacing;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: $color-secondary;
+    }
+  }
+  
+  .btn-primary {
+    background-color: $color-accent;
+    color: $color-primary-bg;
+    border: none;
+    border-radius: $radius-md;
+    padding: $spacing * 0.75 $spacing;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: $spacing * 0.5;
+    margin-top: $spacing;
+    transition: background-color 0.2s ease;
+    
+    i {
+      font-size: 0.75rem;
+    }
+    
+    &:hover {
+      background-color: $color-secondary;
+    }
+  }
+}
+
+/* Style pour les modals (covoiturage et véhicule) */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $color-primary-bg;
+  align-items: center;
+  justify-content: center;
+  
+  .modal-content {
+    background-color: $color-surface-alt;
+    border-radius: $radius-md;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px $color-text-secondary;
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing;
+      border-bottom: 1px solid $color-text-secondary;
+      
+      h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: $color-accent;
+      }
+      
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: $color-text-secondary;
+        cursor: pointer;
+        
+        &:hover {
+          color: $color-text-primary;
+        }
+      }
+    }
+    
+    .modal-body {
+      padding: $spacing;
+      
+      .form-group {
+        margin-bottom: $spacing;
+        
+        label {
+          display: block;
+          margin-bottom: $spacing * 0.25;
+          font-weight: 500;
+          color: $color-text-primary;
+        }
+        
+        input, textarea, select {
+          width: 100%;
+          padding: $spacing * 0.75;
+          border: 1px solid $color-text-secondary;
+          border-radius: $radius-md;
+          font-size: 1rem;
+          background-color: $color-primary-bg;
+          color: $color-text-primary;
+          transition: border-color 0.2s ease;
+          
+          &:focus {
+            border-color: $color-accent;
+            outline: none;
+          }
+        }
+        
+        select {
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0.75rem center;
+          padding-right: 2.5rem;
+        }
+        
+        textarea {
+          min-height: $spacing * 5;
+          resize: vertical;
+        }
+      }
+      
+      .form-row {
+        display: flex;
+        gap: $spacing;
+        
+        .form-group {
+          flex: 1;
+        }
+        
+        @media (max-width: 600px) {
+          flex-direction: column;
+          gap: 0;
+        }
+      }
+      
+      .preferences {
+        h3 {
+          font-size: 1rem;
+          margin-bottom: $spacing;
+        }
+        
+        .checkbox-group {
+          display: flex;
+          align-items: center;
+          margin-bottom: $spacing * 0.5;
+          
+          input[type="checkbox"] {
+            width: auto;
+            margin-right: $spacing * 0.5;
+          }
+        }
+      }
+      
+      .form-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: $spacing;
+        margin-top: $spacing;
+        
+        .btn-secondary {
+          background-color: $color-primary-bg;
+          color: $color-text-primary;
+          border: 1px solid $color-text-secondary;
+          border-radius: $radius-md;
+          padding: $spacing * 0.75 $spacing;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          &:hover {
+            background-color: $color-secondary;
+          }
+        }
+        
+        .btn-primary {
+          background-color: $color-accent;
+          color: $color-primary-bg;
+          border: none;
+          border-radius: $radius-md;
+          padding: $spacing * 0.75 $spacing;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          
+          &:hover {
+            background-color: $color-secondary;
+          }
+        }
+      }
+    }
+  }
+}

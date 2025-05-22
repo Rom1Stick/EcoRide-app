@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="description" content="EcoRide - Profil utilisateur" />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>Mon profil - EcoRide</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="profile-page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+      </div>
+      <!-- Menu de navigation desktop -->
+      <nav class="header__nav">
+        <a href="/">Accueil</a>
+        <a href="./covoiturages.html">Covoiturages</a>
+        <a href="/contact">Contact</a>
+        <div class="auth-container">
+          <!-- Le contenu sera ajusté par userProfile.js -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/Logo_EcoRide.svg"
+              alt="Avatar"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </a>
+        </div>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell"></i>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container">
+        <section class="section profile-section">
+          <h1>Mon profil</h1>
+
+          <div class="profile-container">
+            <div class="profile-header">
+              <div class="profile-image">
+                <img
+                  src="../../assets/images/Logo_EcoRide.svg"
+                  alt="Photo de profil"
+                  id="profileImage"
+                />
+                <button class="edit-profile-image" aria-label="Modifier la photo de profil">
+                  <i class="fa-solid fa-camera"></i>
+                </button>
+              </div>
+              <div class="profile-info">
+                <h2 id="profileName">Nom d'utilisateur</h2>
+                <p id="profileEmail">email@exemple.com</p>
+                <button id="logoutBtn" class="btn-logout">
+                  <i class="fa-solid fa-sign-out-alt"></i> Déconnexion
+                </button>
+                <div class="profile-stats">
+                  <div class="stat">
+                    <span class="value" id="tripsCount">0</span>
+                    <span class="label">Trajets</span>
+                  </div>
+                  <div class="stat">
+                    <span class="value" id="creditsBalance">0</span>
+                    <span class="label">Crédits</span>
+                  </div>
+                  <div class="stat">
+                    <span class="value" id="co2Saved">0kg</span>
+                    <span class="label">CO2 économisé</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Onglets -->
+            <div class="tabs">
+              <button class="tab-button active" data-tab="profile">
+                <i class="fa-solid fa-user"></i> Profil
+              </button>
+              <button class="tab-button" data-tab="trips">
+                <i class="fa-solid fa-route"></i> Mes trajets
+              </button>
+              <button class="tab-button" data-tab="credits">
+                <i class="fa-solid fa-coins"></i> Crédits
+              </button>
+              <button class="tab-button" data-tab="vehicle">
+                <i class="fa-solid fa-car"></i> Véhicule
+              </button>
+            </div>
+
+            <div class="tab-content" id="profile-tab">
+              <form class="profile-form">
+                <div class="form-group">
+                  <label for="name">Nom complet</label>
+                  <input type="text" id="name" placeholder="Votre nom" />
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" id="email" placeholder="Votre email" />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Téléphone</label>
+                  <input type="tel" id="phone" placeholder="Votre numéro de téléphone" />
+                </div>
+                <div class="form-group">
+                  <label for="bio">Bio</label>
+                  <textarea id="bio" placeholder="Présentez-vous en quelques mots"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Enregistrer</button>
+              </form>
+            </div>
+
+            <div class="tab-content hidden" id="trips-tab">
+              <div class="trips-actions">
+                <button id="addRideBtn" class="btn-primary">
+                  <i class="fa-solid fa-plus"></i>
+                  Proposer un covoiturage
+                </button>
+                <div class="filter-buttons" role="group" aria-label="Filtres de trajets">
+                  <button id="filterAllTrips" class="filter-btn active" data-filter="all" aria-pressed="true">
+                    <span class="filter-icon"><i class="fa-solid fa-list"></i></span>
+                    <span class="filter-text">Tous</span>
+                  </button>
+                  <button id="filterBookings" class="filter-btn" data-filter="booking" aria-pressed="false">
+                    <span class="filter-icon"><i class="fa-solid fa-ticket"></i></span>
+                    <span class="filter-text">Réservations</span>
+                  </button>
+                  <button id="filterMyRides" class="filter-btn" data-filter="driver" aria-pressed="false">
+                    <span class="filter-icon"><i class="fa-solid fa-car"></i></span>
+                    <span class="filter-text">Mes propositions</span>
+                  </button>
+                </div>
+                <button id="refreshTripsBtn" class="btn-secondary" title="Rafraîchir les données">
+                  <i class="fa-solid fa-sync-alt"></i> Rafraîchir
+                </button>
+              </div>
+              <p class="empty-state">Vous n'avez pas encore effectué de trajets.</p>
+              <!-- Liste des trajets sera chargée dynamiquement -->
+            </div>
+
+            <div class="tab-content hidden" id="credits-tab">
+              <!-- Contenu de la section des crédits -->
+            </div>
+
+            <div class="tab-content hidden" id="vehicle-tab">
+              <div class="vehicle-info">
+                <h3>Mon véhicule</h3>
+                <p id="noVehicleMessage" class="empty-state">Vous n'avez pas encore ajouté de véhicule. Ajoutez votre véhicule pour pouvoir proposer des covoiturages.</p>
+                
+                <div id="vehicleDetails" style="display: none;">
+                  <div class="vehicle-details-card">
+                    <div class="vehicle-image">
+                      <i class="fa-solid fa-car"></i>
+                    </div>
+                    <div class="vehicle-info-content">
+                      <h4 id="vehicleName">Marque Modèle</h4>
+                      <p id="vehicleDetails1"><i class="fa-solid fa-calendar"></i> <span id="vehicleYear">2020</span></p>
+                      <p id="vehicleDetails2"><i class="fa-solid fa-palette"></i> <span id="vehicleColor">Couleur</span></p>
+                      <p id="vehicleDetails3"><i class="fa-solid fa-id-card"></i> <span id="vehiclePlate">Immatriculation</span></p>
+                    </div>
+                  </div>
+                  <button id="editVehicleBtn" class="btn-secondary">Modifier mon véhicule</button>
+                </div>
+                
+                <button id="addVehicleBtn" class="btn-primary">
+                  <i class="fa-solid fa-plus"></i>
+                  Ajouter un véhicule
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Modal pour ajouter un covoiturage -->
+    <div id="addRideModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Proposer un covoiturage</h2>
+          <button class="close-modal" aria-label="Fermer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addRideForm">
+            <div class="form-group">
+              <label for="departure">Lieu de départ</label>
+              <input type="text" id="departure" name="departure" required placeholder="Ville de départ" maxlength="25" data-valid-city="false" aria-describedby="departure-error" />
+              <div class="autocomplete-container" id="departure-autocomplete"></div>
+              <div id="departure-error" class="error-message" role="alert" aria-live="assertive" style="display: none;">
+                <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                Veuillez sélectionner une ville dans la liste
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="destination">Lieu d'arrivée</label>
+              <input type="text" id="destination" name="destination" required placeholder="Ville d'arrivée" maxlength="25" data-valid-city="false" aria-describedby="destination-error" />
+              <div class="autocomplete-container" id="destination-autocomplete"></div>
+              <div id="destination-error" class="error-message" role="alert" aria-live="assertive" style="display: none;">
+                <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+                Veuillez sélectionner une ville dans la liste
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required />
+              </div>
+              <div class="form-group">
+                <label for="departureTime">Heure de départ</label>
+                <input type="time" id="departureTime" name="departureTime" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="price">Prix par personne (€)</label>
+                <input type="number" id="price" name="price" required min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="seats">Nombre de places</label>
+                <input type="number" id="seats" name="seats" required min="1" max="8" value="3" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="vehicle">Véhicule</label>
+              <select id="vehicle" name="vehicle" required>
+                <option value="">Sélectionner un véhicule</option>
+                <!-- Les options seront chargées dynamiquement -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="description">Description du trajet</label>
+              <textarea id="description" name="description" rows="3" placeholder="Informations complémentaires, bagages autorisés, etc."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="stopover">Arrêts intermédiaires (optionnel)</label>
+              <input type="text" id="stopover" name="stopover" placeholder="Villes d'arrêts séparées par des virgules" />
+            </div>
+            <div class="form-group preferences">
+              <h3>Préférences</h3>
+              <div class="checkbox-group">
+                <input type="checkbox" id="smoking" name="smoking" />
+                <label for="smoking">Fumeur autorisé</label>
+              </div>
+              <div class="checkbox-group">
+                <input type="checkbox" id="pets" name="pets" />
+                <label for="pets">Animaux autorisés</label>
+              </div>
+              <div class="checkbox-group">
+                <input type="checkbox" id="music" name="music" checked />
+                <label for="music">Musique</label>
+              </div>
+            </div>
+            <div class="form-buttons">
+              <button type="button" class="btn-secondary cancel-modal">Annuler</button>
+              <button type="submit" class="btn-primary">Publier le covoiturage</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__top">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope"></i>
+            contact@ecoride.com
+          </p>
+          <p>
+            <i class="fa-solid fa-phone"></i>
+            01 23 45 67 89
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><span>Accueil</span></li>
+              <li><span>À propos</span></li>
+              <li><span>Services</span></li>
+              <li><span>Contact</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><span>Conditions</span></li>
+              <li><span>Confidentialité</span></li>
+              <li><span>Cookies</span></li>
+              <li><span>Mentions légales</span></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+    <script type="module" src="../../assets/js/pages/profile.js"></script>
+  </body>
+</html>

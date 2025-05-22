@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="Contactez l'équipe EcoRide - Plateforme de covoiturage éco-responsable"
+    />
+    <meta name="theme-color" content="#1b5e20" />
+    <title>Contact - EcoRide</title>
+    <link rel="stylesheet" href="../../assets/styles/main.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/6cca64e339.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body class="contact-page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__logo">
+        <a href="./index.html">
+          <img src="../../assets/images/LogoText_Ecoride.svg" alt="Texte EcoRide" class="icon" />
+        </a>
+      </div>
+      <!-- Menu de navigation desktop -->
+      <nav class="header__nav">
+        <a href="./index.html">Accueil</a>
+        <a href="./covoiturages.html">Covoiturages</a>
+        <a href="./contact.html" class="active" aria-current="page">Contact</a>
+        <div class="auth-container">
+          <!-- Contenu remplacé dynamiquement par JavaScript -->
+          <a href="./login.html" class="login-btn" id="loginBtn">Connexion / Inscription</a>
+          <!-- Bouton de profil (caché par défaut) -->
+          <a href="./profile.html" class="user-profile-btn" id="profileBtn" style="display: none">
+            <img
+              src="../../assets/images/Logo_EcoRide.svg"
+              alt="Avatar de l'utilisateur"
+              class="avatar"
+              id="userAvatar"
+            />
+            <span class="username" id="username">Utilisateur</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </a>
+        </div>
+      </nav>
+      <!-- Bouton de menu mobile -->
+      <button class="header__menu" aria-label="Ouvrir le menu" id="menuToggle">
+        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="container">
+        <!-- Section titre -->
+        <section class="page-header">
+          <h1>Contactez-nous</h1>
+          <p>Notre équipe est à votre disposition pour répondre à toutes vos questions</p>
+        </section>
+
+        <!-- Section formulaire de contact -->
+        <section class="section section--alt contact-form">
+          <div class="contact-container">
+            <div class="contact-info">
+              <h2>Nos coordonnées</h2>
+              <div class="info-item">
+                <i class="fa-solid fa-map-marker-alt" aria-hidden="true"></i>
+                <div>
+                  <h3>Adresse</h3>
+                  <address>
+                    123 Avenue Écologique
+                    <br />
+                    75001 Paris, France
+                  </address>
+                </div>
+              </div>
+              <div class="info-item">
+                <i class="fa-solid fa-phone" aria-hidden="true"></i>
+                <div>
+                  <h3>Téléphone</h3>
+                  <p><a href="tel:+33123456789">01 23 45 67 89</a></p>
+                </div>
+              </div>
+              <div class="info-item">
+                <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+                <div>
+                  <h3>Email</h3>
+                  <p><a href="mailto:contact@ecoride.com">contact@ecoride.com</a></p>
+                </div>
+              </div>
+              <div class="info-item">
+                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                <div>
+                  <h3>Horaires</h3>
+                  <p>
+                    Lun-Ven: 9h-18h
+                    <br />
+                    Weekend: Fermé
+                  </p>
+                </div>
+              </div>
+              <div class="social-links">
+                <a href="#" aria-label="Facebook">
+                  <i class="fa-brands fa-facebook" aria-hidden="true"></i>
+                </a>
+                <a href="#" aria-label="Twitter">
+                  <i class="fa-brands fa-twitter" aria-hidden="true"></i>
+                </a>
+                <a href="#" aria-label="Instagram">
+                  <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+                </a>
+                <a href="#" aria-label="LinkedIn">
+                  <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+
+            <form id="contactForm" class="form" aria-labelledby="formTitle">
+              <h2 id="formTitle">Envoyez-nous un message</h2>
+              <div class="form-group">
+                <label for="name">Nom complet</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Votre nom"
+                  autocomplete="name"
+                  aria-required="true"
+                />
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="Votre email"
+                  autocomplete="email"
+                  aria-required="true"
+                />
+              </div>
+              <div class="form-group">
+                <label for="subject">Sujet</label>
+                <select id="subject" name="subject" required aria-required="true">
+                  <option value="" disabled selected>Choisissez un sujet</option>
+                  <option value="question">Question générale</option>
+                  <option value="support">Support technique</option>
+                  <option value="partnership">Partenariat</option>
+                  <option value="other">Autre</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="message">Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="5"
+                  required
+                  placeholder="Votre message"
+                  aria-required="true"
+                ></textarea>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" id="privacy" name="privacy" required aria-required="true" />
+                <label for="privacy">
+                  J'accepte que mes données soient traitées conformément à la
+                  <a href="./confidentialite.html">politique de confidentialité</a>
+                </label>
+              </div>
+              <button type="submit" class="btn btn--primary">
+                <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                Envoyer le message
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Section FAQ -->
+        <section class="section section--primary faq">
+          <h2>Questions fréquentes</h2>
+          <div class="faq-container">
+            <div class="faq-item">
+              <div
+                class="faq-question"
+                tabindex="0"
+                role="button"
+                aria-expanded="false"
+                aria-controls="faq-answer-1"
+              >
+                <h3>Comment puis-je m'inscrire sur EcoRide ?</h3>
+                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+              </div>
+              <div class="faq-answer" id="faq-answer-1" aria-hidden="true">
+                <p>
+                  Vous pouvez vous inscrire facilement en cliquant sur "Connexion / Inscription" en
+                  haut à droite de la page, puis en suivant les instructions pour créer un nouveau
+                  compte.
+                </p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <div
+                class="faq-question"
+                tabindex="0"
+                role="button"
+                aria-expanded="false"
+                aria-controls="faq-answer-2"
+              >
+                <h3>Comment fonctionnent les crédits écologiques ?</h3>
+                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+              </div>
+              <div class="faq-answer" id="faq-answer-2" aria-hidden="true">
+                <p>
+                  Les crédits écologiques sont attribués à chaque trajet partagé en fonction de la
+                  distance et du nombre de passagers. Ils peuvent être échangés contre des
+                  récompenses dans la section "Récompenses" de votre profil.
+                </p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <div
+                class="faq-question"
+                tabindex="0"
+                role="button"
+                aria-expanded="false"
+                aria-controls="faq-answer-3"
+              >
+                <h3>Comment est calculé le prix d'un trajet ?</h3>
+                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+              </div>
+              <div class="faq-answer" id="faq-answer-3" aria-hidden="true">
+                <p>
+                  Le prix est calculé automatiquement en fonction de la distance, du type de
+                  véhicule et du nombre de passagers. Notre algorithme assure un partage équitable
+                  des coûts entre tous les participants.
+                </p>
+              </div>
+            </div>
+            <div class="faq-item">
+              <div
+                class="faq-question"
+                tabindex="0"
+                role="button"
+                aria-expanded="false"
+                aria-controls="faq-answer-4"
+              >
+                <h3>Comment puis-je signaler un problème avec un covoiturage ?</h3>
+                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+              </div>
+              <div class="faq-answer" id="faq-answer-4" aria-hidden="true">
+                <p>
+                  Vous pouvez signaler un problème directement depuis la page du trajet concerné en
+                  cliquant sur "Signaler un problème", ou en contactant notre service client via ce
+                  formulaire de contact.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section carte -->
+        <section class="section section--alt map-section">
+          <h2>Notre localisation</h2>
+          <div class="map-container">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.142047744348!2d2.3519691156743847!3d48.85661100917992!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e671e10bc2a059%3A0x7a2529130aaff20!2sPlace%20de%20l%27H%C3%B4tel%20de%20Ville%2C%2075004%20Paris!5e0!3m2!1sfr!2sfr!4v1644845391244!5m2!1sfr!2sfr"
+              width="100%"
+              height="450"
+              style="border: 0"
+              allowfullscreen=""
+              loading="lazy"
+              title="Carte de notre localisation"
+              aria-label="Carte Google Maps montrant notre adresse à Paris"
+            ></iframe>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__top">
+          <a href="./index.html">
+            <img src="../../assets/images/LogoText_Ecoride.svg" alt="logo ecoride" class="icon" />
+          </a>
+        </div>
+        <div class="footer__contact">
+          <p>
+            <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+            <a href="mailto:contact@ecoride.com">contact@ecoride.com</a>
+          </p>
+          <p>
+            <i class="fa-solid fa-phone" aria-hidden="true"></i>
+            <a href="tel:+33123456789">01 23 45 67 89</a>
+          </p>
+        </div>
+        <div class="footer__socials">
+          <a href="#" aria-label="Facebook">
+            <i class="fa-brands fa-facebook" aria-hidden="true"></i>
+          </a>
+          <a href="#" aria-label="Twitter">
+            <i class="fa-brands fa-twitter" aria-hidden="true"></i>
+          </a>
+          <a href="#" aria-label="Instagram">
+            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+          </a>
+        </div>
+        <nav class="footer__legal">
+          <div>
+            <h3>Navigation</h3>
+            <ul>
+              <li><a href="./index.html">Accueil</a></li>
+              <li><a href="./index.html#about">À propos</a></li>
+              <li><a href="./covoiturages.html">Services</a></li>
+              <li><a href="./contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Légal</h3>
+            <ul>
+              <li><a href="./conditions.html">Conditions</a></li>
+              <li><a href="./confidentialite.html">Confidentialité</a></li>
+              <li><a href="./cookies.html">Cookies</a></li>
+              <li><a href="./mentions-legales.html">Mentions légales</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__right">© 2025 EcoRide. Tous droits réservés.</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="../../assets/js/common/api.js"></script>
+    <script type="module" src="../../assets/js/common/auth.js"></script>
+    <script type="module" src="../../assets/js/common/menu.js"></script>
+    <script type="module" src="../../assets/js/common/userProfile.js"></script>
+    <script type="module" src="../../assets/js/common/menu-auth.js"></script>
+    <script type="module" src="../../assets/js/pages/contact.js"></script>
+  </body>
+</html>

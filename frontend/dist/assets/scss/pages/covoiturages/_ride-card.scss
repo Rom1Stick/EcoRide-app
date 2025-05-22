@@ -1,0 +1,499 @@
+@use '../../abstracts/variables' as *;
+@use '../../abstracts/mixins' as *;
+
+// Styles pour les cartes de covoiturage
+
+.results-page {
+  .results-list {
+    // Nouveau style de carte
+    .ride-card {
+      background-color: $color-surface-alt;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+      display: block;
+      flex-shrink: 0; // Empêche la contraction des cartes
+
+      @include desktop {
+        padding: 1.25rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      // En-tête avec conducteur et prix
+      &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+
+        @include desktop {
+          margin-bottom: 1.25rem;
+        }
+
+        .driver-info {
+          display: flex;
+          align-items: center;
+
+          img {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            object-fit: cover;
+
+            @include desktop {
+              width: 3rem;
+              height: 3rem;
+            }
+          }
+
+          .driver-details {
+            margin-left: 0.5rem;
+
+            @include desktop {
+              margin-left: 0.75rem;
+            }
+
+            .name {
+              font-size: 0.875rem;
+              color: $color-text-primary;
+              display: block;
+
+              @include desktop {
+                font-size: 1.125rem;
+                margin-bottom: 0.25rem;
+              }
+            }
+
+            .rating {
+              display: flex;
+              align-items: center;
+              font-size: 0.75rem;
+              color: $color-accent;
+
+              @include desktop {
+                font-size: 0.875rem;
+              }
+
+              i {
+                margin-right: 0.25rem;
+
+                @include desktop {
+                  font-size: 1rem;
+                }
+              }
+            }
+          }
+        }
+
+        .price {
+          font-size: 1.125rem;
+          font-weight: bold;
+          color: $color-accent;
+
+          @include desktop {
+            font-size: 1.5rem;
+          }
+        }
+      }
+
+      // Itinéraire et horaires
+      &__route {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        color: $color-text-primary;
+
+        @include desktop {
+          font-size: 1.125rem;
+          margin-bottom: 1rem;
+        }
+
+        .route-info {
+          flex: 1;
+          display: flex;
+          align-items: center;
+
+          .from,
+          .to {
+            display: flex;
+            align-items: center;
+
+            i {
+              margin-right: 0.5rem;
+              color: $color-accent;
+            }
+          }
+
+          .route-separator {
+            margin: 0 0.5rem;
+            color: $color-text-secondary;
+          }
+
+          @include desktop {
+            font-weight: 500;
+          }
+        }
+
+        .time-info {
+          color: $color-text-secondary;
+          display: flex;
+          align-items: center;
+
+          i {
+            margin-right: 0.5rem;
+            color: $color-accent;
+          }
+        }
+      }
+
+      // Pied de carte avec informations supplémentaires
+      &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: $color-text-secondary;
+
+        @include desktop {
+          font-size: 0.875rem;
+          padding-top: 0.5rem;
+        }
+
+        .eco-info,
+        .seats-info {
+          display: flex;
+          align-items: center;
+
+          i {
+            margin-right: 0.25rem;
+
+            @include desktop {
+              font-size: 1rem;
+              margin-right: 0.5rem;
+            }
+
+            &.fa-leaf {
+              color: $color-secondary;
+            }
+          }
+        }
+
+        .details-button {
+          color: $color-accent;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+
+          @include desktop {
+            font-size: 1rem;
+            font-weight: 500;
+          }
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      // Badges pour les options
+      .option-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+
+        .badge {
+          font-size: 0.75rem;
+          color: $color-text-primary;
+          background-color: $color-secondary;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          display: flex;
+          align-items: center;
+
+          i {
+            margin-right: 0.25rem;
+            color: $color-accent;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styles pour les cartes de trajet
+.ride-card {
+  background-color: $color-surface-alt;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  @include desktop {
+    flex-direction: row;
+    border-radius: 0.75rem;
+  }
+
+  &__details {
+    padding: 1rem;
+    flex: 1;
+
+    @include desktop {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+    }
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    .departure,
+    .arrival {
+      display: flex;
+      flex-direction: column;
+
+      .time {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: $color-text-primary;
+      }
+
+      .date {
+        font-size: 0.8rem;
+        color: $color-text-secondary;
+      }
+    }
+
+    .route-duration {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      margin: 0 1rem;
+
+      .duration {
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+        color: $color-accent;
+      }
+
+      .route-line {
+        width: 100%;
+        height: 2px;
+        background-color: $color-secondary;
+        position: relative;
+
+        &::before,
+        &::after {
+          content: '';
+          display: block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: $color-accent;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        &::before {
+          left: 0;
+        }
+
+        &::after {
+          right: 0;
+        }
+      }
+    }
+  }
+
+  &__route {
+    margin-bottom: 1rem;
+
+    .route-point {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .point {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: $color-accent;
+        margin-right: 0.75rem;
+      }
+
+      .info {
+        strong {
+          display: block;
+          color: $color-text-primary;
+          font-size: 0.9rem;
+        }
+
+        .time {
+          font-size: 0.8rem;
+          color: $color-text-secondary;
+        }
+      }
+    }
+
+    .route-line {
+      margin-left: 5px;
+      padding-left: 2.5rem;
+      margin-bottom: 0.75rem;
+
+      .line {
+        height: 1.5rem;
+        width: 1px;
+        background-color: $color-secondary;
+        margin-left: -1.8rem;
+      }
+    }
+  }
+
+  &__driver {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    .driver-info {
+      display: flex;
+      align-items: center;
+
+      .avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 0.75rem;
+      }
+
+      .driver-details {
+        .name {
+          display: block;
+          color: $color-text-primary;
+          font-size: 0.9rem;
+          font-weight: bold;
+        }
+
+        .rating {
+          display: flex;
+          align-items: center;
+
+          i {
+            color: $color-accent;
+            font-size: 0.8rem;
+            margin-right: 0.1rem;
+          }
+
+          .count {
+            margin-left: 0.3rem;
+            font-size: 0.75rem;
+            color: $color-text-secondary;
+          }
+        }
+      }
+    }
+
+    .verified-badge {
+      display: flex;
+      align-items: center;
+      font-size: 0.75rem;
+      color: $color-accent;
+
+      i {
+        margin-right: 0.3rem;
+      }
+    }
+  }
+
+  &__amenities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .amenity {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      background-color: $color-secondary;
+      border-radius: 0.5rem;
+      color: $color-text-primary;
+      display: flex;
+      align-items: center;
+
+      i {
+        margin-right: 0.3rem;
+        color: $color-accent;
+      }
+    }
+  }
+
+  &__action {
+    padding: 1rem;
+    background-color: rgba($color-secondary, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    @include desktop {
+      padding: 1.25rem;
+      flex-direction: column;
+      justify-content: center;
+      width: 180px;
+      align-items: flex-start;
+    }
+
+    .price {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: $color-text-primary;
+    }
+
+    .book-btn {
+      background-color: $color-accent;
+      color: $color-primary-bg;
+      font-weight: bold;
+      padding: 0.6rem 1.25rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: $color-primary-bg;
+      }
+    }
+
+    .seats {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+      color: $color-text-secondary;
+
+      i {
+        margin-right: 0.5rem;
+      }
+
+      @include desktop {
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}
