@@ -44,6 +44,10 @@ echo "Activation du module mpm_prefork uniquement..."
 ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/
 ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/
 
+# Activer les modules nécessaires pour les types MIME
+echo "Activation des modules nécessaires pour le traitement des fichiers statiques..."
+a2enmod mime headers
+
 # Vérifier les modules chargés
 echo "Modules Apache après reconfiguration :"
 ls -la /etc/apache2/mods-enabled/mpm_*
@@ -54,6 +58,27 @@ cat > /var/www/html/backend/public/.htaccess << 'EOF'
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
+
+    # Définir les types MIME corrects
+    <IfModule mod_mime.c>
+        AddType text/css .css
+        AddType application/javascript .js
+        AddType image/svg+xml .svg
+        AddType image/png .png
+        AddType image/jpeg .jpg .jpeg
+        AddType image/gif .gif
+    </IfModule>
+
+    # Activer CORS pour les ressources statiques
+    <IfModule mod_headers.c>
+        <FilesMatch "\.(css|js|svg|jpg|jpeg|png|gif)$">
+            Header set Access-Control-Allow-Origin "*"
+        </FilesMatch>
+    </IfModule>
+
+    # Rediriger les assets vers le bon dossier
+    RewriteCond %{REQUEST_URI} ^/assets/(.*)$
+    RewriteRule ^assets/(.*)$ /frontend/assets/$1 [L]
 
     # Servir les fichiers statiques directement s'ils existent
     RewriteCond %{REQUEST_FILENAME} -f
@@ -83,8 +108,13 @@ EOF
 echo "Création du lien symbolique pour les assets frontend..."
 ln -sf /var/www/html/frontend /var/www/html/backend/public/frontend
 
+# Créer le répertoire pour les assets si nécessaire
+echo "Création du répertoire pour les assets..."
+mkdir -p /var/www/html/backend/public/assets
+ln -sf /var/www/html/frontend/assets /var/www/html/backend/public/assets
+
 # Afficher le contenu du répertoire public
-echo "Contenu du répertoire public après création du lien symbolique :"
+echo "Contenu du répertoire public après création des liens symboliques :"
 ls -la /var/www/html/backend/public
 
 # Afficher la structure du dossier frontend/pages
@@ -95,6 +125,12 @@ ls -la /var/www/html/frontend/pages/public
 # Copier les fichiers index.html et autres HTML du frontend vers le dossier public
 echo "Copie des fichiers HTML du frontend/pages/public vers le dossier public..."
 cp -f /var/www/html/frontend/pages/public/index.html /var/www/html/backend/public/index.html 2>/dev/null || echo "index.html non trouvé"
+
+# Vérifier la structure des assets
+echo "Structure des assets:"
+ls -la /var/www/html/frontend/assets || echo "Dossier assets non trouvé"
+ls -la /var/www/html/frontend/assets/styles || echo "Dossier styles non trouvé"
+ls -la /var/www/html/frontend/assets/js || echo "Dossier js non trouvé"
 
 # Créer un fichier index.php de redirection si besoin
 echo "Création d'un fichier index.php de redirection..."
