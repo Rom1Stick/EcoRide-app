@@ -1,1 +1,1 @@
-web: bin/start-nginx 
+web: npx serve -p $PORT frontend 
