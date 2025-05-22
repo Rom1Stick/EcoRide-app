@@ -46,8 +46,8 @@ RUN npm install --production=false
 # Copie du code source frontend
 COPY --link frontend ./
 
-# Build du frontend
-RUN npm run build
+# Build du frontend (utiliser le script disponible)
+RUN npm run build:scss
 
 # Stage de build pour le backend
 FROM base as backend-build
@@ -82,7 +82,7 @@ RUN npm install -g serve
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Script pour configurer le backend sur Heroku
+# Script pour configurer le backend et démarrer le serveur
 RUN echo '#!/bin/bash\n\
 setup_backend_env() {\n\
   # Création du fichier .env pour PHP\n\
@@ -127,7 +127,6 @@ EOL\n\
   chmod -R 755 /var/www/html/backend/storage\n\
 }\n\
 \n\
-# Création d'un script pour démarrer le serveur\n\
 if [ "$SERVE_FRONTEND_ONLY" = "true" ]; then\n\
   serve -c /var/www/html/serve.json -l $PORT\n\
 else\n\
