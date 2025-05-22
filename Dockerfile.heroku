@@ -6,8 +6,15 @@ RUN mkdir -p /usr/share/nginx/html
 # Copier le fichier index.html directement à la racine
 COPY frontend/pages/public/index.html /usr/share/nginx/html/index.html
 
+# Copier les autres pages html
+COPY frontend/pages/public/*.html /usr/share/nginx/html/
+
 # Copier les fichiers d'assets
 COPY frontend/assets /usr/share/nginx/html/assets
+
+# Corriger les chemins relatifs dans tous les fichiers HTML
+RUN sed -i 's|../../assets|/assets|g' /usr/share/nginx/html/*.html && \
+    sed -i 's|"./|"/|g' /usr/share/nginx/html/*.html
 
 # Script pour configurer et démarrer Nginx
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
@@ -19,16 +26,16 @@ RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
     root /usr/share/nginx/html; \
     index index.html; \
     \
-    location = / { \
-        try_files /index.html =404; \
+    # Configuration pour gérer les SPA \
+    location / { \
+        try_files $uri $uri.html $uri/ /index.html; \
     } \
     \
+    # Configuration pour servir les assets statiques \
     location /assets/ { \
         alias /usr/share/nginx/html/assets/; \
-    } \
-    \
-    location / { \
-        try_files \$uri \$uri/ /index.html; \
+        expires 1d; \
+        add_header Cache-Control "public"; \
     } \
 }" > /etc/nginx/conf.d/default.conf' >> /docker-entrypoint.sh && \
     echo 'echo "Configuration Nginx :"' >> /docker-entrypoint.sh && \
