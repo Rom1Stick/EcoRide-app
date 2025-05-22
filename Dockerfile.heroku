@@ -3,11 +3,22 @@ FROM nginx:alpine
 # Copier les fichiers frontend dans le répertoire de service Nginx
 COPY frontend/dist /usr/share/nginx/html
 
-# Script d'entrée pour utiliser le PORT dynamique attribué par Heroku
+# Créer un template de configuration Nginx qui utilise $PORT
+RUN echo 'server { \
+    listen ${PORT}; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html; \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf.template
+
+# Script d'entrée pour remplacer $PORT par sa valeur
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
     echo 'set -e' >> /docker-entrypoint.sh && \
-    echo 'echo "server { listen \$PORT; location / { root /usr/share/nginx/html; index index.html; try_files \$uri \$uri/ /index.html; } }" > /etc/nginx/conf.d/default.conf' >> /docker-entrypoint.sh && \
-    echo 'nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
+    echo 'export PORT="${PORT:-8080}"' >> /docker-entrypoint.sh && \
+    echo 'envsubst < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf' >> /docker-entrypoint.sh && \
+    echo 'exec nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
     chmod +x /docker-entrypoint.sh
 
 # Commande pour démarrer l'application
