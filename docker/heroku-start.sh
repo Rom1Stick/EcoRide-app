@@ -1,9 +1,20 @@
 #!/bin/bash
 set -e
 
-# Afficher les modules Apache chargés pour le débogage
-echo "Modules Apache chargés avant désactivation :"
-apache2ctl -M | grep mpm || true
+# Désactiver tous les MPM sauf prefork
+a2dismod mpm_event mpm_worker
+a2enmod mpm_prefork
+
+# Configuration des variables d'environnement
+export APACHE_RUN_USER=www-data
+export APACHE_RUN_GROUP=www-data
+export APACHE_PID_FILE=/var/run/apache2/apache2.pid
+export APACHE_RUN_DIR=/var/run/apache2
+export APACHE_LOCK_DIR=/var/lock/apache2
+export APACHE_LOG_DIR=/var/log/apache2
+
+# Créer les répertoires nécessaires
+mkdir -p $APACHE_RUN_DIR $APACHE_LOCK_DIR $APACHE_LOG_DIR
 
 # Récupérer les variables d'environnement de Heroku et configurer le fichier .env
 if [ -n "$DATABASE_URL" ]; then
@@ -35,7 +46,6 @@ if [ -n "$APP_DEBUG" ]; then
 fi
 
 # Créer un fichier .htaccess pour le routage frontend/backend
-echo "Création du fichier .htaccess pour le routage..."
 cat > /var/www/html/backend/public/.htaccess <<EOL
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -55,46 +65,8 @@ cat > /var/www/html/backend/public/.htaccess <<EOL
 </IfModule>
 EOL
 
-# Créer un lien symbolique pour les assets frontend dans le dossier public et vérifier qu'il a été créé
-echo "Création du lien symbolique pour les assets frontend..."
+# Créer un lien symbolique pour les assets frontend dans le dossier public
 ln -sf /var/www/html/frontend /var/www/html/backend/public/frontend
 
-# Vérifier si le lien symbolique a été créé et afficher le contenu du répertoire public
-echo "Contenu du répertoire public après création du lien symbolique :"
-ls -la /var/www/html/backend/public/
-
-# Vérifier si le contenu du frontend est accessible
-echo "Contenu du répertoire frontend :"
-ls -la /var/www/html/frontend/
-
-# Créer un lien symbolique pour index.html et les autres fichiers HTML à la racine du répertoire public
-echo "Copie des fichiers HTML du frontend vers le dossier public..."
-cp /var/www/html/frontend/*.html /var/www/html/backend/public/
-
-# Vérifier si les fichiers HTML ont été copiés
-echo "Contenu du répertoire public après copie des fichiers HTML :"
-ls -la /var/www/html/backend/public/
-
-# Correction du problème MPM d'Apache
-echo "Désactivation des modules MPM en conflit..."
-# Désactiver tous les modules MPM possibles
-a2dismod mpm_event || true
-a2dismod mpm_worker || true
-a2dismod mpm_prefork || true
-a2dismod mpm_itk || true
-
-# Ensuite activer seulement mpm_prefork
-echo "Activation du module mpm_prefork uniquement..."
-a2enmod mpm_prefork
-
-# Activer le module rewrite pour le .htaccess
-echo "Activation du module rewrite..."
-a2enmod rewrite
-
-# Vérifier que seul mpm_prefork est activé
-echo "Modules Apache chargés après reconfiguration :"
-apache2ctl -M | grep mpm || true
-
-# Démarrer Apache en avant-plan
-echo "Démarrage d'Apache..."
-apache2-foreground 
+# Démarrer Apache en premier plan
+exec apache2 -DFOREGROUND 
