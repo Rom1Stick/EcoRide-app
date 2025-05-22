@@ -1,0 +1,43 @@
+{
+  "headers": [
+    {
+      "source": "**/*.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
+    },
+    {
+      "source": "**/*.css",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css"
+        }
+      ]
+    },
+    {
+      "source": "**/*.svg",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "public": "frontend",
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/pages/public/index.html"
+    },
+    {
+      "source": "**",
+      "destination": "/pages/public/index.html"
+    }
+  ],
+  "cleanUrls": true
+} 
