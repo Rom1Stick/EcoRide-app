@@ -1,5 +1,10 @@
 build:
   docker:
     web: Dockerfile
+
 run:
-  web: /usr/local/bin/start-server.sh 
+  web: /usr/local/bin/start-server.sh
+
+setup:
+  config:
+    SERVE_FRONTEND_ONLY: "true" 

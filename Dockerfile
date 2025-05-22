@@ -138,7 +138,9 @@ setup_apache_port() {\n\
 }\n\
 \n\
 if [ "$SERVE_FRONTEND_ONLY" = "true" ]; then\n\
-  serve -c /var/www/html/serve.json -l $PORT\n\
+  # Servir uniquement le frontend avec serve en pointant vers le bon répertoire\n\
+  cd /var/www/html/frontend\n\
+  serve -s pages/public -l $PORT\n\
 else\n\
   # Configurer le backend avant de démarrer Apache\n\
   setup_backend_env\n\
