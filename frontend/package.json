@@ -9,6 +9,8 @@
     "build:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --style=compressed --no-source-map",
     "create-dist": "mkdir -p dist",
     "copy-files": "xcopy /E /I /Y pages\\public\\* dist\\ && xcopy /E /I /Y assets dist\\assets\\",
+    "copy-files:linux": "cp -r pages/public/* dist/ && cp -r assets dist/",
+    "build:heroku": "npm run build:scss && npm run create-dist && npm run copy-files:linux",
     "watch:scss": "sass assets/scss/main.scss:assets/styles/main.min.css --watch --style=compressed --no-source-map",
     "lint": "eslint assets/js/**/*.js",
     "format": "prettier --write 'assets/js/**/*.js' 'assets/scss/**/*.scss' '**/*.html'"
