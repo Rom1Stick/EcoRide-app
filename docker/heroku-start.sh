@@ -174,6 +174,13 @@ try {
 }
 "
 
+# Lister les répertoires et fichiers pour comprendre la structure
+echo "Structure des répertoires:"
+ls -la /var/www/html
+ls -la /var/www/html/frontend
+ls -la /var/www/html/frontend/pages || echo "Le répertoire frontend/pages n'existe pas"
+ls -la /var/www/html/frontend/pages/public || echo "Le répertoire frontend/pages/public n'existe pas"
+
 # Créer le lien symbolique pour les assets frontend
 echo "Création du lien symbolique pour les assets frontend..."
 ln -sf /var/www/html/frontend /var/www/html/backend/public/frontend
@@ -183,18 +190,65 @@ echo "Création du répertoire pour les assets..."
 mkdir -p /var/www/html/backend/public/assets
 ln -sf /var/www/html/frontend/assets /var/www/html/backend/public/assets
 
-# Afficher le contenu du répertoire public
-echo "Contenu du répertoire public après création des liens symboliques :"
-ls -la /var/www/html/backend/public
+# Vérifier si le répertoire frontend/pages/public existe et contient des fichiers HTML
+if [ -d "/var/www/html/frontend/pages/public" ]; then
+  echo "Copie des fichiers HTML du répertoire frontend/pages/public vers le dossier public..."
+  find /var/www/html/frontend/pages/public -name "*.html" -exec cp -f {} /var/www/html/backend/public/ \; 2>/dev/null || echo "Aucun fichier HTML trouvé dans frontend/pages/public"
+else
+  echo "Le répertoire frontend/pages/public n'existe pas"
+fi
 
-# Afficher la structure du dossier frontend/pages
-echo "Structure du dossier frontend/pages :"
-ls -la /var/www/html/frontend/pages
-ls -la /var/www/html/frontend/pages/public
-
-# Copier les fichiers index.html et autres HTML du frontend vers le dossier public
-echo "Copie des fichiers HTML du frontend/pages/public vers le dossier public..."
-cp -f /var/www/html/frontend/pages/public/index.html /var/www/html/backend/public/index.html 2>/dev/null || echo "index.html non trouvé"
+# Si nous n'avons pas de fichier index.html, créons-en un de base
+if [ ! -f "/var/www/html/backend/public/index.html" ]; then
+  echo "Création d'un fichier index.html de base..."
+  cat > /var/www/html/backend/public/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRide - Location de véhicules écologiques</title>
+    <link rel="stylesheet" href="/assets/styles/main.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>EcoRide</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Accueil</a></li>
+                    <li><a href="/vehicles.html">Véhicules</a></li>
+                    <li><a href="/login.html">Connexion</a></li>
+                    <li><a href="/register.html">Inscription</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Déplacez-vous de façon écologique</h1>
+                <p>Louez un véhicule électrique pour vos déplacements quotidiens ou occasionnels</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 EcoRide - Tous droits réservés</p>
+        </div>
+    </footer>
+    <script src="/assets/js/common/api.js"></script>
+    <script src="/assets/js/common/menu.js"></script>
+    <script src="/assets/js/common/auth.js"></script>
+    <script src="/assets/js/common/menu-auth.js"></script>
+    <script src="/assets/js/common/userProfile.js"></script>
+    <script src="/assets/js/pages/index.js"></script>
+</body>
+</html>
+EOF
+fi
 
 # Vérifier la structure des assets
 echo "Structure des assets:"
