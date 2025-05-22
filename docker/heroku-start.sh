@@ -1,12 +1,17 @@
 #!/bin/bash
 set -e
 
+# Afficher le contenu initial du fichier .env
+echo "Contenu du fichier .env avant modifications :"
+cat /var/www/html/backend/.env
+
 # Récupérer les variables d'environnement de Heroku et configurer le fichier .env
 if [ -n "$JAWSDB_URL" ]; then
   # Format de JAWSDB_URL: mysql://username:password@hostname:port/database_name
   echo "Configuration de la base de données à partir de JAWSDB_URL"
   regex="^mysql://([^:]+):([^@]+)@([^:]+):([0-9]+)/(.+)$"
   if [[ $JAWSDB_URL =~ $regex ]]; then
+    echo "Correspondance trouvée pour JAWSDB_URL, mise à jour des paramètres DB_*"
     sed -i "s|DB_CONNECTION=.*|DB_CONNECTION=mysql|" /var/www/html/backend/.env
     sed -i "s|DB_HOST=.*|DB_HOST=${BASH_REMATCH[3]}|" /var/www/html/backend/.env
     sed -i "s|DB_PORT=.*|DB_PORT=${BASH_REMATCH[4]}|" /var/www/html/backend/.env
@@ -14,6 +19,8 @@ if [ -n "$JAWSDB_URL" ]; then
     sed -i "s|DB_USERNAME=.*|DB_USERNAME=${BASH_REMATCH[1]}|" /var/www/html/backend/.env
     sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${BASH_REMATCH[2]}|" /var/www/html/backend/.env
     echo "Base de données MySQL configurée avec succès à partir de JAWSDB_URL"
+  else
+    echo "AVERTISSEMENT: JAWSDB_URL ne correspond pas au format attendu: $JAWSDB_URL"
   fi
 elif [ -n "$DATABASE_URL" ]; then
   # Format de DATABASE_URL: mysql://username:password@hostname:port/database_name
@@ -28,6 +35,10 @@ elif [ -n "$DATABASE_URL" ]; then
     sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${BASH_REMATCH[2]}|" /var/www/html/backend/.env
   fi
 fi
+
+# Afficher le contenu du fichier .env après modifications
+echo "Contenu du fichier .env après modifications :"
+cat /var/www/html/backend/.env
 
 # Configuration de JWT_SECRET s'il est fourni
 if [ -n "$JWT_SECRET" ]; then
@@ -121,6 +132,47 @@ cat > /var/www/html/backend/public/.htaccess << 'EOF'
     RewriteRule ^ index.php [QSA,L]
 </IfModule>
 EOF
+
+# Vérification de la base de données et du fichier .env
+echo "Vérification de l'accès à la base de données..."
+cd /var/www/html/backend
+php -r "
+\$host = getenv('DB_HOST') ?: 'localhost';
+\$port = getenv('DB_PORT') ?: '3306';
+\$database = getenv('DB_DATABASE') ?: 'ecoride';
+\$username = getenv('DB_USERNAME') ?: 'root';
+\$password = getenv('DB_PASSWORD') ?: '';
+
+echo \"Trying to connect to MySQL: host=\$host, port=\$port, db=\$database, user=\$username\\n\";
+
+\$dsn = \"mysql:host=\$host;port=\$port;dbname=\$database\";
+try {
+    \$pdo = new PDO(\$dsn, \$username, \$password);
+    echo \"Connexion à la base de données réussie!\\n\";
+    
+    // Vérifier si les tables existent
+    \$tables = \$pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    echo \"Tables trouvées: \" . implode(', ', \$tables) . \"\\n\";
+    
+    // Vérifier si la table users existe
+    \$userTableExists = in_array('users', \$tables);
+    if (!\$userTableExists) {
+        echo \"La table 'users' n'existe pas. Création...\\n\";
+        \$sql = 'CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )';
+        \$pdo->exec(\$sql);
+        echo \"Table 'users' créée avec succès!\\n\";
+    }
+} catch (PDOException \$e) {
+    echo \"Erreur de connexion à la base de données: \" . \$e->getMessage() . \"\\n\";
+}
+"
 
 # Créer le lien symbolique pour les assets frontend
 echo "Création du lien symbolique pour les assets frontend..."
