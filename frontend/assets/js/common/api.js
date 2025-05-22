@@ -1,5 +1,7 @@
+import { API_BASE_URL, ENABLE_LOGS } from './config.js';
+
 export async function registerUser({ name, email, password }) {
-  const response = await fetch('/api/auth/register', {
+  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -22,7 +24,7 @@ export async function getUserInfo() {
 
   try {
     const headers = { Authorization: `Bearer ${storedToken}` };
-    const response = await fetch('/api/users/me', {
+    const response = await fetch(`${API_BASE_URL}/api/users/me`, {
       method: 'GET',
       credentials: 'include',
       headers,
@@ -131,6 +133,9 @@ export class API {
    */
   static async request(url, method, data = null, customHeaders = null) {
     try {
+      // S'assurer que l'URL commence par la base de l'API si ce n'est pas une URL complète
+      const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+      
       const headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -159,7 +164,12 @@ export class API {
         options.body = JSON.stringify(data);
       }
 
-      const response = await fetch(url, options);
+      // Journalisation en développement
+      if (ENABLE_LOGS) {
+        console.log(`📡 API ${method} ${fullUrl}`, { options });
+      }
+
+      const response = await fetch(fullUrl, options);
       
       // Vérifier si la réponse est vide ou non-JSON
       const contentType = response.headers.get('content-type');
@@ -176,9 +186,17 @@ export class API {
       
       // Pour les réponses JSON valides
       const result = await response.json();
+      
+      // Journalisation en développement
+      if (ENABLE_LOGS) {
+        console.log(`✅ API ${method} ${fullUrl} response:`, result);
+      }
+      
       return result;
     } catch (error) {
-      console.error(`Erreur lors de la requête ${method} vers ${url}:`, error);
+      if (ENABLE_LOGS) {
+        console.error(`❌ Erreur lors de la requête ${method} vers ${url}:`, error);
+      }
       return {
         error: true,
         message: error.message || 'Erreur de connexion au serveur',

@@ -1,3 +1,5 @@
+import { API_BASE_URL, ENABLE_LOGS } from './config.js';
+
 export async function initAuthUI() {
   // Ne pas interroger l'API si pas de token JWT en localStorage
   const storedToken = localStorage.getItem('auth_token');
@@ -7,7 +9,7 @@ export async function initAuthUI() {
   try {
     // Préparer l'en-tête Authorization
     const headers = { Authorization: `Bearer ${storedToken}` };
-    const response = await fetch('/api/users/me', {
+    const response = await fetch(`${API_BASE_URL}/api/users/me`, {
       method: 'GET',
       credentials: 'include',
       headers,
@@ -15,13 +17,13 @@ export async function initAuthUI() {
     // Redirection si pas authentifié
     if (response.status === 401) {
       localStorage.removeItem('auth_token');
-      window.location.href = '/pages/public/login.html';
+      window.location.href = '/login';
       return false;
     }
     const result = await response.json();
     if (!response.ok || result.error || !result.data) {
       localStorage.removeItem('auth_token');
-      window.location.href = '/pages/public/login.html';
+      window.location.href = '/login';
       return false;
     }
 
@@ -40,9 +42,11 @@ export async function initAuthUI() {
       navLogout.style.display = '';
     }
   } catch (err) {
-    console.warn('User not authenticated', err);
+    if (ENABLE_LOGS) {
+      console.warn('User not authenticated', err);
+    }
     localStorage.removeItem('auth_token');
-    window.location.href = '/pages/public/login.html';
+    window.location.href = '/login';
     return false;
   }
 
@@ -50,7 +54,7 @@ export async function initAuthUI() {
   const btn = document.getElementById('logout-btn');
   if (btn) {
     btn.addEventListener('click', async () => {
-      await fetch('/api/auth/logout', {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -84,7 +88,7 @@ export class Auth {
    */
   static async login(credentials) {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +109,9 @@ export class Auth {
 
       return result.data;
     } catch (error) {
-      console.error('Erreur de connexion:', error);
+      if (ENABLE_LOGS) {
+        console.error('Erreur de connexion:', error);
+      }
       throw error;
     }
   }
@@ -115,7 +121,7 @@ export class Auth {
    */
   static async logout() {
     try {
-      await fetch('/api/auth/logout', {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -123,7 +129,9 @@ export class Auth {
         },
       });
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      if (ENABLE_LOGS) {
+        console.error('Erreur lors de la déconnexion:', error);
+      }
     } finally {
       localStorage.removeItem('auth_token');
     }
@@ -139,7 +147,7 @@ export class Auth {
     }
 
     try {
-      const response = await fetch('/api/users/me', {
+      const response = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -157,7 +165,9 @@ export class Auth {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des informations utilisateur:', error);
+      if (ENABLE_LOGS) {
+        console.error('Erreur lors de la récupération des informations utilisateur:', error);
+      }
       return null;
     }
   }

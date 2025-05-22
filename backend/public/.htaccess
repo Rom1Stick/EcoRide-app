@@ -2,34 +2,67 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
+    # Rediriger vers HTTPS si nécessaire (pour Heroku)
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    
     # Permettre l'accès direct à la documentation API
     RewriteRule ^docs/api/openapi.yaml$ ../docs/api/openapi.yaml [L]
     
-    # Rediriger toutes les requêtes vers index.php
+    # Traiter toutes les requêtes /api/* via index.php
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    RewriteRule ^ index.php [QSA,L]
+    
+    # Vérifier si la requête correspond à un fichier statique frontend
+    RewriteCond %{DOCUMENT_ROOT}/frontend/pages/public%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ /frontend/pages/public/$1 [L]
+    
+    # Vérifier si la requête correspond à des assets frontend
+    RewriteCond %{REQUEST_URI} ^/assets/
+    RewriteRule ^assets/(.*)$ /frontend/assets/$1 [L]
+    
+    # Routes spécifiques pour les pages HTML
+    RewriteRule ^$ /frontend/pages/public/index.html [L]
+    RewriteRule ^login$ /frontend/pages/public/login.html [L]
+    RewriteRule ^register$ /frontend/pages/public/register.html [L]
+    RewriteRule ^profil$ /frontend/pages/public/profil.html [L]
+    RewriteRule ^covoiturages$ /frontend/pages/public/covoiturages.html [L]
+    RewriteRule ^contact$ /frontend/pages/public/contact.html [L]
+    RewriteRule ^admin$ /frontend/pages/admin/index.html [L]
+    
+    # Pour toute autre requête, vérifier si c'est un fichier ou répertoire existant
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Si ce n'est pas un fichier frontend et pas un répertoire, essayer index.php
     RewriteRule ^ index.php [QSA,L]
 </IfModule>
 
 # Configuration de sécurité
 <IfModule mod_headers.c>
-    # Désactiver l'indexation par les moteurs de recherche en environnement de développement
-    <If "env('APP_ENV') == 'development'">
-        Header set X-Robots-Tag "noindex, nofollow"
-    </If>
-    
     # Désactiver la mise en cache pour l'API
     <FilesMatch "index\.php">
         Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
         Header set Pragma "no-cache"
         Header set Expires "0"
     </FilesMatch>
+    
+    # CORS pour les requêtes API
+    <FilesMatch "index\.php">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    </FilesMatch>
+    
+    # Gérer les requêtes OPTIONS préliminaires pour CORS
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
 </IfModule>
 
 # Limiter la taille des requêtes et configurer la durée de vie des sessions
 <IfModule mod_php.c>
     php_flag session.cookie_httponly on
-    php_flag session.cookie_secure on
     php_flag session.use_only_cookies on
     php_value session.cookie_lifetime 3600
     php_value session.gc_maxlifetime 3600

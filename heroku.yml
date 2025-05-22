@@ -1,0 +1,10 @@
+build:
+  docker:
+    web: Dockerfile
+run:
+  web: /usr/local/bin/heroku-start.sh
+
+setup:
+  addons:
+    - plan: jawsdb-maria:kitefin
+      as: DATABASE 

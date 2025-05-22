@@ -1,22 +1,23 @@
 # syntax = docker/dockerfile:1
 
-# Image de base pour PHP et Apache
+# Base PHP-Apache avec Node.js
 FROM php:8.2-apache as base
 
-LABEL maintainer="Équipe EcoRide"
-
-# Installation des dépendances système
+# Installation de Node.js
 RUN apt-get update && apt-get install -y \
-    git \
     curl \
+    git \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
     zip \
     unzip \
     libssl-dev \
-    nodejs \
-    npm
+    gnupg
+
+# Installer Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
 
 # Activer le module rewrite pour .htaccess
 RUN a2enmod rewrite
@@ -30,132 +31,67 @@ RUN pecl install mongodb && docker-php-ext-enable mongodb
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Définition des variables d'environnement
+# Configuration de l'environnement
 ENV NODE_ENV=production
 ENV PORT=8080
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/backend/public
 
-# Stage de build pour le frontend
-FROM base as frontend-build
+# Configuration d'Apache pour servir depuis le bon répertoire
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-WORKDIR /app/frontend
-
-# Copie des fichiers package.json et installation des dépendances
-COPY --link frontend/package.json frontend/package-lock.json ./
-RUN npm install --production=false
-
-# Copie du code source frontend
-COPY --link frontend ./
-
-# Build du frontend (utiliser le script disponible)
-RUN npm run build:scss
-
-# Stage de build pour le backend
-FROM base as backend-build
-
-WORKDIR /app/backend
-
-# Copie des fichiers composer.json et installation des dépendances
-COPY --link backend/composer.json backend/composer.lock ./
-RUN composer install --no-dev --optimize-autoloader
-
-# Copie du code source backend
-COPY --link backend ./
-
-# Image finale
-FROM base
-
-# Configuration d'Apache pour servir à la fois le frontend et l'API
-COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf
-
-# Copie du frontend depuis l'étape de build
-COPY --from=frontend-build /app/frontend /var/www/html/frontend
-
-# Copie du backend depuis l'étape de build
-COPY --from=backend-build /app/backend /var/www/html/backend
-
-# Création du répertoire de stockage pour le backend
-RUN mkdir -p /var/www/html/backend/storage/logs \
-    && chmod -R 777 /var/www/html/backend/storage
-
-# Copie du fichier serve.json pour la configuration
-COPY serve.json /var/www/html/
-
-# Installation de serve pour le frontend
-RUN npm install -g serve
-
-# Définir le répertoire de travail
+# Configuration du répertoire de travail
 WORKDIR /var/www/html
 
-# Script pour configurer le backend et démarrer le serveur
-RUN echo '#!/bin/bash\n\
-setup_backend_env() {\n\
-  # Création du fichier .env pour PHP\n\
-  cat > /var/www/html/backend/.env << EOL\n\
-APP_ENV=production\n\
-APP_DEBUG=false\n\
-APP_TIMEZONE=Europe/Paris\n\
-\n\
-# Configuration de la base de données\n\
-DB_CONNECTION=mysql\n\
-\n\
-# Utilisation de DATABASE_URL si fourni par Heroku\n\
-if [ -n "$DATABASE_URL" ]; then\n\
-  # Extraction des informations de DATABASE_URL\n\
-  DB_HOST=$(echo $DATABASE_URL | sed -e "s/.*@\\(.*\\):\\(.*\\)\\/.*/\\1/")\n\
-  DB_PORT=$(echo $DATABASE_URL | sed -e "s/.*@.*:\\(.*\\)\\/.*/\\1/")\n\
-  DB_DATABASE=$(echo $DATABASE_URL | sed -e "s/.*\\/\\(.*\\).*/\\1/")\n\
-  DB_USERNAME=$(echo $DATABASE_URL | sed -e "s/.*:\\/\\/\\(.*\\):.*/\\1/")\n\
-  DB_PASSWORD=$(echo $DATABASE_URL | sed -e "s/.*:\\/\\/.*:\\(.*\\)@.*/\\1/")\n\
-fi\n\
-\n\
-# Configuration JWT\n\
-JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc "a-zA-Z0-9" | fold -w 32 | head -n 1)}\n\
-JWT_EXPIRATION=3600\n\
-\n\
-# Configuration MongoDB si MONGODB_URI est fourni\n\
-if [ -n "$MONGODB_URI" ]; then\n\
-  MONGO_CONNECTION=mongodb\n\
-  MONGO_HOST=$(echo $MONGODB_URI | sed -e "s/.*@\\(.*\\):\\(.*\\)\\/.*/\\1/")\n\
-  MONGO_PORT=$(echo $MONGODB_URI | sed -e "s/.*@.*:\\(.*\\)\\/.*/\\1/")\n\
-  MONGO_DATABASE=$(echo $MONGODB_URI | sed -e "s/.*\\/\\(.*\\).*/\\1/")\n\
-  MONGO_USERNAME=$(echo $MONGODB_URI | sed -e "s/.*:\\/\\/\\(.*\\):.*/\\1/")\n\
-  MONGO_PASSWORD=$(echo $MONGODB_URI | sed -e "s/.*:\\/\\/.*:\\(.*\\)@.*/\\1/")\n\
-fi\n\
-\n\
-# Configuration API\n\
-API_BASE_URL=${APP_URL:-https://ecoride-application.herokuapp.com}/api\n\
-EOL\n\
-\n\
-  # Définir les permissions - sans chown qui pose problème\n\
-  chmod -R 755 /var/www/html/backend\n\
-}\n\
-\n\
-# Configurer Apache pour utiliser le port fourni par Heroku\n\
-setup_apache_port() {\n\
-  # Remplacer la configuration du port dans les fichiers Apache\n\
-  sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf\n\
-  sed -i "s/VirtualHost \\*:80/VirtualHost \\*:${PORT}/g" /etc/apache2/sites-available/000-default.conf\n\
-}\n\
-\n\
-if [ "$SERVE_FRONTEND_ONLY" = "true" ]; then\n\
-  # Servir uniquement le frontend avec serve en pointant vers le bon répertoire\n\
-  cd /var/www/html/frontend\n\
-  serve -s pages/public -l $PORT\n\
-else\n\
-  # Configurer le backend avant de démarrer Apache\n\
-  setup_backend_env\n\
-  # Configurer le port Apache\n\
-  setup_apache_port\n\
-  # S\'assurer qu\'un seul MPM est chargé\n\
-  a2dismod mpm_event\n\
-  a2enmod mpm_prefork\n\
-  # Démarrer Apache en mode foreground\n\
-  apache2-foreground\n\
-fi' > /usr/local/bin/start-server.sh && \
-chmod +x /usr/local/bin/start-server.sh
+# Étape de build
+FROM base as build
+
+# Copier le code source
+COPY . .
+
+# Installer les dépendances frontend et builder
+WORKDIR /var/www/html
+RUN npm install --production=false
+RUN npm run build
+
+# Installer les dépendances backend
+WORKDIR /var/www/html/backend
+RUN composer install --no-dev --optimize-autoloader
+
+# Configuration pour la production
+RUN { \
+    echo 'APP_ENV=production'; \
+    echo 'APP_DEBUG=false'; \
+    echo 'APP_TIMEZONE=Europe/Paris'; \
+    echo 'JWT_SECRET='${JWT_SECRET:-changeme_in_production}; \
+    echo 'JWT_EXPIRATION=3600'; \
+    echo 'DB_CONNECTION='${DB_CONNECTION:-mysql}; \
+    echo 'DB_HOST='${DB_HOST:-localhost}; \
+    echo 'DB_PORT='${DB_PORT:-3306}; \
+    echo 'DB_DATABASE='${DB_DATABASE:-ecoride}; \
+    echo 'DB_USERNAME='${DB_USERNAME:-root}; \
+    echo 'DB_PASSWORD='${DB_PASSWORD:-}; \
+} > .env
+
+# Étape finale
+FROM base
+
+# Copier les fichiers nécessaires
+COPY --from=build /var/www/html /var/www/html
+
+# Configuration du serveur pour Heroku
+RUN echo "Listen \${PORT}" > /etc/apache2/ports.conf
+RUN sed -i "s/80/\${PORT}/g" /etc/apache2/sites-available/000-default.conf
+
+# Définir les permissions
+RUN chown -R www-data:www-data /var/www/html
 
 # Exposer le port
 EXPOSE $PORT
 
+# Script de démarrage pour configurer et démarrer Apache
+COPY ./docker/heroku-start.sh /usr/local/bin/heroku-start.sh
+RUN chmod +x /usr/local/bin/heroku-start.sh
+
 # Commande de démarrage
-CMD ["/usr/local/bin/start-server.sh"]
+CMD ["/usr/local/bin/heroku-start.sh"]
