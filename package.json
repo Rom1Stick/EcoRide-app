@@ -9,6 +9,7 @@
     "serve": "^14.2.1"
   },
   "scripts": {
-    "start": "serve -p $PORT frontend"
+    "start": "serve -p $PORT frontend",
+    "build": "echo 'Skipping build step'"
   }
 }
