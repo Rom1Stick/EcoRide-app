@@ -5,12 +5,15 @@ ARG NODE_VERSION=20.18.0
 FROM node:${NODE_VERSION}-slim as base
 
 LABEL fly_launch_runtime="NodeJS"
+LABEL maintainer="Équipe EcoRide"
 
 # NodeJS app lives here
 WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV=production
+# Heroku will set PORT environment variable
+ENV PORT=8080
 
 
 # Throw-away build stage to reduce size of final image
@@ -21,7 +24,7 @@ RUN apt-get update -qq && \
     apt-get install -y python-is-python3 pkg-config build-essential 
 
 # Install node modules
-COPY --link package.json package-lock.json .
+COPY --link package.json package-lock.json ./
 RUN npm install --production=false
 
 # Copy application code
@@ -39,6 +42,9 @@ FROM base
 
 # Copy built application
 COPY --from=build /app /app
+
+# Expose the port
+EXPOSE $PORT
 
 # Start the server by default, this can be overwritten at runtime
 CMD [ "npm", "run", "start" ]
