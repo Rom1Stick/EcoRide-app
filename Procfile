@@ -1,1 +1,0 @@
-web: serve frontend -l $PORT 

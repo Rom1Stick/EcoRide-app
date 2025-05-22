@@ -10,12 +10,13 @@
     "scss": "sass --style compressed --watch frontend/assets/scss/main.scss:frontend/assets/styles/main.min.css",
     "build": "sass --style compressed frontend/assets/scss/main.scss:frontend/assets/styles/main.min.css",
     "preview": "serve frontend",
-    "start": "serve frontend -p $PORT",
+    "start": "echo 'Application statique, voir static.json pour la configuration'",
     "lint": "eslint 'frontend/assets/js/**/*.js'",
     "format": "prettier --write 'frontend/assets/js/**/*.js' 'frontend/assets/scss/**/*.scss' 'frontend/**/*.html'",
     "prepare": "husky install",
     "test:backend": "docker-compose run --rm tests php scripts/tests/run-tests.sh",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "heroku-postbuild": "npm run build"
   },
   "config": {
     "commitizen": {
