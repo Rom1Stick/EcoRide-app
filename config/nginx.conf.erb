@@ -1,0 +1,77 @@
+daemon off;
+# Heroku dynos have at least 4 cores.
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+
+events {
+  use epoll;
+  accept_mutex on;
+  worker_connections <%= ENV['NGINX_WORKER_CONNECTIONS'] || 1024 %>;
+}
+
+http {
+  gzip on;
+  gzip_comp_level 4;
+  gzip_min_length 1100;
+  gzip_types text/plain text/css application/javascript application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+  server_tokens off;
+
+  log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+  access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || 'logs/nginx/access.log' %> l2met;
+  error_log <%= ENV['NGINX_ERROR_LOG_PATH'] || 'logs/nginx/error.log' %>;
+
+  include mime.types;
+  default_type application/octet-stream;
+  sendfile on;
+
+  # Must read the body in 5 seconds.
+  client_body_timeout 5;
+
+  server {
+    listen <%= ENV["PORT"] %>;
+    server_name _;
+    port_in_redirect off;
+    keepalive_timeout 5;
+    root /app/frontend;
+
+    # Serve index.html for the root path
+    location = / {
+      try_files /pages/public/index.html =404;
+    }
+
+    # Handle routes by redirecting to index.html
+    location ~ ^/(login|covoiturages|contact|profil|register)$ {
+      try_files /pages/public/$uri.html /pages/public/index.html;
+    }
+
+    # Define proper MIME types for JavaScript files
+    location ~ \.js$ {
+      add_header Content-Type application/javascript;
+      try_files $uri =404;
+    }
+
+    # Define proper MIME types for CSS files
+    location ~ \.css$ {
+      add_header Content-Type text/css;
+      try_files $uri =404;
+    }
+
+    # Define proper MIME types for SVG files
+    location ~ \.svg$ {
+      add_header Content-Type image/svg+xml;
+      try_files $uri =404;
+    }
+
+    # Serve static assets with cache headers
+    location /assets/ {
+      expires 1y;
+      add_header Cache-Control "public, max-age=31536000, immutable";
+      try_files $uri =404;
+    }
+
+    # For any other path, try to find the file, then fallback to index.html
+    location / {
+      try_files $uri $uri/ /pages/public/index.html;
+    }
+  }
+} 
