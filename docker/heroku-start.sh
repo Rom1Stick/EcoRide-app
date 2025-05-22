@@ -131,6 +131,116 @@ if [ -n "$APP_DEBUG" ]; then
   sed -i "s|APP_DEBUG=.*|APP_DEBUG=$APP_DEBUG|" /var/www/html/backend/.env
 fi
 
+# Configuration des variables MongoDB (pour éviter les erreurs)
+echo "Configuration des variables d'environnement MongoDB..."
+echo "MONGO_HOST=localhost" >> /var/www/html/backend/.env
+echo "MONGO_PORT=27017" >> /var/www/html/backend/.env
+echo "MONGO_USERNAME=ecoride" >> /var/www/html/backend/.env
+echo "MONGO_PASSWORD=ecoride" >> /var/www/html/backend/.env
+echo "MONGO_DATABASE=ecoride" >> /var/www/html/backend/.env
+echo "NOSQL_URI=mongodb://localhost:27017/ecoride" >> /var/www/html/backend/.env
+
+# Patch pour les erreurs MongoDB (création d'une classe fictive)
+echo "Patch de la classe MongoConnection pour éviter les erreurs..."
+mkdir -p /var/www/html/app/DataAccess/NoSql
+cat > /var/www/html/app/DataAccess/NoSql/MongoConnection.php << 'EOF'
+<?php
+namespace App\DataAccess\NoSql;
+
+/**
+ * Classe MongoConnection factice pour éviter les erreurs
+ * lorsque MongoDB n'est pas disponible
+ */
+class MongoConnection
+{
+    public function __construct()
+    {
+        // Ne rien faire
+    }
+    
+    public function getCollection()
+    {
+        return null;
+    }
+    
+    public function getDatabase()
+    {
+        return null;
+    }
+    
+    public function getClient()
+    {
+        return null;
+    }
+}
+EOF
+
+mkdir -p /var/www/html/app/DataAccess/NoSql/Service
+cat > /var/www/html/app/DataAccess/NoSql/Service/ActivityLogService.php << 'EOF'
+<?php
+namespace App\DataAccess\NoSql\Service;
+
+use App\DataAccess\NoSql\MongoConnection;
+
+/**
+ * Service ActivityLogService factice pour éviter les erreurs
+ */
+class ActivityLogService
+{
+    public function __construct(MongoConnection $connection)
+    {
+        // Ne rien faire
+    }
+    
+    public function create($log)
+    {
+        // Ne rien faire, retourner un ID factice
+        return "dummy_id_" . uniqid();
+    }
+}
+EOF
+
+mkdir -p /var/www/html/app/DataAccess/NoSql/Model
+cat > /var/www/html/app/DataAccess/NoSql/Model/ActivityLog.php << 'EOF'
+<?php
+namespace App\DataAccess\NoSql\Model;
+
+/**
+ * Classe ActivityLog factice pour éviter les erreurs
+ */
+class ActivityLog
+{
+    private $userId;
+    private $eventType;
+    private $level;
+    private $description;
+    private $data;
+    private $source;
+    private $ipAddress;
+    
+    public function setUserId($userId) { $this->userId = $userId; return $this; }
+    public function setEventType($eventType) { $this->eventType = $eventType; return $this; }
+    public function setLevel($level) { $this->level = $level; return $this; }
+    public function setDescription($description) { $this->description = $description; return $this; }
+    public function setData($data) { $this->data = $data; return $this; }
+    public function setSource($source) { $this->source = $source; return $this; }
+    public function setIpAddress($ipAddress) { $this->ipAddress = $ipAddress; return $this; }
+    
+    public function toArray()
+    {
+        return [
+            'userId' => $this->userId,
+            'eventType' => $this->eventType,
+            'level' => $this->level,
+            'description' => $this->description,
+            'data' => $this->data,
+            'source' => $this->source,
+            'ipAddress' => $this->ipAddress
+        ];
+    }
+}
+EOF
+
 # Correction des conflits de modules MPM d'Apache
 echo "Correction des conflits de modules MPM..."
 # Stopper Apache pour pouvoir modifier les modules
