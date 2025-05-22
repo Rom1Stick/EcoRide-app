@@ -1,1 +1,1 @@
-web: npx serve -p $PORT -s frontend --single frontend/pages/public/index.html 
+web: npx serve -p $PORT frontend --single 
