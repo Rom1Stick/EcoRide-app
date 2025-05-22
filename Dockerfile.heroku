@@ -6,6 +6,9 @@ COPY frontend/dist /usr/share/nginx/html
 # Créer un template de configuration Nginx qui utilise $PORT
 RUN echo 'server { \
     listen ${PORT}; \
+    server_name _; \
+    port_in_redirect off; \
+    absolute_redirect off; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html; \
