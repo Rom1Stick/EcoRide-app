@@ -73,6 +73,10 @@ COPY --from=frontend-build /app/frontend /var/www/html/frontend
 # Copie du backend depuis l'étape de build
 COPY --from=backend-build /app/backend /var/www/html/backend
 
+# Création du répertoire de stockage pour le backend
+RUN mkdir -p /var/www/html/backend/storage/logs \
+    && chmod -R 777 /var/www/html/backend/storage
+
 # Copie du fichier serve.json pour la configuration
 COPY serve.json /var/www/html/
 
@@ -122,9 +126,8 @@ fi\n\
 API_BASE_URL=${APP_URL:-https://ecoride-application.herokuapp.com}/api\n\
 EOL\n\
 \n\
-  # Définir les permissions\n\
-  chown -R www-data:www-data /var/www/html/backend\n\
-  chmod -R 755 /var/www/html/backend/storage\n\
+  # Définir les permissions - sans chown qui pose problème\n\
+  chmod -R 755 /var/www/html/backend\n\
 }\n\
 \n\
 if [ "$SERVE_FRONTEND_ONLY" = "true" ]; then\n\
@@ -132,6 +135,9 @@ if [ "$SERVE_FRONTEND_ONLY" = "true" ]; then\n\
 else\n\
   # Configurer le backend avant de démarrer Apache\n\
   setup_backend_env\n\
+  # S'assurer qu'un seul MPM est chargé\n\
+  a2dismod mpm_event\n\
+  a2enmod mpm_prefork\n\
   apache2-foreground\n\
 fi' > /usr/local/bin/start-server.sh && \
 chmod +x /usr/local/bin/start-server.sh
