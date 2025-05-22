@@ -2,7 +2,20 @@
 set -e
 
 # Récupérer les variables d'environnement de Heroku et configurer le fichier .env
-if [ -n "$DATABASE_URL" ]; then
+if [ -n "$JAWSDB_URL" ]; then
+  # Format de JAWSDB_URL: mysql://username:password@hostname:port/database_name
+  echo "Configuration de la base de données à partir de JAWSDB_URL"
+  regex="^mysql://([^:]+):([^@]+)@([^:]+):([0-9]+)/(.+)$"
+  if [[ $JAWSDB_URL =~ $regex ]]; then
+    sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=mysql/" /var/www/html/backend/.env
+    sed -i "s/DB_HOST=.*/DB_HOST=${BASH_REMATCH[3]}/" /var/www/html/backend/.env
+    sed -i "s/DB_PORT=.*/DB_PORT=${BASH_REMATCH[4]}/" /var/www/html/backend/.env
+    sed -i "s/DB_DATABASE=.*/DB_DATABASE=${BASH_REMATCH[5]}/" /var/www/html/backend/.env
+    sed -i "s/DB_USERNAME=.*/DB_USERNAME=${BASH_REMATCH[1]}/" /var/www/html/backend/.env
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${BASH_REMATCH[2]}/" /var/www/html/backend/.env
+    echo "Base de données MySQL configurée avec succès à partir de JAWSDB_URL"
+  fi
+elif [ -n "$DATABASE_URL" ]; then
   # Format de DATABASE_URL: mysql://username:password@hostname:port/database_name
   regex="^mysql://([^:]+):([^@]+)@([^:]+):([0-9]+)/(.+)$"
   if [[ $DATABASE_URL =~ $regex ]]; then
@@ -19,6 +32,11 @@ fi
 # Configuration de JWT_SECRET s'il est fourni
 if [ -n "$JWT_SECRET" ]; then
   sed -i "s/JWT_SECRET=.*/JWT_SECRET=$JWT_SECRET/" /var/www/html/backend/.env
+else
+  # Générer un JWT_SECRET aléatoire si non fourni
+  RANDOM_SECRET=$(openssl rand -base64 32)
+  sed -i "s/JWT_SECRET=.*/JWT_SECRET=$RANDOM_SECRET/" /var/www/html/backend/.env
+  echo "JWT_SECRET généré aléatoirement"
 fi
 
 # Configuration supplémentaire en fonction des variables d'environnement
@@ -131,6 +149,11 @@ echo "Structure des assets:"
 ls -la /var/www/html/frontend/assets || echo "Dossier assets non trouvé"
 ls -la /var/www/html/frontend/assets/styles || echo "Dossier styles non trouvé"
 ls -la /var/www/html/frontend/assets/js || echo "Dossier js non trouvé"
+
+# Création des tables de base de données si nécessaires
+echo "Vérification et création des tables de base de données..."
+cd /var/www/html/backend
+php artisan migrate --force || echo "Erreur lors de la migration de la base de données"
 
 # Créer un fichier index.php de redirection si besoin
 echo "Création d'un fichier index.php de redirection..."
