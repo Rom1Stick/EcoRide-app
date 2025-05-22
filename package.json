@@ -31,10 +31,11 @@
     "husky": "^8.0.3",
     "lint-staged": "^15.5.1",
     "prettier": "^3.0.0",
-    "sass": "^1.62.0",
+    "sass": "^1.62.0"
+  },
+  "dependencies": {
     "serve": "^14.0.0"
   },
-  "dependencies": {},
   "keywords": [],
   "lint-staged": {
     "frontend/assets/js/**/*.js": [
