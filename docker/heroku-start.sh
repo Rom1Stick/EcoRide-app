@@ -126,44 +126,8 @@ class MockCollection {
 }
 EOF
 
-# Créer le fichier bootstrap.php manquant dans le dossier app
-echo "Création du fichier bootstrap.php manquant..."
-mkdir -p /var/www/html/backend/app
-cat > /var/www/html/backend/app/bootstrap.php << 'EOF'
-<?php
-// Ce fichier est créé automatiquement par le script de démarrage
-// pour remplacer le fichier manquant référencé dans index.php
-
-require_once __DIR__ . '/../vendor/autoload.php';
-
-// Charger les variables d'environnement
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
-
-// Initialiser les composants de base de l'application
-date_default_timezone_set($_ENV['APP_TIMEZONE'] ?? 'UTC');
-
-// Définir les constantes de base
-define('APP_ROOT', __DIR__ . '/..');
-define('APP_DEBUG', $_ENV['APP_DEBUG'] === 'true');
-
-// Configuration des erreurs
-if (APP_DEBUG) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-} else {
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-}
-
-// Inclure les routes API
-require_once __DIR__ . '/../routes/api.php';
-EOF
-
-# Activer l'affichage des erreurs PHP
-echo "Activation de l'affichage des erreurs PHP..."
+# Modifier directement le fichier index.php pour ne pas dépendre de bootstrap.php
+echo "Modification du fichier index.php..."
 cat > /var/www/html/backend/public/index.php << 'EOF'
 <?php
 // Activer l'affichage des erreurs pour le débogage
@@ -171,10 +135,148 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Code original de l'index.php
+// Charger l'autoloader
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../app/bootstrap.php';
+
+// Configuration de base
+date_default_timezone_set('Europe/Paris');
+
+// Fonction pour récupérer les variables d'environnement du fichier .env
+function env($key, $default = null) {
+    static $env = null;
+    if ($env === null) {
+        $env = [];
+        if (file_exists(__DIR__ . '/../.env')) {
+            $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                    list($name, $value) = explode('=', $line, 2);
+                    $env[trim($name)] = trim($value);
+                }
+            }
+        }
+    }
+    return isset($env[$key]) ? $env[$key] : $default;
+}
+
+// Inclure les routes API directement
+require_once __DIR__ . '/../routes/api.php';
 EOF
+
+# Vérifier si le dossier routes existe
+if [ ! -d "/var/www/html/backend/routes" ]; then
+    echo "Création du dossier routes manquant..."
+    mkdir -p /var/www/html/backend/routes
+fi
+
+# Vérifier si le fichier api.php existe
+if [ ! -f "/var/www/html/backend/routes/api.php" ]; then
+    echo "Création du fichier api.php manquant..."
+    cat > /var/www/html/backend/routes/api.php << 'EOF'
+<?php
+// Fichier de routes API créé automatiquement
+
+// Point d'entrée pour les requêtes API
+$requestUri = $_SERVER['REQUEST_URI'];
+$method = $_SERVER['REQUEST_METHOD'];
+
+// Répondre avec un statut 200 OK pour les requêtes OPTIONS (CORS)
+if ($method === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    http_response_code(200);
+    exit;
+}
+
+// Ajouter les en-têtes CORS pour toutes les autres requêtes
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Content-Type: application/json');
+
+// Router les requêtes
+if (preg_match('/^\/api\/auth\/register(\/)?$/', $requestUri)) {
+    // Route d'inscription
+    if ($method === 'POST') {
+        // Récupérer les données de la requête
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Valider les données
+        if (!isset($data['name']) || !isset($data['email']) || !isset($data['password']) || !isset($data['password_confirmation'])) {
+            echo json_encode(['error' => true, 'message' => 'Données incomplètes']);
+            exit;
+        }
+        
+        if ($data['password'] !== $data['password_confirmation']) {
+            echo json_encode(['error' => true, 'message' => 'Les mots de passe ne correspondent pas']);
+            exit;
+        }
+        
+        try {
+            // Connexion à la base de données MySQL
+            $dbHost = env('DB_HOST', 'localhost');
+            $dbPort = env('DB_PORT', '3306');
+            $dbName = env('DB_DATABASE', 'ecoride');
+            $dbUser = env('DB_USERNAME', 'root');
+            $dbPass = env('DB_PASSWORD', '');
+            
+            $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+            $pdo = new PDO($dsn, $dbUser, $dbPass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            // Vérifier si l'email existe déjà
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$data['email']]);
+            if ($stmt->fetchColumn()) {
+                echo json_encode(['error' => true, 'message' => 'Cet email est déjà utilisé']);
+                exit;
+            }
+            
+            // Hasher le mot de passe
+            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+            
+            // Insérer l'utilisateur
+            $stmt = $pdo->prepare("INSERT INTO users (name, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
+            $stmt->execute([$data['name'], $data['email'], $hashedPassword]);
+            
+            // Générer un token JWT factice
+            $token = bin2hex(random_bytes(32));
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Inscription réussie',
+                'user' => [
+                    'id' => $pdo->lastInsertId(),
+                    'name' => $data['name'],
+                    'email' => $data['email']
+                ],
+                'token' => $token
+            ]);
+        } catch (Exception $e) {
+            // Journaliser l'erreur
+            error_log("Erreur d'inscription: " . $e->getMessage());
+            
+            // Renvoyer une réponse d'erreur
+            echo json_encode(['error' => true, 'message' => 'Erreur interne lors de l\'inscription', 'debug' => $e->getMessage()]);
+        }
+        exit;
+    }
+} elseif (preg_match('/^\/api\/auth\/login(\/)?$/', $requestUri)) {
+    // Route de connexion
+    if ($method === 'POST') {
+        // Logique de connexion ici
+        echo json_encode(['error' => true, 'message' => 'Fonctionnalité non implémentée']);
+        exit;
+    }
+} else {
+    // Route non trouvée
+    http_response_code(404);
+    echo json_encode(['error' => true, 'message' => 'Route non trouvée']);
+    exit;
+}
+EOF
+fi
 
 # Configuration d'Apache
 a2dismod mpm_event
