@@ -19,6 +19,9 @@ if [ -n "$JAWSDB_URL" ]; then
     sed -i "s|DB_USERNAME=.*|DB_USERNAME=${BASH_REMATCH[1]}|" /var/www/html/backend/.env
     sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${BASH_REMATCH[2]}|" /var/www/html/backend/.env
     
+    # Activer le mode debug pour voir les erreurs
+    sed -i "s|APP_DEBUG=.*|APP_DEBUG=true|" /var/www/html/backend/.env
+    
     # Ajouter les variables MongoDB (factices pour éviter les erreurs)
     echo "MONGO_HOST=localhost" >> /var/www/html/backend/.env
     echo "MONGO_PORT=27017" >> /var/www/html/backend/.env
@@ -121,6 +124,20 @@ class MockCollection {
         return null;
     }
 }
+EOF
+
+# Activer l'affichage des erreurs PHP
+echo "Activation de l'affichage des erreurs PHP..."
+cat > /var/www/html/backend/public/index.php << 'EOF'
+<?php
+// Activer l'affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Code original de l'index.php
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/bootstrap.php';
 EOF
 
 # Configuration d'Apache
