@@ -1,0 +1,16 @@
+RewriteEngine On
+RewriteBase /
+# Si le fichier ou le répertoire n'existe pas, rediriger vers index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ frontend/pages/public/index.html [L]
+
+# Rediriger la racine vers index.html
+RewriteRule ^$ frontend/pages/public/index.html [L]
+
+# Autoriser l'accès aux dossiers assets
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|jpg|jpeg|png|gif|svg)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+</IfModule> 

@@ -1,7 +1,11 @@
 {
   "public": "frontend/pages/public",
+  "directoryListing": false,
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "**", "destination": "/index.html" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/**", "destination": "/index.html" }
   ],
   "headers": [
     {
