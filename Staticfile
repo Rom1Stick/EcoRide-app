@@ -1,1 +1,3 @@
-root: frontend 
+root: frontend
+directory: pages/public
+pushstate: true 

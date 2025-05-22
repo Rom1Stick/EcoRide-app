@@ -9,7 +9,7 @@
     "serve": "^14.2.1"
   },
   "scripts": {
-    "start": "serve -p $PORT frontend",
+    "start": "serve -p $PORT -s frontend --single frontend/pages/public/index.html",
     "build": "echo 'Skipping build step'"
   }
 }
