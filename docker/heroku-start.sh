@@ -150,15 +150,23 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
             exit;
         }
         
-        // Connexion à la base de données MySQL
-        $dbHost = env('DB_HOST', 'localhost');
-        $dbPort = env('DB_PORT', '3306');
-        $dbName = env('DB_DATABASE', 'ecoride');
-        $dbUser = env('DB_USERNAME', 'root');
-        $dbPass = env('DB_PASSWORD', '');
+        // Utiliser directement l'URL JAWSDB pour la connexion à la base de données
+        $jawsdb_url = getenv('JAWSDB_URL');
+        if (!$jawsdb_url) {
+            // Mode fallback si JAWSDB_URL n'est pas défini
+            $dbHost = env('DB_HOST', 'localhost');
+            $dbPort = env('DB_PORT', '3306');
+            $dbName = env('DB_DATABASE', 'ecoride');
+            $dbUser = env('DB_USERNAME', 'root');
+            $dbPass = env('DB_PASSWORD', '');
+            
+            $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+            $pdo = new PDO($dsn, $dbUser, $dbPass);
+        } else {
+            // Connexion directe avec l'URL JAWSDB
+            $pdo = new PDO($jawsdb_url);
+        }
         
-        $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
-        $pdo = new PDO($dsn, $dbUser, $dbPass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Vérifier si l'email existe déjà
@@ -223,15 +231,23 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
             exit;
         }
         
-        // Connexion à la base de données MySQL
-        $dbHost = env('DB_HOST', 'localhost');
-        $dbPort = env('DB_PORT', '3306');
-        $dbName = env('DB_DATABASE', 'ecoride');
-        $dbUser = env('DB_USERNAME', 'root');
-        $dbPass = env('DB_PASSWORD', '');
+        // Utiliser directement l'URL JAWSDB pour la connexion à la base de données
+        $jawsdb_url = getenv('JAWSDB_URL');
+        if (!$jawsdb_url) {
+            // Mode fallback si JAWSDB_URL n'est pas défini
+            $dbHost = env('DB_HOST', 'localhost');
+            $dbPort = env('DB_PORT', '3306');
+            $dbName = env('DB_DATABASE', 'ecoride');
+            $dbUser = env('DB_USERNAME', 'root');
+            $dbPass = env('DB_PASSWORD', '');
+            
+            $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+            $pdo = new PDO($dsn, $dbUser, $dbPass);
+        } else {
+            // Connexion directe avec l'URL JAWSDB
+            $pdo = new PDO($jawsdb_url);
+        }
         
-        $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
-        $pdo = new PDO($dsn, $dbUser, $dbPass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Vérifier si l'utilisateur existe
