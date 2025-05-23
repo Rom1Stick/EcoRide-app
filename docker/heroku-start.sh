@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Activer plus de débogage
+set -x
+
 # Afficher le contenu initial du fichier .env
 echo "Contenu du fichier .env avant modifications :"
 cat /var/www/html/backend/.env
@@ -73,6 +76,13 @@ EOF
   fi
 fi
 
+# Vérifier l'existence des répertoires et fichiers source
+echo "Vérification de la structure du projet..."
+ls -la /var/www/html/
+ls -la /var/www/html/frontend/ || echo "Le répertoire frontend n'existe pas"
+ls -la /var/www/html/frontend/pages/ || echo "Le répertoire frontend/pages n'existe pas"
+ls -la /var/www/html/frontend/pages/public/ || echo "Le répertoire frontend/pages/public n'existe pas"
+
 # Configuration pour servir les fichiers frontend
 echo "Configuration du frontend..."
 
@@ -82,10 +92,21 @@ mkdir -p /var/www/html/web
 # Copier les fichiers frontend (pages, assets, etc.) vers le répertoire web
 cp -r /var/www/html/frontend/* /var/www/html/web/
 
+# S'assurer que le répertoire public existe
+mkdir -p /var/www/html/backend/public
+
+# Copier directement index.html à la racine du répertoire public
+echo "Copie de index.html vers le répertoire public..."
+cp /var/www/html/frontend/pages/public/index.html /var/www/html/backend/public/index.html
+
 # Créer un fichier .htaccess pour la racine qui gère à la fois le frontend et l'API
 cat > /var/www/html/backend/public/.htaccess <<'EOF'
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    
+    # Activer le débogage des règles de réécriture
+    RewriteLog "/var/log/apache2/rewrite.log"
+    RewriteLogLevel 9
     
     # Si la requête commence par /api, il s'agit d'une requête API
     RewriteCond %{REQUEST_URI} ^/api/.*
@@ -101,25 +122,38 @@ cat > /var/www/html/backend/public/.htaccess <<'EOF'
     # Rediriger vers la version avec .html
     RewriteRule ^(.*)$ $1.html [L]
     
-    # Si toutes les conditions échouent et que c'est n'est ni un fichier ni un répertoire existant
+    # Si toutes les conditions échouent et que ce n'est ni un fichier ni un répertoire existant
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     # Rediriger vers index.html uniquement si toutes les tentatives précédentes ont échoué
     RewriteRule ^ /index.html [L]
 </IfModule>
+
+# Définir les types MIME appropriés pour éviter les erreurs de chargement
+AddType text/css .css
+AddType application/javascript .js
+AddType image/svg+xml .svg
 EOF
 
 # Copier toutes les pages HTML du répertoire pages/public vers le répertoire public
 echo "Copie des pages HTML..."
 mkdir -p /var/www/html/backend/public/pages
-cp -r /var/www/html/web/pages/public/* /var/www/html/backend/public/
+cp -r /var/www/html/frontend/pages/public/* /var/www/html/backend/public/
 
 # Corriger les chemins dans tous les fichiers HTML
 echo "Correction des chemins relatifs dans les fichiers HTML..."
 find /var/www/html/backend/public -name "*.html" -exec sed -i 's|../../assets|/assets|g' {} \;
 
+# Vérifier le contenu de l'index.html après modification
+echo "Contenu de index.html après modifications :"
+grep -A 5 -B 5 "assets" /var/www/html/backend/public/index.html
+
 # Créer un lien symbolique pour les assets
-ln -sf /var/www/html/web/assets /var/www/html/backend/public/assets
+echo "Création du lien symbolique pour les assets..."
+ln -sf /var/www/html/frontend/assets /var/www/html/backend/public/assets
+
+# Vérifier que le lien symbolique a été créé correctement
+ls -la /var/www/html/backend/public/
 
 # Modifier le fichier VirtualHost d'Apache pour servir à la fois le frontend et l'API
 cat > /etc/apache2/sites-available/000-default.conf <<EOF
@@ -132,6 +166,9 @@ cat > /etc/apache2/sites-available/000-default.conf <<EOF
         AllowOverride All
         Require all granted
     </Directory>
+    
+    # Activer le débogage pour le module RewriteEngine
+    LogLevel alert rewrite:trace8
     
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
@@ -415,9 +452,21 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
 }
 EOF
 
-# Créer un fichier index.php amélioré qui gère correctement les fichiers HTML
+# Créer un fichier index.php simplifié qui affiche directement index.html pour la racine
 cat > /var/www/html/backend/public/index.php <<'EOF'
 <?php
+// Activer l'affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Vérifier si c'est la racine (/) ou rien
+if ($_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] === '') {
+    // Servir directement le fichier index.html
+    include __DIR__ . '/index.html';
+    exit;
+}
+
 // Vérifier si la requête est une requête API
 if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
     // Si c'est une requête API, inclure le gestionnaire d'API
@@ -430,9 +479,6 @@ $request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Normaliser le chemin
 $request_path = ltrim($request_path, '/');
-if (empty($request_path)) {
-    $request_path = 'index.html';
-}
 
 // Vérifier si le fichier existe avec ou sans extension .html
 $file_path = __DIR__ . '/' . $request_path;
@@ -468,11 +514,49 @@ if (file_exists($file_path) && !is_dir($file_path)) {
 }
 EOF
 
+# Créer une page de test qui sera servie si index.html ne fonctionne pas
+cat > /var/www/html/backend/public/test.php <<'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test EcoRide</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #1b5e20; }
+        .debug { background: #f5f5f5; border: 1px solid #ddd; padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Test EcoRide - Page de diagnostic</h1>
+    <p>Si vous voyez cette page, le serveur fonctionne mais il y a probablement un problème avec le chargement de index.html.</p>
+    
+    <div class="debug">
+        <h2>Informations de débogage</h2>
+        <h3>Structure du répertoire public :</h3>
+        <pre><?php echo shell_exec('ls -la ' . __DIR__); ?></pre>
+        
+        <h3>Contenu de index.html :</h3>
+        <pre><?php echo htmlspecialchars(file_exists(__DIR__ . '/index.html') ? file_get_contents(__DIR__ . '/index.html', false, null, 0, 500) . '...' : 'Fichier non trouvé'); ?></pre>
+        
+        <h3>Variable $_SERVER :</h3>
+        <pre><?php print_r($_SERVER); ?></pre>
+    </div>
+</body>
+</html>
+EOF
+
+# Créer une page de test simple pour vérifier si Apache fonctionne correctement
+echo "<html><body><h1>EcoRide fonctionne !</h1><p>Si vous voyez cette page, le serveur Apache fonctionne correctement.</p></body></html>" > /var/www/html/backend/public/hello.html
+
 # Désactiver tous les modules Apache MPM puis activer uniquement mpm_prefork
 a2dismod mpm_event
 a2dismod mpm_worker
 a2enmod mpm_prefork
 a2enmod rewrite
 
-# Démarrer Apache en avant-plan
-apache2-foreground 
+# Créer une page de test simple pour vérifier si Apache fonctionne correctement
+echo "<html><body><h1>EcoRide fonctionne !</h1><p>Si vous voyez cette page, le serveur Apache fonctionne correctement.</p></body></html>" > /var/www/html/backend/public/hello.html
+
+# Démarrer Apache en avant-plan avec journalisation améliorée
+echo "Démarrage d'Apache..."
+exec apache2-foreground 
