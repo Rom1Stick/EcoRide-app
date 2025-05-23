@@ -63,11 +63,11 @@ class AuthController extends Controller
             // Hasher le mot de passe
             $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
 
-            // Insérer l'utilisateur dans la table Utilisateur
+            // Insérer l'utilisateur dans la table Utilisateur avec confirmation automatique
             // On stocke le nom complet dans le champ nom et on laisse prenom vide
             $stmt = $db->prepare(
-                'INSERT INTO Utilisateur (nom, prenom, email, mot_passe, photo_path, date_creation)
-                 VALUES (?, ?, ?, ?, ?, NOW())'
+                'INSERT INTO Utilisateur (nom, prenom, email, mot_passe, photo_path, date_creation, confirmed)
+                 VALUES (?, ?, ?, ?, ?, NOW(), 1)'
             );
             $stmt->execute([$data['name'], '', $data['email'], $hashedPassword, '/assets/images/Logo_EcoRide.svg']);
 
@@ -85,39 +85,27 @@ class AuthController extends Controller
             $stmt = $db->prepare('INSERT INTO CreditTransaction (utilisateur_id, montant, type_id, description) VALUES (?, ?, ?, ?)');
             $stmt->execute([$userId, 20, $typeId, 'Crédit de bienvenue']);
 
-            // Génération du token de confirmation
-            $confirmationToken = bin2hex(random_bytes(32));
-            $expiresAt = date('Y-m-d H:i:s', time() + 24 * 3600);
-            $stmt = $db->prepare('INSERT INTO user_confirmations (utilisateur_id, token, expires_at) VALUES (?, ?, ?)');
-            $stmt->execute([$userId, $confirmationToken, $expiresAt]);
-
-            // Assigner le rôle par défaut 'visiteur'
+            // Auto-confirmation : Assigner directement les rôles "visiteur" et "passager"
             $stmtRole = $db->prepare('SELECT role_id FROM Role WHERE libelle = ?');
+            $stmtInsert = $db->prepare('INSERT IGNORE INTO Possede (utilisateur_id, role_id) VALUES (?, ?)');
+            
+            // Assigner le rôle visiteur
             $stmtRole->execute(['visiteur']);
             if ($visitorRid = $stmtRole->fetchColumn()) {
-                $db->prepare('INSERT IGNORE INTO Possede (utilisateur_id, role_id) VALUES (?, ?)')
-                   ->execute([$userId, $visitorRid]);
+                $stmtInsert->execute([$userId, $visitorRid]);
+            }
+            
+            // Assigner directement le rôle passager (auto-confirmation)
+            $stmtRole->execute(['passager']);
+            if ($passagerRid = $stmtRole->fetchColumn()) {
+                $stmtInsert->execute([$userId, $passagerRid]);
             }
 
             $db->commit();
 
-            // Journalisation MongoDB de l'inscription
-            try {
-                $mongoConn = new \App\DataAccess\NoSql\MongoConnection();
-                $activityService = new \App\DataAccess\NoSql\Service\ActivityLogService($mongoConn);
-                $activityLog = new \App\DataAccess\NoSql\Model\ActivityLog();
-                $activityLog
-                    ->setUserId((int)$userId)
-                    ->setEventType('register')
-                    ->setLevel('info')
-                    ->setDescription('Nouvel utilisateur inscrit')
-                    ->setData(['email' => $data['email']])
-                    ->setSource('api')
-                    ->setIpAddress($_SERVER['REMOTE_ADDR'] ?? null);
-                $activityService->create($activityLog);
-            } catch (\Exception $e) {
-                // Ignorer les erreurs de journalisation MongoDB
-            }
+            // Suppression de la journalisation MongoDB car nous n'utilisons plus MongoDB
+            // Le code de journalisation utilise maintenant MySQL via logAuthActivity()
+            
         } catch (\Exception $e) {
             $db->rollBack();
             // En mode debug, renvoyer le message d'exception pour faciliter le diagnostic
@@ -146,10 +134,9 @@ class AuthController extends Controller
                     'email' => $data['email'],
                     'photoPath' => '/assets/images/Logo_EcoRide.svg'
                 ],
-                'token' => $token,
-                'confirmation_token' => $confirmationToken
+                'token' => $token
             ],
-            'Inscription réussie, veuillez confirmer votre compte'
+            'Inscription réussie, votre compte est confirmé'
         );
     }
 

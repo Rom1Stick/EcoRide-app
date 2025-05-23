@@ -10,6 +10,7 @@ $router = $app->getRouter();
 // Routes publiques
 $router->get('/api', 'HomeController@index');
 $router->get('/api/health', 'HomeController@health');
+$router->get('/api/test-db', 'HomeController@testDatabase');
 
 // Routes d'authentification
 $router->post('/api/auth/register', 'AuthController@register');
@@ -87,4 +88,8 @@ $router->post('/api/admin/users/{userId}/activate', 'AdminController@activateUse
 
 // Routes pour les statistiques
 $router->get('/api/admin/stats/rides', 'AdminController@getRideStats')->middleware('auth');
-$router->get('/api/admin/stats/credits', 'AdminController@getCreditStats')->middleware('auth'); 
+$router->get('/api/admin/stats/credits', 'AdminController@getCreditStats')->middleware('auth');
+
+// Route de débogage pour visualiser les données (à supprimer en production)
+$router->get('/api/debug/tables', 'HomeController@debugTables');
+$router->get('/api/debug/users', 'HomeController@debugUsers'); 

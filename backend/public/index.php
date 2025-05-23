@@ -16,9 +16,20 @@ define('BASE_PATH', dirname(__DIR__));
 // Charger l'autoloader de Composer
 require BASE_PATH . '/vendor/autoload.php';
 
-// Charger les variables d'environnement
-$dotenv = new \App\Core\DotEnv(BASE_PATH . '/.env');
-$dotenv->load();
+// Charger les variables d'environnement depuis .env si disponible
+$envFiles = [
+    '/var/www/html/.env',           // Fichier généré par le script de démarrage
+    BASE_PATH . '/.env',            // Fichier .env du backend
+    dirname(BASE_PATH) . '/.env'    // Fichier .env à la racine du projet
+];
+
+foreach ($envFiles as $envFile) {
+    if (file_exists($envFile)) {
+        $dotenv = new \App\Core\DotEnv($envFile);
+        $dotenv->load();
+        break; // Utiliser le premier fichier trouvé
+    }
+}
 
 // En-têtes HTTP de sécurité
 header('X-Frame-Options: SAMEORIGIN');
@@ -28,7 +39,9 @@ header('Permissions-Policy: geolocation=(), microphone=()');
 header("Content-Security-Policy: default-src 'self';");
 
 // Configurer les erreurs en fonction de l'environnement
-if (env('APP_DEBUG', false) === true) {
+// Utiliser getenv() directement car env() nécessite l'autoload qui est déjà fait
+$appDebug = getenv('APP_DEBUG') === 'true' || $_ENV['APP_DEBUG'] ?? false;
+if ($appDebug) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
@@ -38,7 +51,8 @@ if (env('APP_DEBUG', false) === true) {
 }
 
 // Configurer le fuseau horaire par défaut
-date_default_timezone_set(env('APP_TIMEZONE', 'Europe/Paris'));
+$timezone = getenv('APP_TIMEZONE') ?: $_ENV['APP_TIMEZONE'] ?? 'Europe/Paris';
+date_default_timezone_set($timezone);
 
 // Initialiser l'application
 $app = new \App\Core\Application();
