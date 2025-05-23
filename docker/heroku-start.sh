@@ -82,16 +82,6 @@ mkdir -p /var/www/html/web
 # Copier les fichiers frontend (pages, assets, etc.) vers le répertoire web
 cp -r /var/www/html/frontend/* /var/www/html/web/
 
-# Copier tous les fichiers HTML du dossier pages/public vers le dossier public du backend
-echo "Copie des pages HTML vers le dossier public..."
-mkdir -p /var/www/html/backend/public/pages
-cp -r /var/www/html/web/pages/public/* /var/www/html/backend/public/
-cp -r /var/www/html/web/assets /var/www/html/backend/public/
-
-# Correction des chemins dans tous les fichiers HTML
-echo "Correction des chemins dans les fichiers HTML..."
-find /var/www/html/backend/public -name "*.html" -exec sed -i 's|../../assets|/assets|g' {} \;
-
 # Créer un fichier .htaccess pour la racine qui gère à la fois le frontend et l'API
 cat > /var/www/html/backend/public/.htaccess <<'EOF'
 <IfModule mod_rewrite.c>
@@ -104,9 +94,32 @@ cat > /var/www/html/backend/public/.htaccess <<'EOF'
     # Pour toutes les autres requêtes, vérifier si le fichier existe
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.html [L]
+    # Vérifier si la requête se termine par .html
+    RewriteCond %{REQUEST_URI} !\.html$
+    # Vérifier si la requête correspond à un fichier .html sans l'extension
+    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
+    # Rediriger vers la version avec .html
+    RewriteRule ^(.*)$ $1.html [L]
+    
+    # Si toutes les conditions échouent et que c'est n'est ni un fichier ni un répertoire existant
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # Rediriger vers index.html uniquement si toutes les tentatives précédentes ont échoué
+    RewriteRule ^ /index.html [L]
 </IfModule>
 EOF
+
+# Copier toutes les pages HTML du répertoire pages/public vers le répertoire public
+echo "Copie des pages HTML..."
+mkdir -p /var/www/html/backend/public/pages
+cp -r /var/www/html/web/pages/public/* /var/www/html/backend/public/
+
+# Corriger les chemins dans tous les fichiers HTML
+echo "Correction des chemins relatifs dans les fichiers HTML..."
+find /var/www/html/backend/public -name "*.html" -exec sed -i 's|../../assets|/assets|g' {} \;
+
+# Créer un lien symbolique pour les assets
+ln -sf /var/www/html/web/assets /var/www/html/backend/public/assets
 
 # Modifier le fichier VirtualHost d'Apache pour servir à la fois le frontend et l'API
 cat > /etc/apache2/sites-available/000-default.conf <<EOF
@@ -397,12 +410,12 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
         exit;
     }
     
-    // Sinon, on laisse Apache gérer la demande (affichage du frontend)
-    return false;
+    // Pour les autres requêtes, API en laisse le contrôle au fichier index.php principal
+    exit;
 }
 EOF
 
-# Créer un fichier index.php qui redirige vers api_handler.php pour les requêtes API
+# Créer un fichier index.php amélioré qui gère correctement les fichiers HTML
 cat > /var/www/html/backend/public/index.php <<'EOF'
 <?php
 // Vérifier si la requête est une requête API
@@ -412,44 +425,47 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
     exit;
 }
 
-// Pour toutes les autres requêtes, vérifier si c'est un fichier spécifique
-$requestPath = $_SERVER['REQUEST_URI'];
+// Obtenir le chemin de la requête sans les paramètres de requête
+$request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Nettoyer le chemin de la requête
-$requestPath = parse_url($requestPath, PHP_URL_PATH);
-$requestPath = ltrim($requestPath, '/');
-
-// Si la requête est vide ou /, servir index.html
-if (empty($requestPath) || $requestPath == '/') {
-    include_once 'index.html';
-    exit;
+// Normaliser le chemin
+$request_path = ltrim($request_path, '/');
+if (empty($request_path)) {
+    $request_path = 'index.html';
 }
 
-// Vérifier si le fichier existe
-$filePath = __DIR__ . '/' . $requestPath;
-if (file_exists($filePath) && !is_dir($filePath)) {
-    // Si c'est un fichier HTML, l'inclure directement
-    if (pathinfo($filePath, PATHINFO_EXTENSION) == 'html') {
-        include_once $filePath;
+// Vérifier si le fichier existe avec ou sans extension .html
+$file_path = __DIR__ . '/' . $request_path;
+$html_file_path = $file_path . (substr($file_path, -5) === '.html' ? '' : '.html');
+
+if (file_exists($file_path) && !is_dir($file_path)) {
+    // Si le fichier existe exactement comme demandé, le servir directement
+    return false; // Laisse Apache gérer le fichier
+} else if (file_exists($html_file_path) && !is_dir($html_file_path)) {
+    // Si nous avons trouvé un fichier HTML correspondant, le servir
+    include $html_file_path;
+    exit;
+} else {
+    // Page non trouvée, vérifier si c'est une page spéciale comme "login" ou "register"
+    $special_pages = [
+        'login' => 'login.html',
+        'register' => 'register.html',
+        'profile' => 'profile.html',
+        'covoiturages' => 'covoiturages.html',
+        'contact' => 'contact.html'
+    ];
+    
+    // Vérifier si le chemin de requête correspond à l'une de nos pages spéciales
+    $base_path = explode('/', $request_path)[0];
+    if (array_key_exists($base_path, $special_pages) && file_exists(__DIR__ . '/' . $special_pages[$base_path])) {
+        include __DIR__ . '/' . $special_pages[$base_path];
         exit;
     }
     
-    // Pour les autres fichiers (CSS, JS, images), laisser Apache les servir
-    return false;
-} 
-
-// Si le fichier n'existe pas directement mais est un chemin comme "covoiturages.html"
-// Vérifier s'il existe dans le répertoire racine
-if (pathinfo($requestPath, PATHINFO_EXTENSION) == 'html') {
-    $simpleFilePath = __DIR__ . '/' . basename($requestPath);
-    if (file_exists($simpleFilePath)) {
-        include_once $simpleFilePath;
-        exit;
-    }
+    // Si rien ne correspond, servir la page d'accueil
+    include __DIR__ . '/index.html';
+    exit;
 }
-
-// Pour toute autre requête non trouvée, servir index.html (SPA fallback)
-include_once 'index.html';
 EOF
 
 # Désactiver tous les modules Apache MPM puis activer uniquement mpm_prefork
