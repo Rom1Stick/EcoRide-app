@@ -73,9 +73,63 @@ EOF
   fi
 fi
 
+# Configuration pour servir les fichiers frontend
+echo "Configuration du frontend..."
+
+# Créer le répertoire web à la racine
+mkdir -p /var/www/html/web
+
+# Copier les fichiers frontend (pages, assets, etc.) vers le répertoire web
+cp -r /var/www/html/frontend/* /var/www/html/web/
+
+# Créer un fichier .htaccess pour la racine qui gère à la fois le frontend et l'API
+cat > /var/www/html/backend/public/.htaccess <<'EOF'
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Si la requête commence par /api, il s'agit d'une requête API
+    RewriteCond %{REQUEST_URI} ^/api/.*
+    RewriteRule ^ index.php [L]
+
+    # Pour toutes les autres requêtes, rediriger vers le frontend
+    RewriteCond %{REQUEST_URI} !^/api/.*
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ /index.html [L]
+</IfModule>
+EOF
+
+# Copier index.html à la racine du répertoire public
+cp /var/www/html/web/pages/public/index.html /var/www/html/backend/public/index.html
+
+# Modifier les chemins des assets dans index.html
+sed -i 's|../../assets|/assets|g' /var/www/html/backend/public/index.html
+
+# Créer un lien symbolique pour les assets
+ln -sf /var/www/html/web/assets /var/www/html/backend/public/assets
+
+# Modifier le fichier VirtualHost d'Apache pour servir à la fois le frontend et l'API
+cat > /etc/apache2/sites-available/000-default.conf <<EOF
+<VirtualHost *:${PORT}>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html/backend/public
+    
+    <Directory /var/www/html/backend/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+EOF
+
+echo "Frontend configuré avec succès."
+
 # Modifier le fichier index.php pour remplacer toutes les classes et dépendances non disponibles
 echo "Modification du fichier index.php..."
-cat > /var/www/html/backend/public/index.php <<'EOF'
+cat > /var/www/html/backend/public/api_handler.php <<'EOF'
 <?php
 // Activer l'affichage des erreurs pour le débogage
 ini_set('display_errors', 1);
@@ -336,10 +390,43 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
     }
     exit;
 } else {
-    // Route par défaut pour les autres endpoints
-    http_response_code(404);
-    echo json_encode(['error' => true, 'message' => 'Route non trouvée']);
+    // Si la requête commence par /api/ mais n'est pas gérée, renvoyer une erreur 404
+    if (strpos($requestUri, '/api/') === 0) {
+        http_response_code(404);
+        echo json_encode(['error' => true, 'message' => 'Route API non trouvée']);
+        exit;
+    }
+    
+    // Sinon, on laisse Apache gérer la demande (affichage du frontend)
+    include_once 'index.html';
     exit;
+}
+EOF
+
+# Créer un fichier index.php qui redirige vers api_handler.php pour les requêtes API
+cat > /var/www/html/backend/public/index.php <<'EOF'
+<?php
+// Vérifier si la requête est une requête API
+if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
+    // Si c'est une requête API, inclure le gestionnaire d'API
+    include_once 'api_handler.php';
+    exit;
+}
+
+// Sinon, servir l'index.html ou rediriger vers la page correspondante
+if ($_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] === '') {
+    // Page d'accueil
+    include_once 'index.html';
+} else {
+    // Vérifier si le fichier existe
+    $requestedFile = __DIR__ . $_SERVER['REQUEST_URI'];
+    if (file_exists($requestedFile) && !is_dir($requestedFile)) {
+        // Servir le fichier directement (pour les ressources comme CSS, JS, images)
+        return false; // Laisse Apache gérer le fichier
+    } else {
+        // Pour les autres routes, servir index.html (pour le routage côté client)
+        include_once 'index.html';
+    }
 }
 EOF
 
