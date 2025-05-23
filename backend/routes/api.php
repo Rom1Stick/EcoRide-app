@@ -1,90 +1,176 @@
 <?php
+// Activer l'affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-/**
- * Définition des routes de l'API EcoRide
- */
+// Fichier de routes API simplifié sans routeur
+$requestUri = $_SERVER['REQUEST_URI'];
+$method = $_SERVER['REQUEST_METHOD'];
 
-// Instance du routeur
-$router = $app->getRouter();
+// Répondre avec un statut 200 OK pour les requêtes OPTIONS (CORS)
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Routes publiques
-$router->get('/api', 'HomeController@index');
-$router->get('/api/health', 'HomeController@health');
+if ($method === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
-// Routes d'authentification
-$router->post('/api/auth/register', 'AuthController@register');
-$router->post('/api/auth/login', 'AuthController@login');
-$router->post('/api/auth/refresh', 'AuthController@refresh')->middleware('auth');
-$router->post('/api/auth/logout', 'AuthController@logout')->middleware('auth');
+// Définir le header de réponse comme JSON par défaut
+header('Content-Type: application/json');
 
-// Endpoint de confirmation de compte via jeton
-$router->get('/api/auth/confirm', 'AuthController@confirm');
-
-// Routes des trajets
-$router->get('/api/rides', 'RideController@index');
-$router->get('/api/rides/my', 'RideController@getMyRides')->middleware('auth');
-$router->get('/api/rides/{id}', 'RideController@show');
-$router->post('/api/rides', 'RideController@store')->middleware('auth');
-$router->put('/api/rides/{id}', 'RideController@update')->middleware('auth');
-$router->delete('/api/rides/{id}', 'RideController@destroy')->middleware('auth');
-
-// Routes de recherche (double route pour compatibilité)
-$router->get('/api/rides/search', 'SearchController@search');
-$router->get('/api/trips/search', 'SearchController@search');
-
-// Routes des utilisateurs
-$router->get('/api/users/me', 'UserController@me');
-$router->post('/api/users/me/role-requests', 'UserController@requestRole')->middleware('auth');
-$router->post('/api/users/add-role', 'UserController@addRole')->middleware('auth');
-$router->put('/api/users/me', 'UserController@update')->middleware('auth');
-
-// Routes des réservations
-$router->get('/api/bookings', 'BookingController@index')->middleware('auth');
-$router->post('/api/bookings/create', 'BookingController@create')->middleware('auth');
-$router->post('/api/rides/{id}/book', 'BookingController@store')->middleware('auth');
-$router->post('/api/rides/{id}/confirm', 'BookingController@confirm')->middleware('auth');
-$router->delete('/api/bookings/{id}', 'BookingController@destroy')->middleware('auth');
-
-// Routes des véhicules
-$router->get('/api/vehicles', 'VehicleController@getUserVehicle')->middleware('auth');
-$router->post('/api/vehicles', 'VehicleController@store')->middleware('auth');
-$router->put('/api/vehicles/{id}', 'VehicleController@update')->middleware('auth');
-$router->delete('/api/vehicles/{id}', 'VehicleController@destroy')->middleware('auth');
-
-// Route des types d'énergie
-$router->get('/api/energy-types', 'VehicleController@getEnergyTypes');
-
-// Routes du système de crédits
-$router->get('/api/credits/balance', 'CreditsController@balance')->middleware('auth');
-$router->get('/api/credits/transactions', 'CreditsController@transactions')->middleware('auth');
-$router->post('/api/credits/transfer', 'CreditsController@transfer')->middleware('auth');
-$router->get('/api/credits/pricing', 'CreditsController@pricing');
-$router->get('/api/admin/credits/alerts', 'CreditsController@alerts')->middleware('auth');
-
-// Routes de recherche de lieux (autocomplétion)
-$router->get('/api/locations/search', 'LocationController@search');
-$router->get('/api/locations/popular', 'LocationController@getPopular');
-
-// Routes d'administration (gestion des rôles et utilisateurs)
-$router->get('/api/admin/users', 'AdminController@listUsers')->middleware('auth');
-$router->post('/api/admin/users/{userId}/roles', 'AdminController@addUserRole')->middleware('auth');
-$router->delete('/api/admin/users/{userId}/roles/{roleId}', 'AdminController@removeUserRole')->middleware('auth');
-$router->get('/api/admin/roles', 'AdminController@listRoles')->middleware('auth');
-$router->get('/api/admin/permissions', 'AdminController@listPermissions')->middleware('auth');
-
-// Gestion des demandes de rôle
-$router->get('/api/admin/role-requests', 'AdminController@listRoleRequests')->middleware('auth');
-$router->post('/api/admin/role-requests/{requestId}/approve', 'AdminController@approveRoleRequest')->middleware('auth');
-$router->post('/api/admin/role-requests/{requestId}/reject', 'AdminController@rejectRoleRequest')->middleware('auth');
-
-// Routes supplémentaires
-$router->get('/api/admin/users/pending', 'AdminController@listPendingUsers')->middleware('auth');
-$router->post('/api/admin/users/{userId}/confirm', 'AdminController@confirmUser')->middleware('auth');
-
-// Routes pour la suspension et réactivation de comptes
-$router->post('/api/admin/users/{userId}/suspend', 'AdminController@suspendUser')->middleware('auth');
-$router->post('/api/admin/users/{userId}/activate', 'AdminController@activateUser')->middleware('auth');
-
-// Routes pour les statistiques
-$router->get('/api/admin/stats/rides', 'AdminController@getRideStats')->middleware('auth');
-$router->get('/api/admin/stats/credits', 'AdminController@getCreditStats')->middleware('auth'); 
+// Route d'inscription simplifiée
+if ($requestUri === '/api/auth/register' && $method === 'POST') {
+    try {
+        // Récupérer les données de la requête
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Valider les données
+        if (!isset($data['name']) || !isset($data['email']) || !isset($data['password']) || !isset($data['password_confirmation'])) {
+            http_response_code(400);
+            echo json_encode(['error' => true, 'message' => 'Données incomplètes']);
+            exit;
+        }
+        
+        if ($data['password'] !== $data['password_confirmation']) {
+            http_response_code(400);
+            echo json_encode(['error' => true, 'message' => 'Les mots de passe ne correspondent pas']);
+            exit;
+        }
+        
+        // Connexion à la base de données MySQL
+        $dbHost = env('DB_HOST', 'localhost');
+        $dbPort = env('DB_PORT', '3306');
+        $dbName = env('DB_DATABASE', 'ecoride');
+        $dbUser = env('DB_USERNAME', 'root');
+        $dbPass = env('DB_PASSWORD', '');
+        
+        $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+        $pdo = new PDO($dsn, $dbUser, $dbPass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // Vérifier si l'email existe déjà
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$data['email']]);
+        if ($stmt->fetchColumn()) {
+            http_response_code(400);
+            echo json_encode(['error' => true, 'message' => 'Cet email est déjà utilisé']);
+            exit;
+        }
+        
+        // Hasher le mot de passe
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+        
+        // Insérer l'utilisateur
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+        $stmt->execute([$data['name'], $data['email'], $hashedPassword]);
+        
+        // Générer un token JWT factice
+        $token = bin2hex(random_bytes(32));
+        
+        http_response_code(201);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Inscription réussie',
+            'user' => [
+                'id' => $pdo->lastInsertId(),
+                'name' => $data['name'],
+                'email' => $data['email']
+            ],
+            'token' => $token
+        ]);
+    } catch (Exception $e) {
+        // Journaliser l'erreur
+        error_log("Erreur d'inscription: " . $e->getMessage());
+        
+        // Renvoyer une réponse d'erreur détaillée en mode DEBUG
+        if (env('APP_DEBUG', false) === true) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => true, 
+                'message' => 'Erreur interne lors de l\'inscription', 
+                'debug' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => true, 'message' => 'Erreur interne lors de l\'inscription']);
+        }
+    }
+    exit;
+} elseif (preg_match('/^\/api\/auth\/login(\/)?$/', $requestUri) && $method === 'POST') {
+    // Route de connexion simplifiée
+    try {
+        // Récupérer les données de la requête
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Valider les données
+        if (!isset($data['email']) || !isset($data['password'])) {
+            http_response_code(400);
+            echo json_encode(['error' => true, 'message' => 'Données incomplètes']);
+            exit;
+        }
+        
+        // Connexion à la base de données MySQL
+        $dbHost = env('DB_HOST', 'localhost');
+        $dbPort = env('DB_PORT', '3306');
+        $dbName = env('DB_DATABASE', 'ecoride');
+        $dbUser = env('DB_USERNAME', 'root');
+        $dbPass = env('DB_PASSWORD', '');
+        
+        $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+        $pdo = new PDO($dsn, $dbUser, $dbPass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // Vérifier si l'utilisateur existe
+        $stmt = $pdo->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
+        $stmt->execute([$data['email']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$user || !password_verify($data['password'], $user['password'])) {
+            http_response_code(401);
+            echo json_encode(['error' => true, 'message' => 'Identifiants invalides']);
+            exit;
+        }
+        
+        // Générer un token JWT factice
+        $token = bin2hex(random_bytes(32));
+        
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Connexion réussie',
+            'user' => [
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email']
+            ],
+            'token' => $token
+        ]);
+    } catch (Exception $e) {
+        // Journaliser l'erreur
+        error_log("Erreur de connexion: " . $e->getMessage());
+        
+        // Renvoyer une réponse d'erreur détaillée en mode DEBUG
+        if (env('APP_DEBUG', false) === true) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => true, 
+                'message' => 'Erreur interne lors de la connexion', 
+                'debug' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => true, 'message' => 'Erreur interne lors de la connexion']);
+        }
+    }
+    exit;
+} else {
+    // Route par défaut pour les autres endpoints
+    http_response_code(404);
+    echo json_encode(['error' => true, 'message' => 'Route non trouvée']);
+    exit;
+} 
