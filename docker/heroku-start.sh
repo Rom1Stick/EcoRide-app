@@ -31,17 +31,28 @@ if [ -n "$JAWSDB_URL" ]; then
     # Exécuter un script PHP pour créer la structure de la base de données
     echo "Exécution du script d'initialisation de la base de données..."
     
+    # Extraire les composants de l'URL JAWSDB
+    DB_USER=${BASH_REMATCH[1]}
+    DB_PASS=${BASH_REMATCH[2]}
+    DB_HOST=${BASH_REMATCH[3]}
+    DB_PORT=${BASH_REMATCH[4]}
+    DB_NAME=${BASH_REMATCH[5]}
+    
     # Créer un script temporaire
-    cat > /tmp/init-db.php <<'EOF'
+    cat > /tmp/init-db.php <<EOF
 <?php
 try {
-    // Se connecter à la base de données en utilisant l'URL JAWSDB
-    $jawsdb_url = getenv('JAWSDB_URL');
-    $dbh = new PDO($jawsdb_url);
-    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Se connecter à la base de données avec une connexion TCP explicite
+    \$dsn = "mysql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_NAME";
+    \$options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+    \$pdo = new PDO(\$dsn, "$DB_USER", "$DB_PASS", \$options);
     
     // Créer la table users si elle n'existe pas
-    $dbh->exec("CREATE TABLE IF NOT EXISTS users (
+    \$pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
@@ -52,8 +63,8 @@ try {
 
     echo "Table 'users' créée avec succès.\n";
     echo "Base de données initialisée avec succès.\n";
-} catch (PDOException $e) {
-    die("Erreur lors de l'initialisation de la base de données : " . $e->getMessage() . "\n");
+} catch (PDOException \$e) {
+    die("Erreur lors de l'initialisation de la base de données : " . \$e->getMessage() . "\n");
 }
 EOF
 
@@ -163,11 +174,26 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
             $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
             $pdo = new PDO($dsn, $dbUser, $dbPass);
         } else {
-            // Connexion directe avec l'URL JAWSDB
-            $pdo = new PDO($jawsdb_url);
+            // Extraire les composants de l'URL JAWSDB pour créer une connexion TCP explicite
+            $regex = "/^mysql:\/\/([^:]+):([^@]+)@([^:]+):([0-9]+)\/(.+)$/";
+            if (preg_match($regex, $jawsdb_url, $matches)) {
+                $dbUser = $matches[1];
+                $dbPass = $matches[2];
+                $dbHost = $matches[3];
+                $dbPort = $matches[4];
+                $dbName = $matches[5];
+                
+                $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+                $options = [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ];
+                $pdo = new PDO($dsn, $dbUser, $dbPass, $options);
+            } else {
+                throw new Exception("Format d'URL JAWSDB invalide");
+            }
         }
-        
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Vérifier si l'email existe déjà
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
@@ -244,11 +270,26 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
             $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
             $pdo = new PDO($dsn, $dbUser, $dbPass);
         } else {
-            // Connexion directe avec l'URL JAWSDB
-            $pdo = new PDO($jawsdb_url);
+            // Extraire les composants de l'URL JAWSDB pour créer une connexion TCP explicite
+            $regex = "/^mysql:\/\/([^:]+):([^@]+)@([^:]+):([0-9]+)\/(.+)$/";
+            if (preg_match($regex, $jawsdb_url, $matches)) {
+                $dbUser = $matches[1];
+                $dbPass = $matches[2];
+                $dbHost = $matches[3];
+                $dbPort = $matches[4];
+                $dbName = $matches[5];
+                
+                $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+                $options = [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ];
+                $pdo = new PDO($dsn, $dbUser, $dbPass, $options);
+            } else {
+                throw new Exception("Format d'URL JAWSDB invalide");
+            }
         }
-        
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         // Vérifier si l'utilisateur existe
         $stmt = $pdo->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
