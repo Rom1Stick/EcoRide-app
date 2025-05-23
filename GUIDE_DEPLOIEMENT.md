@@ -10,6 +10,8 @@ Ce guide vous explique comment déployer vos modifications locales vers votre ap
 4. [Informations utiles](#informations-utiles)
 5. [Dépannage](#dépannage)
 6. [Base de données](#base-de-données)
+7. [Fonctionnalités](#fonctionnalités)
+8. [Système d'auto-confirmation](#système-d'auto-confirmation)
 
 ## 🔧 Prérequis
 
@@ -214,6 +216,36 @@ En cas de problème, consultez :
 1. Les logs Heroku : `heroku logs --tail --app ecoride-application`
 2. La documentation Heroku : https://devcenter.heroku.com/
 3. La documentation Docker : https://docs.docker.com/
+
+## 🎯 Fonctionnalités
+
+- ✅ **Inscription et authentification** des utilisateurs
+- ✅ **Auto-confirmation automatique** des nouveaux comptes (plus besoin de confirmation par email)
+- ✅ **Attribution automatique du rôle "passager"** lors de l'inscription
+- ✅ **Gestion des profils** utilisateur avec rôles
+- ✅ **Création et recherche** de trajets de covoiturage
+- ✅ **Système de réservations** avec gestion des places
+- ✅ **Gestion des véhicules** personnels
+- ✅ **Système de crédits** intégré (20€ de bienvenue)
+- ✅ **Interface responsive** moderne
+- ✅ **API REST** complète
+
+## 🔄 Système d'auto-confirmation
+
+**Nouveau système mis en place** : Les utilisateurs sont automatiquement confirmés lors de l'inscription, simplifiant grandement le processus.
+
+### **Fonctionnement :**
+- ✅ **Inscription** : L'utilisateur s'inscrit normalement
+- ✅ **Auto-confirmation** : Le compte est automatiquement confirmé (`confirmed = 1`)
+- ✅ **Rôles assignés** : "visiteur" + "passager" automatiquement
+- ✅ **Crédits** : 20€ de bienvenue automatiques
+- ✅ **Connexion immédiate** : L'utilisateur peut se connecter directement
+
+### **Avantages :**
+- 🚀 **Pas d'étape de confirmation email**
+- 🎯 **Expérience utilisateur simplifiée**
+- ⚡ **Inscription et utilisation immédiates**
+- 🔧 **Moins de support client**
 
 ---
 
