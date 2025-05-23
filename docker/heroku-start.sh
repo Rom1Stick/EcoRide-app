@@ -82,6 +82,16 @@ mkdir -p /var/www/html/web
 # Copier les fichiers frontend (pages, assets, etc.) vers le répertoire web
 cp -r /var/www/html/frontend/* /var/www/html/web/
 
+# Copier tous les fichiers HTML du dossier pages/public vers le dossier public du backend
+echo "Copie des pages HTML vers le dossier public..."
+mkdir -p /var/www/html/backend/public/pages
+cp -r /var/www/html/web/pages/public/* /var/www/html/backend/public/
+cp -r /var/www/html/web/assets /var/www/html/backend/public/
+
+# Correction des chemins dans tous les fichiers HTML
+echo "Correction des chemins dans les fichiers HTML..."
+find /var/www/html/backend/public -name "*.html" -exec sed -i 's|../../assets|/assets|g' {} \;
+
 # Créer un fichier .htaccess pour la racine qui gère à la fois le frontend et l'API
 cat > /var/www/html/backend/public/.htaccess <<'EOF'
 <IfModule mod_rewrite.c>
@@ -91,22 +101,12 @@ cat > /var/www/html/backend/public/.htaccess <<'EOF'
     RewriteCond %{REQUEST_URI} ^/api/.*
     RewriteRule ^ index.php [L]
 
-    # Pour toutes les autres requêtes, rediriger vers le frontend
-    RewriteCond %{REQUEST_URI} !^/api/.*
+    # Pour toutes les autres requêtes, vérifier si le fichier existe
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ /index.html [L]
+    RewriteRule ^ index.html [L]
 </IfModule>
 EOF
-
-# Copier index.html à la racine du répertoire public
-cp /var/www/html/web/pages/public/index.html /var/www/html/backend/public/index.html
-
-# Modifier les chemins des assets dans index.html
-sed -i 's|../../assets|/assets|g' /var/www/html/backend/public/index.html
-
-# Créer un lien symbolique pour les assets
-ln -sf /var/www/html/web/assets /var/www/html/backend/public/assets
 
 # Modifier le fichier VirtualHost d'Apache pour servir à la fois le frontend et l'API
 cat > /etc/apache2/sites-available/000-default.conf <<EOF
@@ -398,8 +398,7 @@ if ($requestUri === '/api/auth/register' && $method === 'POST') {
     }
     
     // Sinon, on laisse Apache gérer la demande (affichage du frontend)
-    include_once 'index.html';
-    exit;
+    return false;
 }
 EOF
 
@@ -413,21 +412,44 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
     exit;
 }
 
-// Sinon, servir l'index.html ou rediriger vers la page correspondante
-if ($_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] === '') {
-    // Page d'accueil
+// Pour toutes les autres requêtes, vérifier si c'est un fichier spécifique
+$requestPath = $_SERVER['REQUEST_URI'];
+
+// Nettoyer le chemin de la requête
+$requestPath = parse_url($requestPath, PHP_URL_PATH);
+$requestPath = ltrim($requestPath, '/');
+
+// Si la requête est vide ou /, servir index.html
+if (empty($requestPath) || $requestPath == '/') {
     include_once 'index.html';
-} else {
-    // Vérifier si le fichier existe
-    $requestedFile = __DIR__ . $_SERVER['REQUEST_URI'];
-    if (file_exists($requestedFile) && !is_dir($requestedFile)) {
-        // Servir le fichier directement (pour les ressources comme CSS, JS, images)
-        return false; // Laisse Apache gérer le fichier
-    } else {
-        // Pour les autres routes, servir index.html (pour le routage côté client)
-        include_once 'index.html';
+    exit;
+}
+
+// Vérifier si le fichier existe
+$filePath = __DIR__ . '/' . $requestPath;
+if (file_exists($filePath) && !is_dir($filePath)) {
+    // Si c'est un fichier HTML, l'inclure directement
+    if (pathinfo($filePath, PATHINFO_EXTENSION) == 'html') {
+        include_once $filePath;
+        exit;
+    }
+    
+    // Pour les autres fichiers (CSS, JS, images), laisser Apache les servir
+    return false;
+} 
+
+// Si le fichier n'existe pas directement mais est un chemin comme "covoiturages.html"
+// Vérifier s'il existe dans le répertoire racine
+if (pathinfo($requestPath, PATHINFO_EXTENSION) == 'html') {
+    $simpleFilePath = __DIR__ . '/' . basename($requestPath);
+    if (file_exists($simpleFilePath)) {
+        include_once $simpleFilePath;
+        exit;
     }
 }
+
+// Pour toute autre requête non trouvée, servir index.html (SPA fallback)
+include_once 'index.html';
 EOF
 
 # Désactiver tous les modules Apache MPM puis activer uniquement mpm_prefork
