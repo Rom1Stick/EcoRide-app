@@ -13,7 +13,9 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "App\\DataAccess\\": "src/DataAccess/"
+            "App\\DataAccess\\": "src/DataAccess/",
+            "App\\Domain\\": "app/Domain/",
+            "App\\Infrastructure\\": "app/Infrastructure/"
         },
         "files": [
             "app/Core/helpers.php"
