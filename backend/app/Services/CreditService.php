@@ -49,23 +49,9 @@ class CreditService
             $stmt2->execute([$userId, $amount, $typeId, $description]);
             $this->db->commit();
 
-            // Journalisation MongoDB
-            try {
-                $mongoConn = new \App\DataAccess\NoSql\MongoConnection();
-                $activityService = new \App\DataAccess\NoSql\Service\ActivityLogService($mongoConn);
-                $activityLog = new \App\DataAccess\NoSql\Model\ActivityLog();
-                $activityLog
-                    ->setUserId($userId)
-                    ->setEventType('credit')
-                    ->setLevel('info')
-                    ->setDescription("Crédit de $amount ({$type})")
-                    ->setData(['description' => $description])
-                    ->setSource('api')
-                    ->setIpAddress($_SERVER['REMOTE_ADDR'] ?? null);
-                $activityService->create($activityLog);
-            } catch (Exception $e) {
-                // Ignorer les erreurs de journalisation
-            }
+            // Suppression de la journalisation MongoDB car nous n'utilisons plus MongoDB
+            // La journalisation est maintenant gérée via MySQL
+            
         } catch (Exception $e) {
             $this->db->rollBack();
             throw $e;
@@ -92,23 +78,9 @@ class CreditService
             $stmt2->execute([$userId, $debit, $typeId, $description]);
             $this->db->commit();
 
-            // Journalisation MongoDB
-            try {
-                $mongoConn = new \App\DataAccess\NoSql\MongoConnection();
-                $activityService = new \App\DataAccess\NoSql\Service\ActivityLogService($mongoConn);
-                $activityLog = new \App\DataAccess\NoSql\Model\ActivityLog();
-                $activityLog
-                    ->setUserId($userId)
-                    ->setEventType('debit')
-                    ->setLevel('info')
-                    ->setDescription("Débit de $amount ({$type})")
-                    ->setData(['description' => $description])
-                    ->setSource('api')
-                    ->setIpAddress($_SERVER['REMOTE_ADDR'] ?? null);
-                $activityService->create($activityLog);
-            } catch (Exception $e) {
-                // Ignorer les erreurs de journalisation
-            }
+            // Suppression de la journalisation MongoDB car nous n'utilisons plus MongoDB
+            // La journalisation est maintenant gérée via MySQL
+            
         } catch (Exception $e) {
             $this->db->rollBack();
             throw $e;

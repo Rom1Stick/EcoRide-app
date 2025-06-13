@@ -78,10 +78,8 @@ class Request
      */
     private function parseJsonBody(): void
     {
-    /**
-            $body = file_get_contents('php://input');
-            $this->jsonBody = json_decode($body, true);
-        }
+        $body = file_get_contents('php://input');
+        $this->jsonBody = json_decode($body, true);
     }
 
     /**

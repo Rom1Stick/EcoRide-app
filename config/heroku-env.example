@@ -1,0 +1,26 @@
+# Variables d'environnement pour Heroku
+# Ce fichier sert d'exemple pour configurer les variables sur Heroku
+
+# Base de données MongoDB
+# Cette variable sera automatiquement créée par l'addon MongoDB
+MONGODB_URI=mongodb://user:password@host:port/database
+
+# Environnement de l'application
+NODE_ENV=production
+PHP_ENV=production
+
+# Configuration de sécurité (optionnel)
+APP_SECRET=your-secret-key-here
+JWT_SECRET=your-jwt-secret-here
+
+# Configuration de l'application (optionnel)
+APP_DEBUG=false
+LOG_LEVEL=info
+
+# Commandes pour configurer ces variables sur Heroku :
+# heroku config:set NODE_ENV=production -a ecoride-application
+# heroku config:set PHP_ENV=production -a ecoride-application
+# heroku config:set APP_SECRET=your-secret-key -a ecoride-application
+# heroku config:set JWT_SECRET=your-jwt-secret -a ecoride-application
+# heroku config:set APP_DEBUG=false -a ecoride-application
+# heroku config:set LOG_LEVEL=info -a ecoride-application 

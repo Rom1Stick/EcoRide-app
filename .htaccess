@@ -1,0 +1,46 @@
+# Configuration Apache pour EcoRide - Routage Frontend + API
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Rediriger les requêtes /api vers le backend PHP
+    RewriteCond %{REQUEST_URI} ^/api
+    RewriteRule ^api/(.*)$ api/public/index.php [L,QSA]
+    
+    # Servir les assets statiques directement
+    RewriteCond %{REQUEST_URI} ^/assets
+    RewriteRule ^assets/(.*)$ assets/$1 [L]
+    
+    # Servir les pages frontend
+    RewriteCond %{REQUEST_URI} ^/pages
+    RewriteRule ^pages/(.*)$ pages/$1 [L]
+    
+    # Redirection par défaut vers la page d'accueil
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/(api|assets|pages)
+    RewriteRule ^ pages/ [R=301,L]
+</IfModule>
+
+# Configuration de sécurité
+<IfModule mod_headers.c>
+    # Protection XSS
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # Protection contre le clickjacking
+    Header set X-Frame-Options "SAMEORIGIN"
+    
+    # Protection contre le MIME-sniffing
+    Header set X-Content-Type-Options "nosniff"
+    
+    # Politique de referrer
+    Header set Referrer-Policy "no-referrer-when-downgrade"
+    
+    # Content Security Policy adapté
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+</IfModule>
+
+# Protection des fichiers sensibles
+<FilesMatch "^(\.env|\.git|composer\.json|package\.json|Dockerfile|docker-compose\.yml)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch> 
