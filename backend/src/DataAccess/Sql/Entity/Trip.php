@@ -2,11 +2,15 @@
 
 namespace App\DataAccess\Sql\Entity;
 
+use App\Core\Traits\TimestampableTrait;
+use App\Domain\Services\CarbonFootprintService;
+
 /**
  * Entité représentant un trajet dans le système EcoRide
  */
 class Trip
 {
+    use TimestampableTrait;
     /**
      * Identifiant unique du trajet
      *
@@ -752,15 +756,7 @@ class Trip
         return $this;
     }
 
-    /**
-     * Met à jour la date de modification
-     *
-     * @return void
-     */
-    public function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTime();
-    }
+
 
     /**
      * Calcule l'heure d'arrivée estimée
@@ -776,25 +772,16 @@ class Trip
 
     /**
      * Calcule le CO2 économisé par rapport à des déplacements individuels
-     * Utilise une estimation basée sur la distance et le nombre de passagers
+     * Utilise le service centralisé CarbonFootprintService
      *
      * @return void
      */
     public function calculateCO2Savings(): void
     {
-        // On estime qu'une voiture moyenne émet 120g de CO2 par km
-        // On multiplie par le nombre de voitures "économisées" (passagers)
-        $defaultEmissionPerKm = 0.12; // 120g/km = 0.12kg/km
-        
-        // Nombre de passagers potentiels (hors conducteur)
-        $potentialPassengers = $this->availableSeats;
-        
-        // CO2 économisé = distance * émission moyenne * passagers potentiels
-        if ($potentialPassengers > 0) {
-            $this->co2Saved = $this->distance * $defaultEmissionPerKm * $potentialPassengers;
-        } else {
-            $this->co2Saved = 0.0;
-        }
+        $this->co2Saved = CarbonFootprintService::calculateTripSavings(
+            $this->distance, 
+            $this->availableSeats
+        );
     }
 
     /**

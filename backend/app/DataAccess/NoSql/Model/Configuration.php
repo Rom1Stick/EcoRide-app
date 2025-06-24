@@ -2,11 +2,15 @@
 
 namespace App\DataAccess\NoSql\Model;
 
+use App\Core\Traits\TimestampableTrait;
+
 /**
  * Modèle de configuration pour MongoDB
  */
 class Configuration
 {
+    use TimestampableTrait;
+
     /**
      * @var string|null ID MongoDB
      */
@@ -219,17 +223,6 @@ class Configuration
     public function setUpdatedAt(\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * Met à jour la date de mise à jour
-     * 
-     * @return Configuration
-     */
-    public function updateTimestamp(): self
-    {
-        $this->updatedAt = new \DateTime();
         return $this;
     }
 } 

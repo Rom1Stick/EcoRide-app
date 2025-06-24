@@ -2,11 +2,16 @@
 
 namespace App\DataAccess\Sql\Entity;
 
+use App\Core\Traits\TimestampableTrait;
+use App\Domain\Services\CarbonFootprintService;
+
 /**
  * Entité représentant une réservation de trajet dans le système EcoRide
  */
 class Booking
 {
+    use TimestampableTrait;
+    
     /**
      * Identifiant unique de la réservation
      *
@@ -524,29 +529,18 @@ class Booking
     }
 
     /**
-     * Met à jour la date de modification
-     *
-     * @return void
-     */
-    public function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTime();
-    }
-
-    /**
      * Calcule la quantité de CO2 économisée pour cette réservation
-     * basé sur la distance du trajet et le nombre de sièges réservés
+     * Utilise le service centralisé CarbonFootprintService
      *
      * @param Trip $trip Le trajet associé
      * @return void
      */
     public function calculateCO2Savings(Trip $trip): void
     {
-        // Moyenne d'émission d'une voiture standard: 120g CO2/km
-        $averageEmission = 0.12; // en kg/km
-        
-        // CO2 économisé = distance * émission moyenne * nombre de places
-        $this->co2Saved = $trip->getDistance() * $averageEmission * $this->seatCount;
+        $this->co2Saved = CarbonFootprintService::calculateBookingSavings(
+            $trip->getDistance(),
+            $this->seatCount
+        );
     }
 
     /**

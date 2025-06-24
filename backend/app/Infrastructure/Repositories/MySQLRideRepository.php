@@ -562,13 +562,34 @@ class MySQLRideRepository implements RideRepositoryInterface
             $ride->getTotalSeats(),
             $ride->getPricePerPerson()->getAmount(),
             $ride->getCarbonFootprint(),
-            1 // TODO: Récupérer l'ID du véhicule depuis l'entité Vehicle
+            $this->getVehicleIdFromRide($ride)
         ]);
 
         $this->logger->info('Nouveau trajet créé', [
             'departure' => $ride->getDeparture()->getName(),
             'arrival' => $ride->getArrival()->getName()
         ]);
+    }
+
+    /**
+     * Récupère l'ID du véhicule depuis l'entité Ride
+     * 
+     * @param Ride $ride
+     * @return int
+     */
+    private function getVehicleIdFromRide(Ride $ride): int
+    {
+        // Dans une implémentation complète, l'entité Ride aurait une propriété vehicle
+        // Pour l'instant, on utilise une valeur par défaut ou on récupère depuis la base
+        // TODO futur: Ajouter une propriété $vehicle dans l'entité Ride
+        
+        // Récupération depuis la base de données basée sur le conducteur
+        $sql = "SELECT voiture_id FROM Voiture WHERE utilisateur_id = ? LIMIT 1";
+        $stmt = $this->database->prepare($sql);
+        $stmt->execute([$ride->getDriverId()]);
+        $result = $stmt->fetch();
+        
+        return $result ? (int)$result['voiture_id'] : 1; // Fallback à 1 si aucun véhicule trouvé
     }
 
     private function update(Ride $ride): void

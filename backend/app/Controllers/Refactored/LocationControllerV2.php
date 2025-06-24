@@ -2,340 +2,307 @@
 
 namespace App\Controllers\Refactored;
 
-use App\Controllers\Controller;
-use App\Infrastructure\Repositories\MySQLLocationRepository;
-use App\Infrastructure\Factories\RepositoryFactory;
-use App\Core\Logger;
-use Exception;
+use App\Core\Controller;
+use App\Core\Http\Response;
+use App\Domain\Services\LocationService;
 
 /**
- * Contrôleur de lieux refactorisé - Architecture Orientée Objet
- * 
- * Cette version utilise le LocationRepository pour une gestion optimisée
- * des lieux avec cache et logique métier encapsulée.
+ * Contrôleur V2 orienté objet pour la gestion des lieux
  */
 class LocationControllerV2 extends Controller
 {
-    private MySQLLocationRepository $locationRepository;
-    private Logger $logger;
-
-    public function __construct()
-    {
-        parent::__construct();
-        
-        // Initialisation du logger
-        $logPath = BASE_PATH . '/logs/locations_v2.log';
-        $this->logger = new Logger($logPath);
-        
-        // Création du repository via la factory
-        $repositoryFactory = RepositoryFactory::createFromLegacyDatabase(
-            $this->app->getDatabase(),
-            $this->logger
-        );
-        
-        $this->locationRepository = $repositoryFactory->createLocationRepository();
-        
-        $this->logger->info('LocationControllerV2 initialisé avec architecture OO');
-    }
+    public function __construct(
+        private LocationService $locationService
+    ) {}
 
     /**
-     * Recherche de lieux avec intelligence artificielle de tri
+     * Recherche de lieux
      */
-    public function search(): array
+    public function search(): Response
     {
         try {
-            // Récupération et validation du terme de recherche
-            $query = trim($_GET['q'] ?? '');
-            $limit = min(20, max(1, (int) ($_GET['limit'] ?? 10)));
+            $query = $_GET['q'] ?? '';
+            $locations = $this->locationService->searchLocations($query);
             
-            if (empty($query) || strlen($query) < 2) {
-                // Si pas de recherche, retourner les lieux populaires
-                $popularLocations = $this->locationRepository->findMostPopular($limit);
-                
-                $this->logger->info('Lieux populaires retournés', [
-                    'count' => count($popularLocations)
-                ]);
-                
-                return $this->success([
-                    'locations' => array_map([$this, 'formatLocationForApi'], $popularLocations),
-                    'type' => 'popular'
-                ]);
-            }
-            
-            // Recherche avec le repository
-            $locations = $this->locationRepository->searchByName($query, $limit);
-            
-            $this->logger->info('Recherche de lieux effectuée', [
-                'query' => $query,
-                'count' => count($locations),
-                'limit' => $limit
+            return $this->json([
+                'success' => true,
+                'locations' => $locations
             ]);
             
-            return $this->success([
-                'locations' => array_map([$this, 'formatLocationForApi'], $locations),
-                'query' => $query,
-                'type' => 'search'
-            ]);
-            
-        } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la recherche de lieux', [
-                'query' => $query ?? '',
-                'error' => $e->getMessage()
-            ]);
-            return $this->error('Erreur lors de la recherche des lieux', 500);
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors de la recherche de lieux', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de la recherche'
+            ], 500);
         }
     }
 
     /**
      * Récupération des lieux populaires
      */
-    public function getPopular(): array
+    public function getPopular(): Response
     {
         try {
-            $limit = min(20, max(1, (int) ($_GET['limit'] ?? 8)));
+            $locations = $this->locationService->getPopularLocations();
             
-            $popularLocations = $this->locationRepository->findMostPopular($limit);
-            
-            $this->logger->info('Lieux populaires récupérés', [
-                'count' => count($popularLocations)
+            return $this->json([
+                'success' => true,
+                'locations' => $locations
             ]);
             
-            return $this->success([
-                'locations' => array_map([$this, 'formatLocationForApi'], $popularLocations),
-                'type' => 'popular'
-            ]);
-            
-        } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la récupération des lieux populaires', [
-                'error' => $e->getMessage()
-            ]);
-            return $this->error('Erreur lors de la récupération des lieux populaires', 500);
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors de la récupération des lieux populaires', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des lieux populaires'
+            ], 500);
         }
     }
 
     /**
      * Détails d'un lieu spécifique
      */
-    public function show(int $id): array
+    public function show(int $locationId): Response
     {
         try {
-            $location = $this->locationRepository->findById($id);
+            $location = $this->locationService->getLocationDetails($locationId);
             
             if (!$location) {
-                return $this->error('Lieu non trouvé', 404);
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Lieu non trouvé'
+                ], 404);
             }
             
-            $this->logger->info('Détails lieu récupérés', ['location_id' => $id]);
-            
-            return $this->success($this->formatLocationDetailsForApi($location));
-            
-        } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la récupération du lieu', [
-                'location_id' => $id,
-                'error' => $e->getMessage()
+            return $this->json([
+                'success' => true,
+                'location' => $location->toArray()
             ]);
-            return $this->error('Erreur lors de la récupération du lieu', 500);
+            
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors de la récupération du lieu', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur'
+            ], 500);
         }
     }
 
     /**
-     * Création ou récupération d'un lieu (utilisé par l'autocomplétion)
+     * Création ou récupération d'un lieu
      */
-    public function findOrCreate(): array
+    public function store(): Response
     {
         try {
-            $data = $this->getJsonData();
+            $data = $this->getRequestData();
             
+            // Validation
             if (empty($data['name'])) {
-                return $this->error('Le nom du lieu est requis', 400);
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Le nom du lieu est requis'
+                ], 400);
             }
             
-            $locationName = trim($data['name']);
+            $location = $this->locationService->getOrCreateLocation(
+                $data['name'],
+                $data['address'] ?? null
+            );
             
-            // Vérifier si le lieu existe déjà
-            $existingLocation = $this->locationRepository->findByName($locationName);
-            if ($existingLocation) {
-                return $this->success([
-                    'location' => $this->formatLocationForApi($existingLocation),
-                    'created' => false
-                ]);
-            }
-            
-            // Créer un nouveau lieu
-            $newLocation = $this->locationRepository->findOrCreate($locationName);
-            
-            $this->logger->info('Nouveau lieu créé', [
-                'location_id' => $newLocation->getId(),
-                'name' => $locationName
+            return $this->json([
+                'success' => true,
+                'location' => $location->toArray(),
+                'message' => 'Lieu créé ou récupéré avec succès'
             ]);
             
-            return $this->success([
-                'location' => $this->formatLocationForApi($newLocation),
-                'created' => true
-            ]);
-            
-        } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la création/recherche du lieu', [
-                'error' => $e->getMessage(),
-                'data' => $data ?? []
-            ]);
-            return $this->error('Erreur lors du traitement du lieu', 500);
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors de la création/récupération du lieu', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur'
+            ], 500);
         }
     }
 
     /**
      * Mise à jour des coordonnées d'un lieu
      */
-    public function updateCoordinates(int $id): array
+    public function updateCoordinates(int $locationId): Response
     {
         try {
-            $data = $this->getJsonData();
+            $data = $this->getRequestData();
             
+            // Validation
             if (!isset($data['latitude']) || !isset($data['longitude'])) {
-                return $this->error('Les coordonnées latitude et longitude sont requises', 400);
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Latitude et longitude sont requises'
+                ], 400);
             }
             
-            $latitude = (float) $data['latitude'];
-            $longitude = (float) $data['longitude'];
+            $latitude = (float)$data['latitude'];
+            $longitude = (float)$data['longitude'];
             
             // Validation des coordonnées
-            if ($latitude < -90 || $latitude > 90) {
-                return $this->error('La latitude doit être comprise entre -90 et 90', 400);
+            if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Coordonnées invalides'
+                ], 400);
             }
             
-            if ($longitude < -180 || $longitude > 180) {
-                return $this->error('La longitude doit être comprise entre -180 et 180', 400);
+            $success = $this->locationService->updateLocationCoordinates($locationId, $latitude, $longitude);
+            
+            if ($success) {
+                return $this->json([
+                    'success' => true,
+                    'message' => 'Coordonnées mises à jour avec succès'
+                ]);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Lieu non trouvé'
+                ], 404);
             }
             
-            // Vérifier que le lieu existe
-            $location = $this->locationRepository->findById($id);
-            if (!$location) {
-                return $this->error('Lieu non trouvé', 404);
-            }
-            
-            // Mise à jour des coordonnées
-            $this->locationRepository->updateCoordinates($id, $latitude, $longitude);
-            
-            // Récupération du lieu mis à jour
-            $updatedLocation = $this->locationRepository->findById($id);
-            
-            $this->logger->info('Coordonnées lieu mises à jour', [
-                'location_id' => $id,
-                'latitude' => $latitude,
-                'longitude' => $longitude
-            ]);
-            
-            return $this->success([
-                'location' => $this->formatLocationDetailsForApi($updatedLocation)
-            ], 'Coordonnées mises à jour avec succès');
-            
-        } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la mise à jour des coordonnées', [
-                'location_id' => $id,
-                'error' => $e->getMessage()
-            ]);
-            return $this->error('Erreur lors de la mise à jour des coordonnées', 500);
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors de la mise à jour des coordonnées', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur'
+            ], 500);
         }
     }
 
     /**
-     * Liste paginée de tous les lieux
+     * Calcul de distance entre deux lieux
      */
-    public function index(): array
+    public function calculateDistance(): Response
     {
         try {
-            $page = max(1, (int) ($_GET['page'] ?? 1));
-            $limit = min(100, max(1, (int) ($_GET['limit'] ?? 20)));
+            $fromLocationId = (int)($_GET['from'] ?? 0);
+            $toLocationId = (int)($_GET['to'] ?? 0);
             
-            $locations = $this->locationRepository->findAll($page, $limit);
-            $total = $this->locationRepository->count();
-            $pages = ceil($total / $limit);
+            if (!$fromLocationId || !$toLocationId) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'IDs des lieux de départ et d\'arrivée requis'
+                ], 400);
+            }
             
-            $this->logger->info('Liste lieux récupérée', [
-                'count' => count($locations),
-                'page' => $page,
-                'total' => $total
+            $distance = $this->locationService->calculateDistance($fromLocationId, $toLocationId);
+            
+            if ($distance === null) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Impossible de calculer la distance'
+                ], 400);
+            }
+            
+            return $this->json([
+                'success' => true,
+                'distance' => round($distance, 2),
+                'unit' => 'km'
             ]);
             
-            return $this->success([
-                'locations' => array_map([$this, 'formatLocationForApi'], $locations),
-                'pagination' => [
-                    'total' => $total,
-                    'page' => $page,
-                    'limit' => $limit,
-                    'pages' => $pages
-                ]
-            ]);
-            
-        } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la récupération de la liste des lieux', [
-                'error' => $e->getMessage()
-            ]);
-            return $this->error('Erreur lors de la récupération de la liste des lieux', 500);
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors du calcul de distance', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur'
+            ], 500);
         }
     }
 
     /**
-     * Suggestions intelligentes basées sur l'historique
+     * Lieux populaires comme points de départ
      */
-    public function suggestions(): array
+    public function getPopularDepartures(): Response
     {
         try {
-            $userId = (int) ($_SERVER['AUTH_USER_ID'] ?? 0);
-            $limit = min(10, max(1, (int) ($_GET['limit'] ?? 5)));
+            $limit = min((int)($_GET['limit'] ?? 10), 20); // Max 20
+            $locations = $this->locationService->getPopularDepartureLocations($limit);
             
-            // Pour l'instant, on retourne les lieux populaires
-            // Dans une version avancée, on analyserait l'historique de l'utilisateur
-            $suggestedLocations = $this->locationRepository->findMostPopular($limit);
-            
-            $this->logger->info('Suggestions lieux générées', [
-                'user_id' => $userId ?: null,
-                'count' => count($suggestedLocations)
+            return $this->json([
+                'success' => true,
+                'locations' => $locations,
+                'count' => count($locations)
             ]);
             
-            return $this->success([
-                'suggestions' => array_map([$this, 'formatLocationForApi'], $suggestedLocations),
-                'type' => 'popularity_based'
-            ]);
-            
-        } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la génération des suggestions', [
-                'error' => $e->getMessage()
-            ]);
-            return $this->error('Erreur lors de la génération des suggestions', 500);
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors de la récupération des lieux de départ populaires', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur'
+            ], 500);
         }
     }
 
-    // =============================================================================
-    // MÉTHODES PRIVÉES - FORMATAGE
-    // =============================================================================
-
     /**
-     * Formate une Location pour l'API
+     * Lieux populaires comme destinations
      */
-    private function formatLocationForApi($location): array
+    public function getPopularDestinations(): Response
     {
-        return [
-            'id' => $location->getId(),
-            'name' => $location->getName(),
-            'coordinates' => [
-                'latitude' => $location->getLatitude(),
-                'longitude' => $location->getLongitude()
-            ],
-            'hasCoordinates' => $location->getLatitude() !== null && $location->getLongitude() !== null
-        ];
+        try {
+            $limit = min((int)($_GET['limit'] ?? 10), 20); // Max 20
+            $locations = $this->locationService->getPopularDestinationLocations($limit);
+            
+            return $this->json([
+                'success' => true,
+                'locations' => $locations,
+                'count' => count($locations)
+            ]);
+            
+        } catch (\Exception $e) {
+            $this->logError('Erreur lors de la récupération des destinations populaires', $e);
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur'
+            ], 500);
+        }
     }
 
     /**
-     * Formate les détails complets d'une Location pour l'API
+     * Récupère les données de la requête
      */
-    private function formatLocationDetailsForApi($location): array
+    private function getRequestData(): array
     {
-        $basic = $this->formatLocationForApi($location);
+        // Essayer JSON d'abord
+        $json = file_get_contents('php://input');
+        if ($json) {
+            $data = json_decode($json, true);
+            if ($data) {
+                return $data;
+            }
+        }
         
-        // Ajouter des statistiques d'utilisation si nécessaire
-        // $basic['usage_stats'] = $this->getLocationUsageStats($location->getId());
-        
-        return $basic;
+        // Fallback sur POST/GET
+        return array_merge($_GET, $_POST);
+    }
+
+    /**
+     * Retourne une réponse JSON
+     */
+    private function json(array $data, int $status = 200): Response
+    {
+        return new Response(json_encode($data), $status, [
+            'Content-Type' => 'application/json'
+        ]);
+    }
+
+    /**
+     * Log une erreur avec contexte
+     */
+    private function logError(string $message, \Exception $e): void
+    {
+        error_log(sprintf(
+            '[%s] %s: %s in %s:%d',
+            date('Y-m-d H:i:s'),
+            $message,
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        ));
     }
 } 

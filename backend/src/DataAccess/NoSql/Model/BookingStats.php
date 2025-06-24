@@ -2,11 +2,15 @@
 
 namespace App\DataAccess\NoSql\Model;
 
+use App\Core\Traits\TimestampableTrait;
+
 /**
  * Modèle pour stocker et analyser les statistiques de réservation
  */
 class BookingStats implements \JsonSerializable
 {
+    use TimestampableTrait;
+    
     /**
      * ID MongoDB
      * 
@@ -572,17 +576,6 @@ class BookingStats implements \JsonSerializable
     public function setUpdatedAt(\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
-        return $this;
-    }
-    
-    /**
-     * Mettre à jour le timestamp
-     * 
-     * @return self
-     */
-    public function updateTimestamp(): self
-    {
-        $this->updatedAt = new \DateTime();
         return $this;
     }
     
