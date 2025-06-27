@@ -629,7 +629,7 @@ function setupBackButton() {
       if (document.referrer && document.referrer.includes(window.location.origin)) {
         window.history.back();
       } else {
-        window.location.href = '/frontend/pages/public/covoiturages.html';
+        window.location.href = '/pages/public/covoiturages.html';
       }
     });
   });
@@ -701,7 +701,7 @@ function setupBookingButton() {
       if (!isLoggedIn) {
         // Rediriger vers la page de connexion avec une redirection de retour
         const returnUrl = encodeURIComponent(window.location.href);
-        window.location.href = `/frontend/pages/public/login.html?redirect=${returnUrl}`;
+        window.location.href = `/pages/public/login.html?redirect=${returnUrl}`;
         return;
       }
 
@@ -847,7 +847,7 @@ function setupContactButton() {
       if (!isLoggedIn) {
         // Rediriger vers la page de connexion avec une redirection de retour
         const returnUrl = encodeURIComponent(window.location.href);
-        window.location.href = `/frontend/pages/public/login.html?redirect=${returnUrl}`;
+        window.location.href = `/pages/public/login.html?redirect=${returnUrl}`;
         return;
       }
 

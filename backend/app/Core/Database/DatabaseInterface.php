@@ -2,53 +2,51 @@
 
 namespace App\Core\Database;
 
+use PDO;
+use PDOStatement;
+
 /**
- * Interface pour les opérations de base de données
+ * Interface pour l'abstraction de la base de données
  */
 interface DatabaseInterface
 {
     /**
-     * Exécute une requête SQL avec des paramètres
-     *
-     * @param string $query Requête SQL
-     * @param array $params Paramètres pour la requête
-     * @return mixed Résultat de la requête
+     * Obtient une connexion à la base de données
      */
-    public function query(string $query, array $params = []);
-    
+    public function getConnection(): PDO;
+
     /**
      * Prépare une requête SQL
-     *
-     * @param string $query Requête SQL
-     * @return mixed Statement préparé
      */
-    public function prepare(string $query);
-    
+    public function prepare(string $sql): PDOStatement;
+
     /**
-     * Commence une transaction
-     *
-     * @return bool True si la transaction a été démarrée
+     * Exécute une requête SQL directement
      */
-    public function beginTransaction(): bool;
-    
+    public function execute(string $sql, array $params = []): PDOStatement;
+
     /**
-     * Valide une transaction
-     *
-     * @return bool True si la transaction a été validée
-     */
-    public function commit(): bool;
-    
-    /**
-     * Annule une transaction
-     *
-     * @return bool True si la transaction a été annulée
-     */
-    public function rollBack(): bool;
-    
-    /**
-     * Récupère l'identifiant de la dernière ligne insérée
-     *
-     * @return string Identifiant de la dernière ligne insérée
+     * Obtient l'ID du dernier enregistrement inséré
      */
     public function lastInsertId(): string;
+
+    /**
+     * Démarre une transaction
+     */
+    public function beginTransaction(): bool;
+
+    /**
+     * Valide une transaction
+     */
+    public function commit(): bool;
+
+    /**
+     * Annule une transaction
+     */
+    public function rollback(): bool;
+
+    /**
+     * Vérifie si une transaction est active
+     */
+    public function inTransaction(): bool;
 } 

@@ -39,7 +39,7 @@ class Validator
     public function required(string $field, string $message): self
     {
         if (!isset($this->data[$field]) || empty($this->data[$field])) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -55,7 +55,7 @@ class Validator
     public function minLength(string $field, int $length, string $message): self
     {
         if (isset($this->data[$field]) && strlen($this->data[$field]) < $length) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -71,7 +71,7 @@ class Validator
     public function maxLength(string $field, int $length, string $message): self
     {
         if (isset($this->data[$field]) && strlen($this->data[$field]) > $length) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -86,7 +86,7 @@ class Validator
     public function email(string $field, string $message): self
     {
         if (isset($this->data[$field]) && !filter_var($this->data[$field], FILTER_VALIDATE_EMAIL)) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -104,7 +104,7 @@ class Validator
         if (isset($this->data[$field])) {
             $date = DateTime::createFromFormat($format, $this->data[$field]);
             if (!$date || $date->format($format) !== $this->data[$field]) {
-                $this->addError($field, $message);
+                $this->addErrorInternal($field, $message);
             }
         }
         return $this;
@@ -123,7 +123,7 @@ class Validator
         if (isset($this->data[$field])) {
             $time = DateTime::createFromFormat($format, $this->data[$field]);
             if (!$time || $time->format($format) !== $this->data[$field]) {
-                $this->addError($field, $message);
+                $this->addErrorInternal($field, $message);
             }
         }
         return $this;
@@ -139,7 +139,7 @@ class Validator
     public function numeric(string $field, string $message): self
     {
         if (isset($this->data[$field]) && !is_numeric($this->data[$field])) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -154,7 +154,7 @@ class Validator
     public function integer(string $field, string $message): self
     {
         if (isset($this->data[$field]) && (!is_numeric($this->data[$field]) || floor((float)$this->data[$field]) != $this->data[$field])) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -170,7 +170,7 @@ class Validator
     public function min(string $field, float $min, string $message): self
     {
         if (isset($this->data[$field]) && $this->data[$field] < $min) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -186,7 +186,7 @@ class Validator
     public function max(string $field, float $max, string $message): self
     {
         if (isset($this->data[$field]) && $this->data[$field] > $max) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -202,7 +202,7 @@ class Validator
     public function in(string $field, array $values, string $message): self
     {
         if (isset($this->data[$field]) && !in_array($this->data[$field], $values)) {
-            $this->addError($field, $message);
+            $this->addErrorInternal($field, $message);
         }
         return $this;
     }
@@ -221,23 +221,35 @@ class Validator
             $today = new DateTime('today');
             
             if ($inputDate < $today) {
-                $this->addError($field, $message);
+                $this->addErrorInternal($field, $message);
             }
         }
         return $this;
     }
 
     /**
-     * Ajoute une erreur de validation
+     * Ajoute une erreur de validation (méthode publique)
      *
      * @param string $field Nom du champ
      * @param string $message Message d'erreur
      * @return self
      */
-    private function addError(string $field, string $message): self
+    public function addError(string $field, string $message): self
     {
         $this->errors[$field] = $message;
         return $this;
+    }
+
+    /**
+     * Ajoute une erreur de validation (méthode privée pour compatibilité)
+     *
+     * @param string $field Nom du champ
+     * @param string $message Message d'erreur
+     * @return self
+     */
+    private function addErrorInternal(string $field, string $message): self
+    {
+        return $this->addError($field, $message);
     }
 
     /**

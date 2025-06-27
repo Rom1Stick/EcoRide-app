@@ -2,6 +2,7 @@
 
 namespace App\DataAccess\NoSql\Model;
 
+use App\Core\Traits\TimestampableTrait;
 use DateTime;
 use JsonSerializable;
 
@@ -10,6 +11,8 @@ use JsonSerializable;
  */
 class TripStats implements JsonSerializable
 {
+    use TimestampableTrait;
+
     /**
      * Identifiant MongoDB
      *
@@ -721,39 +724,6 @@ class TripStats implements JsonSerializable
         // Trier par clé (date) en ordre décroissant
         krsort($this->monthlyTripHistory);
         
-        return $this;
-    }
-
-    /**
-     * Obtenir la date de dernière mise à jour
-     *
-     * @return DateTime
-     */
-    public function getUpdatedAt(): DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Définir la date de dernière mise à jour
-     *
-     * @param DateTime $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt(DateTime $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * Mettre à jour l'horodatage
-     *
-     * @return self
-     */
-    public function updateTimestamp(): self
-    {
-        $this->updatedAt = new DateTime();
         return $this;
     }
 

@@ -2,11 +2,15 @@
 
 namespace App\DataAccess\Sql\Entity;
 
+use App\Core\Traits\TimestampableTrait;
+
 /**
  * Entité représentant un véhicule dans le système EcoRide
  */
 class Vehicle
 {
+    use TimestampableTrait;
+
     /**
      * Identifiant unique du véhicule
      *
@@ -453,16 +457,6 @@ class Vehicle
     {
         $this->updatedAt = $updatedAt;
         return $this;
-    }
-
-    /**
-     * Met à jour la date de modification
-     *
-     * @return void
-     */
-    public function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTime();
     }
 
     /**
